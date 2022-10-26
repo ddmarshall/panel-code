@@ -1,0 +1,5 @@
+.spyproject/
+examples/figures/
+**/__pycache__/
+sphinx/build/
+sphinx/source/api/_autosummary/
