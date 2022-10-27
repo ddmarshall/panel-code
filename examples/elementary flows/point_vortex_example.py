@@ -16,16 +16,16 @@ from pyPC.vortex_flow import PointVortex2D
 
 def draw_point_vortex_flow_field():
     """Draws the streamlines, potential lines, and the velocity vectors."""
-    source = PointVortex2D(x0=1, y0=2, strength=1.0)
+    vortex = PointVortex2D(x0=1, y0=2, strength=1.0)
 
     # set mesh
     nptsx = 100
     nptsy = 100
     xg, yg = np.meshgrid(np.linspace(-1, 5, nptsx), np.linspace(-1, 5, nptsy))
 
-    stream_function = source.stream_function(xg, yg)
-    potential = source.potential(xg, yg)
-    ug, vg = source.velocity(xg, yg)
+    stream_function = vortex.stream_function(xg, yg)
+    potential = vortex.potential(xg, yg)
+    ug, vg = vortex.velocity(xg, yg)
 
     fig = plt.figure()
     fig.set_figwidth(5)
