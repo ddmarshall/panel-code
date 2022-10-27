@@ -23,17 +23,17 @@ class TestPointVortex2D(unittest.TestCase):
         xpt = np.array([1., 2.])
         ypt = np.array([1., 2.])
 
-        ps = PointVortex2D()
-        ps.x0 = 0.1
-        ps.y0 = 0.2
-        ps.set_strength(0.5)
+        pv = PointVortex2D()
+        pv.x0 = 0.1
+        pv.y0 = 0.2
+        pv.set_strength(0.5)
 
         # test some hand calculations
-        phi = ps.potential(xpt[0], ypt[0])
+        phi = pv.potential(xpt[0], ypt[0])
         phi_ref = -0.0578243602
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
 
-        phi = ps.potential(xpt, ypt)
+        phi = pv.potential(xpt, ypt)
         phi_ref = np.array([-0.0578243602, -0.0603497810])
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
 
@@ -42,17 +42,17 @@ class TestPointVortex2D(unittest.TestCase):
         xpt = np.array([1., 2.])
         ypt = np.array([1., 2.])
 
-        ps = PointVortex2D()
-        ps.x0 = 0.1
-        ps.y0 = 0.2
-        ps.set_strength(0.5)
+        pv = PointVortex2D()
+        pv.x0 = 0.1
+        pv.y0 = 0.2
+        pv.set_strength(0.5)
 
         # test some hand calculations
-        psi = ps.stream_function(xpt[0], ypt[0])
+        psi = pv.stream_function(xpt[0], ypt[0])
         psi_ref = 0.0147840442
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
 
-        psi = ps.stream_function(xpt, ypt)
+        psi = pv.stream_function(xpt, ypt)
         psi_ref = np.array([0.0147840442, 0.0765634212])
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
 
@@ -61,19 +61,19 @@ class TestPointVortex2D(unittest.TestCase):
         xp = np.array([1., 2.])
         yp = np.array([1., 2.])
 
-        ps = PointVortex2D()
-        ps.x0 = 0.1
-        ps.y0 = 0.2
-        ps.set_strength(0.5)
+        pv = PointVortex2D()
+        pv.x0 = 0.1
+        pv.y0 = 0.2
+        pv.set_strength(0.5)
 
         # test some hand calculations
-        u, v = ps.velocity(xp[1], yp[1])
+        u, v = pv.velocity(xp[1], yp[1])
         u_ref = 0.0209108684
         v_ref = -0.0220725833
         self.assertIsNone(npt.assert_allclose(u, u_ref))
         self.assertIsNone(npt.assert_allclose(v, v_ref))
 
-        u, v = ps.velocity(xp, yp)
+        u, v = pv.velocity(xp, yp)
         u_ref = np.array([0.0439048119, 0.0209108684])
         v_ref = np.array([-0.0493929134, -0.0220725833])
         self.assertIsNone(npt.assert_allclose(u, u_ref))
@@ -125,12 +125,12 @@ class TestPointVortex2D(unittest.TestCase):
                     phi_ref[i, j] = float(data[4])
                     psi_ref[i, j] = float(data[5])
 
-        pe = PointVortex2D(x0=x0, y0=y0, strength=strength)
-        phi = pe.potential(xp, yp)
+        pv = PointVortex2D(x0=x0, y0=y0, strength=strength)
+        phi = pv.potential(xp, yp)
         self.assertIsNone(npt.assert_allclose(phi, phi_ref, rtol=1e-5))
-        psi = pe.stream_function(xp, yp)
+        psi = pv.stream_function(xp, yp)
         self.assertIsNone(npt.assert_allclose(psi, psi_ref, rtol=1e-5))
-        u, v = pe.velocity(xp, yp)
+        u, v = pv.velocity(xp, yp)
         self.assertIsNone(npt.assert_allclose(u, u_ref, rtol=2e-5))
         self.assertIsNone(npt.assert_allclose(v, v_ref, rtol=1e-5))
 
