@@ -21,11 +21,11 @@ class PointElement2D(ABC):
 
     Attributes
     ----------
-    x0: float
+    x0 : float
         X-coorinate of source origin.
-    y0: float
+    y0 : float
         Y-coorinate of source origin.
-    angle: float
+    angle : float
         Orientation angle of element in radians.
     """
 
