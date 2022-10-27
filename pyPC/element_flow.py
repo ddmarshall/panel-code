@@ -25,10 +25,13 @@ class PointElement2D(ABC):
         X-coorinate of source origin.
     y0: float
         Y-coorinate of source origin.
+    angle: float
+        Orientation angle of element in radians.
     """
 
     x0: float
     y0: float
+    angle: float
     _strength_over_2pi: float = field(init=False)
 
     def __post_init__(self) -> None:

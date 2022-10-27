@@ -17,8 +17,8 @@ class PointVortex2D(PointElement2D):
     """Represents a point vortex in 2 dimensions."""
 
     def __init__(self, x0: float = 0, y0: float = 0,
-                 strength: float = 1) -> None:
-        super().__init__(x0=x0, y0=y0)
+                 strength: float = 1, angle:float = 0) -> None:
+        super().__init__(x0=x0, y0=y0, angle=angle)
         self.set_strength(strength)
 
     def potential(self, xp: np_type.NDArray,
@@ -40,7 +40,7 @@ class PointVortex2D(PointElement2D):
         """
         rx, ry, _ = self._r_terms(xp, yp)
 
-        return -self._strength_over_2pi*np.arctan2(ry, rx)
+        return -self._strength_over_2pi*(np.arctan2(ry, rx)+self.angle)
 
     def stream_function(self, xp: np_type.NDArray,
                         yp: np_type.NDArray) -> np_type.NDArray:
