@@ -39,8 +39,11 @@ class PointVortex2D(PointElement2D):
             Value of the velocity potential.
         """
         rx, ry, _ = self._r_terms(xp, yp)
+        angle = np.arctan2(ry, rx)-self.angle
+        angle[angle > np.pi] = 2*np.pi - angle[angle > np.pi]
+        angle[angle <= -np.pi] = 2*np.pi + angle[angle <= -np.pi]
 
-        return -self._strength_over_2pi*(np.arctan2(ry, rx)+self.angle)
+        return -self._strength_over_2pi*angle
 
     def stream_function(self, xp: np_type.NDArray,
                         yp: np_type.NDArray) -> np_type.NDArray:
