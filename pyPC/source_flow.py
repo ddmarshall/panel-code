@@ -60,7 +60,7 @@ class PointSource2D(PointElement2D):
             Value of the stream function.
         """
         rx, ry, _ = self._r_terms(xp, yp)
-        angle = np.arctan2(ry, rx)-self.angle
+        angle = np.asarray(np.arctan2(ry, rx)-self.angle)
         angle[angle > np.pi] = 2*np.pi - angle[angle > np.pi]
         angle[angle <= -np.pi] = 2*np.pi + angle[angle <= -np.pi]
 
