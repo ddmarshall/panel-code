@@ -14,7 +14,7 @@ from matplotlib.gridspec import GridSpec
 from pyPC.source_flow import PointSource2D
 
 
-def draw_point_source_flow_field():
+def draw_point_source_flow_field() -> None:
     """Draws the streamlines, potential lines, and the velocity vectors."""
     source = PointSource2D(x0=1, y0=2, strength=1.0)
 

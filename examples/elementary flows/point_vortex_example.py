@@ -14,7 +14,7 @@ from matplotlib.gridspec import GridSpec
 from pyPC.vortex_flow import PointVortex2D
 
 
-def draw_point_vortex_flow_field():
+def draw_point_vortex_flow_field() -> None:
     """Draws the streamlines, potential lines, and the velocity vectors."""
     vortex = PointVortex2D(x0=1, y0=2, strength=1.0)
 

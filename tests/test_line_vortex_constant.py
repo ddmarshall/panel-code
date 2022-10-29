@@ -24,7 +24,7 @@ class TestLineVortexConstant2D(unittest.TestCase):
         xpt = np.array([1., 2.])
         ypt = np.array([1., 2.])
 
-        vortex = LineVortexConstant2D(x0=[0.1, 0.3], y0=[0.2, 0.5])
+        vortex = LineVortexConstant2D(x0=(0.1, 0.3), y0=(0.2, 0.5))
         vortex.set_strength(0.5)
 
         # test some hand calculations
@@ -41,7 +41,7 @@ class TestLineVortexConstant2D(unittest.TestCase):
         xpt = np.array([1., 2.])
         ypt = np.array([1., 2.])
 
-        vortex = LineVortexConstant2D(x0=[0.1, 0.3], y0=[0.2, 0.5])
+        vortex = LineVortexConstant2D(x0=(0.1, 0.3), y0=(0.2, 0.5))
         vortex.set_strength(0.5)
 
         # test some hand calculations
@@ -58,7 +58,7 @@ class TestLineVortexConstant2D(unittest.TestCase):
         xp = np.array([1., 2.])
         yp = np.array([1., 2.])
 
-        vortex = LineVortexConstant2D(x0=[0.1, 0.3], y0=[0.2, 0.5])
+        vortex = LineVortexConstant2D(x0=(0.1, 0.3), y0=(0.2, 0.5))
         vortex.set_strength(0.5)
 
         # test some hand calculations
@@ -81,7 +81,7 @@ class TestLineVortexConstant2D(unittest.TestCase):
                            np.linspace(-1, 5, 100))
 
         # values
-        vortex = LineVortexConstant2D(x0=[1, 2], y0=[2, 4], strength=1)
+        vortex = LineVortexConstant2D(x0=(1, 2), y0=(2, 4), strength=1)
         u, v = vortex.velocity(x, y)
         phi = vortex.potential(x, y)
         psi = vortex.stream_function(x, y)

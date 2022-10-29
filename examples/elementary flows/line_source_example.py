@@ -14,12 +14,12 @@ from matplotlib.gridspec import GridSpec
 from pyPC.source_flow import LineSourceConstant2D
 
 
-def draw_approximate_point_source_flow_field():
+def draw_approximate_point_source_flow_field() -> None:
     """Draws the streamlines, potential lines, and the velocity vectors."""
     # set mesh
     xg, yg = np.meshgrid(np.linspace(-1, 5, 100), np.linspace(-1, 5, 100))
 
-    source = LineSourceConstant2D([1, 2], [2, 4], strength=1)
+    source = LineSourceConstant2D((1, 2), (2, 4), strength=1)
     ug, vg = source.velocity(xg, yg)
     potential = source.potential(xg, yg)
     stream_function = source.stream_function(xg, yg)

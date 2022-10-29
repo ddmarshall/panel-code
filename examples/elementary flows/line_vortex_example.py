@@ -14,12 +14,12 @@ from matplotlib.gridspec import GridSpec
 from pyPC.vortex_flow import LineVortexConstant2D
 
 
-def draw_approximate_point_vortex_flow_field():
+def draw_approximate_point_vortex_flow_field() -> None:
     """Draws the streamlines, potential lines, and the velocity vectors."""
     # set mesh
     xg, yg = np.meshgrid(np.linspace(-1, 5, 100), np.linspace(-1, 5, 100))
 
-    vortex = LineVortexConstant2D([1, 2], [2, 4], strength=1)
+    vortex = LineVortexConstant2D((1, 2), (2, 4), strength=1)
     ug, vg = vortex.velocity(xg, yg)
     potential = vortex.potential(xg, yg)
     stream_function = vortex.stream_function(xg, yg)
