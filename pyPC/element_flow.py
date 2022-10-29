@@ -260,6 +260,8 @@ class LineElement2D(ABC):
         float
             panel length
         """
+        # pylint: disable=too-many-locals
+
         # calculate the panel geometry terms
         dxp = self.x0[1]-self.x0[0]
         dyp = self.y0[1]-self.y0[0]

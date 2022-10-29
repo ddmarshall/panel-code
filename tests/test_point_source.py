@@ -82,6 +82,8 @@ class TestPointSource2D(unittest.TestCase):
     def testReferenceImplementation(self) -> None:
         """Test the calculations against a reference implementation."""
 
+        # pylint: disable=too-many-locals
+
         # Read the reference data
         directory = dirname(abspath(__file__))
         ref_filename = directory + "/data/point_source_2d.dat"

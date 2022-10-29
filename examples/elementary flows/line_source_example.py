@@ -17,14 +17,9 @@ from pyPC.source_flow import LineSourceConstant2D
 def draw_approximate_point_source_flow_field():
     """Draws the streamlines, potential lines, and the velocity vectors."""
     # set mesh
-    nptsx = 100
-    nptsy = 100
-    xg, yg = np.meshgrid(np.linspace(-1, 5, nptsx), np.linspace(-1, 5, nptsy))
+    xg, yg = np.meshgrid(np.linspace(-1, 5, 100), np.linspace(-1, 5, 100))
 
-    xpan = [1, 2]
-    ypan = [2, 4]
-    sigma = 1
-    source = LineSourceConstant2D(xpan, ypan, strength=sigma)
+    source = LineSourceConstant2D([1, 2], [2, 4], strength=1)
     ug, vg = source.velocity(xg, yg)
     potential = source.potential(xg, yg)
     stream_function = source.stream_function(xg, yg)
@@ -40,16 +35,16 @@ def draw_approximate_point_source_flow_field():
     ax = stream_function_axis
     ax.contour(xg, yg, stream_function, levels=20, colors="blue",
                linestyles="solid")
-    ax.plot([xpan[0], xpan[-1]], [ypan[0], ypan[-1]], linewidth=3,
+    ax.plot(source.x0, source.y0, linewidth=3,
             color="red", marker="o")
     ax = potential_axis
     ax.contour(xg, yg, potential, levels=20, colors="blue",
                linestyles="solid")
-    ax.plot([xpan[0], xpan[-1]], [ypan[0], ypan[-1]], linewidth=3,
+    ax.plot(source.x0, source.y0, linewidth=3,
             color="red", marker="o")
     ax = velocity_axis
     ax.quiver(xg, yg, ug, vg, color="blue")
-    ax.plot([xpan[0], xpan[-1]], [ypan[0], ypan[-1]], linewidth=3,
+    ax.plot(source.x0, source.y0, linewidth=3,
             color="red", marker="o")
     ax.set_xlim([0.8, 2.2])
     ax.set_ylim([1.8, 4.2])

@@ -11,8 +11,9 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 
+from approximate_elements import ApproxLineSourceConstant2D
+
 from pyPC.source_flow import LineSourceConstant2D
-from approximate_elements import ApproximateLineSourceConstant2D
 
 
 class TestLineSourceConstant2D(unittest.TestCase):
@@ -76,30 +77,24 @@ class TestLineSourceConstant2D(unittest.TestCase):
     def testApproximateImplementation(self) -> None:
         """Test the calculations against a reference implementation."""
         # set mesh
-        nptsx = 100
-        nptsy = 100
-        x, y = np.meshgrid(np.linspace(-1, 5, nptsx),
-                           np.linspace(-1, 5, nptsy))
-
-        # panel geometry
-        xpan = [1, 2]
-        ypan = [2, 4]
-        sigma = 1
-
-        # approximate values
-        ns = 6000
-        source_app = ApproximateLineSourceConstant2D(x0=xpan, y0=ypan,
-                                                     sigma=sigma,
-                                                     num_elements=ns)
-        u_app, v_app = source_app.velocity(x, y)
-        phi_app = source_app.potential(x, y)
-        psi_app = source_app.stream_function(x, y)
+        x, y = np.meshgrid(np.linspace(-1, 5, 100),
+                           np.linspace(-1, 5, 100))
 
         # values
-        source = LineSourceConstant2D(x0=xpan, y0=ypan, strength=sigma)
+        source = LineSourceConstant2D(x0=[1, 2], y0=[2, 4], strength=1)
         u, v = source.velocity(x, y)
         phi = source.potential(x, y)
         psi = source.stream_function(x, y)
+
+        # approximate values
+        ns = 6000
+        source_app = ApproxLineSourceConstant2D(x0=source.x0,
+                                                y0=source.y0,
+                                                sigma=source.get_strength(),
+                                                num_elements=ns)
+        u_app, v_app = source_app.velocity(x, y)
+        phi_app = source_app.potential(x, y)
+        psi_app = source_app.stream_function(x, y)
 
         self.assertIsNone(npt.assert_allclose(phi, phi_app, rtol=0, atol=2e-4))
         self.assertIsNone(npt.assert_allclose(psi, psi_app, rtol=0, atol=2e-4))

@@ -16,7 +16,7 @@ from pyPC.source_flow import PointSource2D
 from pyPC.vortex_flow import PointVortex2D
 
 
-class ApproximateLineSourceConstant2D():
+class ApproxLineSourceConstant2D():
     """Approximate constant strength 2D line source."""
 
     def __init__(self, x0: Tuple[float, float], y0: Tuple[float, float],
@@ -129,7 +129,7 @@ class ApproximateLineSourceConstant2D():
         return u, v
 
 
-class ApproximateLineVortexConstant2D():
+class ApproxLineVortexConstant2D():
     """Approximate constant strength 2D line vortex."""
 
     def __init__(self, x0: Tuple[float, float], y0: Tuple[float, float],
