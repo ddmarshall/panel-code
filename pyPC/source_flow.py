@@ -117,8 +117,7 @@ class LineSourceConstant2D(LineElementConstant2D):
         numpy.ndarray
             Value of the velocity potential.
         """
-        I2 = self._getI2(xp, yp)
-        return self._strength_over_2pi*I2
+        return self._strength_over_2pi*self._getI02(xp, yp)
 
     def stream_function(self, xp: np_type.NDArray,
                         yp: np_type.NDArray) -> np_type.NDArray:
@@ -137,8 +136,7 @@ class LineSourceConstant2D(LineElementConstant2D):
         numpy.ndarray
             Value of the stream function.
         """
-        I3 = self._getI3(xp, yp)
-        return self._strength_over_2pi*I3
+        return self._strength_over_2pi*self._getI03(xp, yp)
 
     def velocity(self, xp: np_type.NDArray,
                  yp: np_type.NDArray) -> Tuple[np_type.NDArray,
@@ -160,13 +158,12 @@ class LineSourceConstant2D(LineElementConstant2D):
         numpy.ndarray
             Value of the y-velocity.
         """
-        I0, I1, _, _, _, _, _ = self._getI0I1(xp, yp)
-        uxi = self._strength_over_2pi*I0
-        ueta = self._strength_over_2pi*I1
+        I00, I01, _, _, _, _, ell = self._getTerms(xp, yp)
+        uxi = self._strength_over_2pi*I00
+        ueta = self._strength_over_2pi*I01
 
         dxp = self.x0[1]-self.x0[0]
         dyp = self.y0[1]-self.y0[0]
-        ell = np.sqrt(dxp**2 + dyp**2)
         u = (uxi*dxp-ueta*dyp)/ell
         v = (uxi*dyp+ueta*dxp)/ell
         return u, v

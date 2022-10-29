@@ -225,14 +225,51 @@ class LineElement2D(ABC):
             Value of the y-velocity.
         """
 
-    def _getI0I1(self, xp: np_type.NDArray,
-                 yp: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray,
-                                               np_type.NDArray,
-                                               np_type.NDArray,
-                                               np_type.NDArray,
-                                               np_type.NDArray,
-                                               float]:
+    def _getXiEtaTerms(self, xp: np_type.NDArray,
+                       yp: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                     np_type.NDArray,
+                                                     float]:
+        """
+        Return the geometry terms needed for line elements.
+
+        Parameters
+        ----------
+        xp : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+
+        Returns
+        -------
+        numpy.ndarray
+            xi-coordinate of points relative to the panel length
+        numpy.ndarray
+            eta-coordinate of points relative to the panel length
+        float
+            panel length
+
+        """
+        # calculate the panel geometry terms
+        dxp = self.x0[1]-self.x0[0]
+        dyp = self.y0[1]-self.y0[0]
+        ell = np.sqrt(dxp**2 + dyp**2)
+
+        # calculate the computational coordinates
+        x1p = xp - self.x0[0]
+        y1p = yp - self.y0[0]
+        xip = (x1p*dxp + y1p*dyp)/ell
+        etap = (-x1p*dyp + y1p*dxp)/ell
+
+        return xip, etap, ell
+
+    def _getTerms(self, xp: np_type.NDArray,
+                  yp: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                np_type.NDArray,
+                                                np_type.NDArray,
+                                                np_type.NDArray,
+                                                np_type.NDArray,
+                                                np_type.NDArray,
+                                                float]:
         """
         Return the basic integrals and terms needed for line elements.
 
@@ -260,33 +297,22 @@ class LineElement2D(ABC):
         float
             panel length
         """
-        # pylint: disable=too-many-locals
-
-        # calculate the panel geometry terms
-        dxp = self.x0[1]-self.x0[0]
-        dyp = self.y0[1]-self.y0[0]
-        ell = np.sqrt(dxp**2 + dyp**2)
-
-        # calculate the computational coordinates
-        x1p = xp - self.x0[0]
-        y1p = yp - self.y0[0]
-        xip = (x1p*dxp + y1p*dyp)/ell
-        etap = (-x1p*dyp + y1p*dxp)/ell
+        xip, etap, ell = self._getXiEtaTerms(xp, yp)
 
         # calculate the terms need to be returned
         r1_sqr = xip**2 + etap**2
         beta1 = np.arctan2(etap, xip)
         r2_sqr = (xip-ell)**2 + etap**2
         beta2 = np.arctan2(etap, xip-ell)
-        I0 = 0.5*np.log(r1_sqr/r2_sqr)
-        I1 = beta2 - beta1
+        I00 = 0.5*np.log(r1_sqr/r2_sqr)
+        I01 = beta2 - beta1
 
-        return I0, I1, r2_sqr, beta2, xip, etap, ell
+        return I00, I01, r2_sqr, beta2, xip, etap, ell
 
-    def _getI2(self, xp: np_type.NDArray,
-               yp: np_type.NDArray) -> np_type.NDArray:
+    def _getI00(self, xp: np_type.NDArray,
+                yp: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the I2 itegral values.
+        Return the I0,0 integral values.
 
         Parameters
         ----------
@@ -298,15 +324,19 @@ class LineElement2D(ABC):
         Returns
         -------
         numpy.ndarray
-            Value of the I2 integral
+            Value of the I0,0 integral
         """
-        I0, I1, r2_sqr, _, xip, etap, ell = self._getI0I1(xp, yp)
-        return ell*(xip*I0/ell + etap*I1/ell + 0.5*np.log(r2_sqr)-1)
+        xip, etap, ell = self._getXiEtaTerms(xp, yp)
 
-    def _getI3(self, xp: np_type.NDArray,
-               yp: np_type.NDArray) -> np_type.NDArray:
+        # calculate the terms need to be returned
+        r1_sqr = xip**2 + etap**2
+        r2_sqr = (xip-ell)**2 + etap**2
+        return 0.5*np.log(r1_sqr/r2_sqr)
+
+    def _getI01(self, xp: np_type.NDArray,
+                yp: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the I3 itegral values.
+        Return the I0,1 integral values.
 
         Parameters
         ----------
@@ -318,10 +348,54 @@ class LineElement2D(ABC):
         Returns
         -------
         numpy.ndarray
-            Value of the I3 integral
+            Value of the I0,1 integral
         """
-        I0, I1, _, beta2, xip, etap, ell = self._getI0I1(xp, yp)
-        return ell*(etap*I0/ell - xip*I1/ell + beta2)
+        xip, etap, ell = self._getXiEtaTerms(xp, yp)
+
+        # calculate the terms need to be returned
+        beta1 = np.arctan2(etap, xip)
+        beta2 = np.arctan2(etap, xip-ell)
+        return beta2 - beta1
+
+    def _getI02(self, xp: np_type.NDArray,
+                yp: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the I0,2 integral values.
+
+        Parameters
+        ----------
+        xp : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the I0,2 integral
+        """
+        I00, I01, r2_sqr, _, xip, etap, ell = self._getTerms(xp, yp)
+        return ell*(xip*I00/ell + etap*I01/ell + 0.5*np.log(r2_sqr)-1)
+
+    def _getI03(self, xp: np_type.NDArray,
+                yp: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the I0,3 integral values.
+
+        Parameters
+        ----------
+        xp : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the I0,3 integral
+        """
+        I00, I01, _, beta2, xip, etap, ell = self._getTerms(xp, yp)
+        return ell*(etap*I00/ell - xip*I01/ell + beta2)
 
 
 @dataclass
