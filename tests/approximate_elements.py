@@ -14,6 +14,7 @@ import numpy.typing as np_type
 
 from pyPC.source_flow import PointSource2D
 from pyPC.vortex_flow import PointVortex2D
+from pyPC.doublet_flow import PointDoublet2D
 
 
 class ApproxLineSourceConstant2D():
@@ -26,20 +27,6 @@ class ApproxLineSourceConstant2D():
         self.y0 = y0
         self.sigma = sigma
         self.ne = num_elements
-
-    def _setup_source(self) -> Tuple[np_type.NDArray, np_type.NDArray,
-                                     PointSource2D]:
-        xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
-        ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
-
-        ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
-        angle = np.arctan2(self.y0[1]-self.y0[0], self.x0[1]-self.x0[0])
-        strength = self.sigma*ell/(self.ne-1)
-
-        source = PointSource2D(x0=self.x0[0], y0=self.y0[0],
-                               strength=strength, angle=angle)
-
-        return xpan, ypan, source
 
     def potential(self, x: np_type.NDArray,
                   y: np_type.NDArray) -> np_type.NDArray:
@@ -128,6 +115,32 @@ class ApproxLineSourceConstant2D():
 
         return u, v
 
+    def _setup_source(self) -> Tuple[np_type.NDArray, np_type.NDArray,
+                                     PointSource2D]:
+        """
+        Set up the point source for calculations.
+
+        Returns
+        -------
+        numpy.ndarray
+            X-coordinates of the point elements.
+        numpy.ndarray
+            Y-coordinates of the point elements.
+        PointSource2D
+            Point source class configured for analysis.
+        """
+        xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
+        ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
+
+        ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
+        angle = np.arctan2(self.y0[1]-self.y0[0], self.x0[1]-self.x0[0])
+        strength = self.sigma*ell/(self.ne-1)
+
+        source = PointSource2D(x0=self.x0[0], y0=self.y0[0],
+                               strength=strength, angle=angle)
+
+        return xpan, ypan, source
+
 
 class ApproxLineVortexConstant2D():
     """Approximate constant strength 2D line vortex."""
@@ -139,20 +152,6 @@ class ApproxLineVortexConstant2D():
         self.y0 = y0
         self.gamma = gamma
         self.ne = num_elements
-
-    def _setup_vortex(self) -> Tuple[np_type.NDArray, np_type.NDArray,
-                                     PointVortex2D]:
-        xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
-        ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
-
-        ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
-        angle = np.arctan2(self.y0[1]-self.y0[0], self.x0[1]-self.x0[0])
-        strength = self.gamma*ell/(self.ne-1)
-
-        vortex = PointVortex2D(x0=self.x0[0], y0=self.y0[0],
-                               strength=strength, angle=angle)
-
-        return xpan, ypan, vortex
 
     def potential(self, x: np_type.NDArray,
                   y: np_type.NDArray) -> np_type.NDArray:
@@ -240,3 +239,154 @@ class ApproxLineVortexConstant2D():
             v = v + vtemp
 
         return u, v
+
+    def _setup_vortex(self) -> Tuple[np_type.NDArray, np_type.NDArray,
+                                     PointVortex2D]:
+        """
+        Set up the point vortex for calculations.
+
+        Returns
+        -------
+        numpy.ndarray
+            X-coordinates of the point elements.
+        numpy.ndarray
+            Y-coordinates of the point elements.
+        PointVortex2D
+            Point vortex class configured for analysis.
+        """
+        xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
+        ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
+
+        ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
+        angle = np.arctan2(self.y0[1]-self.y0[0], self.x0[1]-self.x0[0])
+        strength = self.gamma*ell/(self.ne-1)
+
+        vortex = PointVortex2D(x0=self.x0[0], y0=self.y0[0],
+                               strength=strength, angle=angle)
+
+        return xpan, ypan, vortex
+
+
+class ApproxLineDoubletConstant2D():
+    """Approximate constant strength 2D line doublet."""
+
+    def __init__(self, x0: Tuple[float, float], y0: Tuple[float, float],
+                 mu: float, num_elements: int) -> None:
+
+        self.x0 = x0
+        self.y0 = y0
+        self.mu = mu
+        self.ne = num_elements
+
+    def potential(self, x: np_type.NDArray,
+                  y: np_type.NDArray) -> np_type.NDArray:
+        """
+        Calculate the potential.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the velocity potential.
+        """
+        xpan, ypan, doublet = self._setup_doublet()
+
+        potential = np.zeros_like(x)
+        for xp, yp in zip(xpan, ypan):
+            doublet.x0 = xp
+            doublet.y0 = yp
+            potential = potential + doublet.potential(x, y)
+
+        return potential
+
+    def stream_function(self, x: np_type.NDArray,
+                        y: np_type.NDArray) -> np_type.NDArray:
+        """
+        Calculate the stream function.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the stream function.
+        """
+        xpan, ypan, doublet = self._setup_doublet()
+
+        stream_function = np.zeros_like(x)
+        for xp, yp in zip(xpan, ypan):
+            doublet.x0 = xp
+            doublet.y0 = yp
+            stream_function = stream_function + doublet.stream_function(x, y)
+
+        return stream_function
+
+    def velocity(self, x: np_type.NDArray,
+                 y: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                              np_type.NDArray]:
+        """
+        Calculate the velocity vector components.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the x-velocity.
+        numpy.ndarray
+            Value of the y-velocity.
+        """
+        xpan, ypan, doublet = self._setup_doublet()
+
+        u = np.zeros_like(x)
+        v = np.zeros_like(x)
+        for xp, yp in zip(xpan, ypan):
+            doublet.x0 = xp
+            doublet.y0 = yp
+            utemp, vtemp = doublet.velocity(x, y)
+            u = u + utemp
+            v = v + vtemp
+
+        return u, v
+
+    def _setup_doublet(self) -> Tuple[np_type.NDArray, np_type.NDArray,
+                                      PointDoublet2D]:
+        """
+        Set up the point doublet for calculations.
+
+        Returns
+        -------
+        numpy.ndarray
+            X-coordinates of the point elements.
+        numpy.ndarray
+            Y-coordinates of the point elements.
+        PointDoublet2D
+            Point doublet class configured for analysis.
+        """
+        xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
+        ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
+
+        ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
+        angle = 0.5*np.pi+np.arctan2(self.y0[1]-self.y0[0], self.x0[1]-self.x0[0])
+        strength = self.mu*ell/(self.ne-1)
+
+        doublet = PointDoublet2D(x0=self.x0[0], y0=self.y0[0],
+                                 strength=strength, angle=angle)
+
+        return xpan, ypan, doublet

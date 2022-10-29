@@ -397,6 +397,50 @@ class LineElement2D(ABC):
         I00, I01, _, beta2, xip, etap, ell = self._getTerms(xp, yp)
         return ell*(etap*I00/ell - xip*I01/ell + beta2)
 
+    def _getI04(self, xp: np_type.NDArray,
+                yp: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the I0,4 integral values.
+
+        Parameters
+        ----------
+        xp : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the I0,4 integral
+        """
+        xip, etap, ell = self._getXiEtaTerms(xp, yp)
+        r1_sqr = xip**2 + etap**2
+        r2_sqr = (xip-ell)**2 + etap**2
+        return etap*(1/r2_sqr - 1/r1_sqr)
+
+    def _getI05(self, xp: np_type.NDArray,
+                yp: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the I0,5 integral values.
+
+        Parameters
+        ----------
+        xp : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the I0,5 integral
+        """
+        xip, etap, ell = self._getXiEtaTerms(xp, yp)
+        r1_sqr = xip**2 + etap**2
+        r2_sqr = (xip-ell)**2 + etap**2
+        return -((xip-ell)/r2_sqr - xip/r1_sqr)
+
 
 @dataclass
 class LineElementConstant2D(LineElement2D):
