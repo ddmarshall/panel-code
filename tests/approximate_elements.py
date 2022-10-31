@@ -382,8 +382,10 @@ class ApproxLineDoubletConstant2D():
         xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
         ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
 
+        # doublet is orientied in the xi-direction, so need to rotate angle
+        angle = 0.5*np.pi+np.arctan2(self.y0[1]-self.y0[0],
+                                     self.x0[1]-self.x0[0])
         ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
-        angle = 0.5*np.pi+np.arctan2(self.y0[1]-self.y0[0], self.x0[1]-self.x0[0])
         strength = self.mu*ell/(self.ne-1)
 
         doublet = PointDoublet2D(x0=self.x0[0], y0=self.y0[0],
