@@ -16,7 +16,7 @@ from pyPC.source_flow import PointSource2D
 
 def draw_point_source_flow_field() -> None:
     """Draws the streamlines, potential lines, and the velocity vectors."""
-    source = PointSource2D(x0=1, y0=2, strength=1.0)
+    source = PointSource2D(xo=1, yo=2, strength=1.0)
 
     # set mesh
     nptsx = 100

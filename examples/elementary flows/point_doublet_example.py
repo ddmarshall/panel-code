@@ -16,7 +16,7 @@ from pyPC.doublet_flow import PointDoublet2D
 
 def draw_point_doublet_flow_field() -> None:
     """Draws the streamlines, potential lines, and the velocity vectors."""
-    doublet = PointDoublet2D(x0=1, y0=2, strength=1.0, angle=np.pi/2)
+    doublet = PointDoublet2D(xo=1, yo=2, strength=1.0, angle=np.pi/2)
 
     # set mesh
     nptsx = 100

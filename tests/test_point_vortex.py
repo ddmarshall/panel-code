@@ -24,8 +24,8 @@ class TestPointVortex2D(unittest.TestCase):
         ypt = np.array([1., 2.])
 
         pv = PointVortex2D()
-        pv.x0 = 0.1
-        pv.y0 = 0.2
+        pv.xo = 0.1
+        pv.yo = 0.2
         pv.set_strength(0.5)
 
         # test some hand calculations
@@ -43,8 +43,8 @@ class TestPointVortex2D(unittest.TestCase):
         ypt = np.array([1., 2.])
 
         pv = PointVortex2D()
-        pv.x0 = 0.1
-        pv.y0 = 0.2
+        pv.xo = 0.1
+        pv.yo = 0.2
         pv.set_strength(0.5)
 
         # test some hand calculations
@@ -62,8 +62,8 @@ class TestPointVortex2D(unittest.TestCase):
         yp = np.array([1., 2.])
 
         pv = PointVortex2D()
-        pv.x0 = 0.1
-        pv.y0 = 0.2
+        pv.xo = 0.1
+        pv.yo = 0.2
         pv.set_strength(0.5)
 
         # test some hand calculations
@@ -92,8 +92,8 @@ class TestPointVortex2D(unittest.TestCase):
             line = ref_file.readline()
             data = line.split()
             self.assertTrue(len(data), 2)
-            x0 = float(data[0])
-            y0 = float(data[1])
+            xo = float(data[0])
+            yo = float(data[1])
 
             # read element strength
             line = ref_file.readline()
@@ -127,7 +127,7 @@ class TestPointVortex2D(unittest.TestCase):
                     phi_ref[i, j] = float(data[4])
                     psi_ref[i, j] = float(data[5])
 
-        pv = PointVortex2D(x0=x0, y0=y0, strength=strength)
+        pv = PointVortex2D(xo=xo, yo=yo, strength=strength)
         phi = pv.potential(xp, yp)
         self.assertIsNone(npt.assert_allclose(phi, phi_ref, rtol=1e-5))
         psi = pv.stream_function(xp, yp)

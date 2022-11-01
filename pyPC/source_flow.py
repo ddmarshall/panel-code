@@ -16,9 +16,9 @@ from pyPC.element_flow import PointElement2D, LineElementConstant2D
 class PointSource2D(PointElement2D):
     """Represents a point source in 2 dimensions."""
 
-    def __init__(self, x0: float = 0, y0: float = 0,
+    def __init__(self, xo: float = 0, yo: float = 0,
                  strength: float = 1, angle:float = 0) -> None:
-        super().__init__(x0=x0, y0=y0, angle=angle)
+        super().__init__(xo=xo, yo=yo, angle=angle)
         self.set_strength(strength)
 
     def potential(self, xp: np_type.NDArray,

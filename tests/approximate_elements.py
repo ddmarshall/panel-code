@@ -20,11 +20,11 @@ from pyPC.doublet_flow import PointDoublet2D
 class ApproxLineSourceConstant2D():
     """Approximate constant strength 2D line source."""
 
-    def __init__(self, x0: Tuple[float, float], y0: Tuple[float, float],
+    def __init__(self, xo: Tuple[float, float], yo: Tuple[float, float],
                  sigma: float, num_elements: int) -> None:
 
-        self.x0 = x0
-        self.y0 = y0
+        self.xo = xo
+        self.yo = yo
         self.sigma = sigma
         self.ne = num_elements
 
@@ -49,8 +49,8 @@ class ApproxLineSourceConstant2D():
 
         potential = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            source.x0 = xp
-            source.y0 = yp
+            source.xo = xp
+            source.yo = yp
             potential = potential + source.potential(x, y)
 
         return potential
@@ -76,8 +76,8 @@ class ApproxLineSourceConstant2D():
 
         stream_function = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            source.x0 = xp
-            source.y0 = yp
+            source.xo = xp
+            source.yo = yp
             stream_function = stream_function + source.stream_function(x, y)
 
         return stream_function
@@ -107,8 +107,8 @@ class ApproxLineSourceConstant2D():
         u = np.zeros_like(x)
         v = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            source.x0 = xp
-            source.y0 = yp
+            source.xo = xp
+            source.yo = yp
             utemp, vtemp = source.velocity(x, y)
             u = u + utemp
             v = v + vtemp
@@ -129,14 +129,14 @@ class ApproxLineSourceConstant2D():
         PointSource2D
             Point source class configured for analysis.
         """
-        xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
-        ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
+        xpan = np.linspace(self.xo[0], self.xo[1], self.ne)
+        ypan = np.linspace(self.yo[0], self.yo[1], self.ne)
 
-        ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
-        angle = np.arctan2(self.y0[1]-self.y0[0], self.x0[1]-self.x0[0])
+        ell = np.sqrt((self.xo[1]-self.xo[0])**2 + (self.yo[1]-self.yo[0])**2)
+        angle = np.arctan2(self.yo[1]-self.yo[0], self.xo[1]-self.xo[0])
         strength = self.sigma*ell/(self.ne-1)
 
-        source = PointSource2D(x0=self.x0[0], y0=self.y0[0],
+        source = PointSource2D(xo=self.xo[0], yo=self.yo[0],
                                strength=strength, angle=angle)
 
         return xpan, ypan, source
@@ -145,11 +145,11 @@ class ApproxLineSourceConstant2D():
 class ApproxLineVortexConstant2D():
     """Approximate constant strength 2D line vortex."""
 
-    def __init__(self, x0: Tuple[float, float], y0: Tuple[float, float],
+    def __init__(self, xo: Tuple[float, float], yo: Tuple[float, float],
                  gamma: float, num_elements: int) -> None:
 
-        self.x0 = x0
-        self.y0 = y0
+        self.xo = xo
+        self.yo = yo
         self.gamma = gamma
         self.ne = num_elements
 
@@ -174,8 +174,8 @@ class ApproxLineVortexConstant2D():
 
         potential = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            vortex.x0 = xp
-            vortex.y0 = yp
+            vortex.xo = xp
+            vortex.yo = yp
             potential = potential + vortex.potential(x, y)
 
         return potential
@@ -201,8 +201,8 @@ class ApproxLineVortexConstant2D():
 
         stream_function = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            vortex.x0 = xp
-            vortex.y0 = yp
+            vortex.xo = xp
+            vortex.yo = yp
             stream_function = stream_function + vortex.stream_function(x, y)
 
         return stream_function
@@ -232,8 +232,8 @@ class ApproxLineVortexConstant2D():
         u = np.zeros_like(x)
         v = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            vortex.x0 = xp
-            vortex.y0 = yp
+            vortex.xo = xp
+            vortex.yo = yp
             utemp, vtemp = vortex.velocity(x, y)
             u = u + utemp
             v = v + vtemp
@@ -254,14 +254,14 @@ class ApproxLineVortexConstant2D():
         PointVortex2D
             Point vortex class configured for analysis.
         """
-        xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
-        ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
+        xpan = np.linspace(self.xo[0], self.xo[1], self.ne)
+        ypan = np.linspace(self.yo[0], self.yo[1], self.ne)
 
-        ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
-        angle = np.arctan2(self.y0[1]-self.y0[0], self.x0[1]-self.x0[0])
+        ell = np.sqrt((self.xo[1]-self.xo[0])**2 + (self.yo[1]-self.yo[0])**2)
+        angle = np.arctan2(self.yo[1]-self.yo[0], self.xo[1]-self.xo[0])
         strength = self.gamma*ell/(self.ne-1)
 
-        vortex = PointVortex2D(x0=self.x0[0], y0=self.y0[0],
+        vortex = PointVortex2D(xo=self.xo[0], yo=self.yo[0],
                                strength=strength, angle=angle)
 
         return xpan, ypan, vortex
@@ -270,11 +270,11 @@ class ApproxLineVortexConstant2D():
 class ApproxLineDoubletConstant2D():
     """Approximate constant strength 2D line doublet."""
 
-    def __init__(self, x0: Tuple[float, float], y0: Tuple[float, float],
+    def __init__(self, xo: Tuple[float, float], yo: Tuple[float, float],
                  mu: float, num_elements: int) -> None:
 
-        self.x0 = x0
-        self.y0 = y0
+        self.xo = xo
+        self.yo = yo
         self.mu = mu
         self.ne = num_elements
 
@@ -299,8 +299,8 @@ class ApproxLineDoubletConstant2D():
 
         potential = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            doublet.x0 = xp
-            doublet.y0 = yp
+            doublet.xo = xp
+            doublet.yo = yp
             potential = potential + doublet.potential(x, y)
 
         return potential
@@ -326,8 +326,8 @@ class ApproxLineDoubletConstant2D():
 
         stream_function = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            doublet.x0 = xp
-            doublet.y0 = yp
+            doublet.xo = xp
+            doublet.yo = yp
             stream_function = stream_function + doublet.stream_function(x, y)
 
         return stream_function
@@ -357,8 +357,8 @@ class ApproxLineDoubletConstant2D():
         u = np.zeros_like(x)
         v = np.zeros_like(x)
         for xp, yp in zip(xpan, ypan):
-            doublet.x0 = xp
-            doublet.y0 = yp
+            doublet.xo = xp
+            doublet.yo = yp
             utemp, vtemp = doublet.velocity(x, y)
             u = u + utemp
             v = v + vtemp
@@ -379,16 +379,16 @@ class ApproxLineDoubletConstant2D():
         PointDoublet2D
             Point doublet class configured for analysis.
         """
-        xpan = np.linspace(self.x0[0], self.x0[1], self.ne)
-        ypan = np.linspace(self.y0[0], self.y0[1], self.ne)
+        xpan = np.linspace(self.xo[0], self.xo[1], self.ne)
+        ypan = np.linspace(self.yo[0], self.yo[1], self.ne)
 
         # doublet is orientied in the xi-direction, so need to rotate angle
-        angle = 0.5*np.pi+np.arctan2(self.y0[1]-self.y0[0],
-                                     self.x0[1]-self.x0[0])
-        ell = np.sqrt((self.x0[1]-self.x0[0])**2 + (self.y0[1]-self.y0[0])**2)
+        angle = 0.5*np.pi+np.arctan2(self.yo[1]-self.yo[0],
+                                     self.xo[1]-self.xo[0])
+        ell = np.sqrt((self.xo[1]-self.xo[0])**2 + (self.yo[1]-self.yo[0])**2)
         strength = self.mu*ell/(self.ne-1)
 
-        doublet = PointDoublet2D(x0=self.x0[0], y0=self.y0[0],
+        doublet = PointDoublet2D(xo=self.xo[0], yo=self.yo[0],
                                  strength=strength, angle=angle)
 
         return xpan, ypan, doublet

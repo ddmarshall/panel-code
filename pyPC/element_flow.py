@@ -21,16 +21,16 @@ class PointElement2D(ABC):
 
     Attributes
     ----------
-    x0 : float
+    xo : float
         X-coorinate of source origin.
-    y0 : float
+    yo : float
         Y-coorinate of source origin.
     angle : float
         Orientation angle of element in radians.
     """
 
-    x0: float
-    y0: float
+    xo: float
+    yo: float
     angle: float
     _strength_over_2pi: float = field(init=False)
 
@@ -143,8 +143,8 @@ class PointElement2D(ABC):
         rmag2 : np_type.NDArray
             Square of the distance from element to point.
         """
-        rx = xp - self.x0
-        ry = yp - self.y0
+        rx = xp - self.xo
+        ry = yp - self.yo
         rmag2 = rx**2 + ry**2
         return rx, ry, rmag2
 

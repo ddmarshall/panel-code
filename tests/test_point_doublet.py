@@ -24,8 +24,8 @@ class TestPointDoublet2D(unittest.TestCase):
         ypt = np.array([1., 2.])
 
         pd = PointDoublet2D()
-        pd.x0 = 0.1
-        pd.y0 = 0.2
+        pd.xo = 0.1
+        pd.yo = 0.2
         pd.set_strength(0.5)
         pd.angle = np.pi/4
 
@@ -44,8 +44,8 @@ class TestPointDoublet2D(unittest.TestCase):
         ypt = np.array([1., 2.])
 
         pd = PointDoublet2D()
-        pd.x0 = 0.1
-        pd.y0 = 0.2
+        pd.xo = 0.1
+        pd.yo = 0.2
         pd.set_strength(0.5)
         pd.angle = np.pi/4
 
@@ -64,8 +64,8 @@ class TestPointDoublet2D(unittest.TestCase):
         yp = np.array([1., 2.])
 
         pd = PointDoublet2D()
-        pd.x0 = 0.1
-        pd.y0 = 0.2
+        pd.xo = 0.1
+        pd.yo = 0.2
         pd.set_strength(0.5)
 
         # test some hand calculations
@@ -94,8 +94,8 @@ class TestPointDoublet2D(unittest.TestCase):
             line = ref_file.readline()
             data = line.split()
             self.assertTrue(len(data), 2)
-            x0 = float(data[0])
-            y0 = float(data[1])
+            xo = float(data[0])
+            yo = float(data[1])
 
             # read element strength
             line = ref_file.readline()
@@ -130,7 +130,7 @@ class TestPointDoublet2D(unittest.TestCase):
                     phi_ref[i, j] = float(data[4])
                     psi_ref[i, j] = float(data[5])
 
-        pd = PointDoublet2D(x0=x0, y0=y0, strength=strength, angle=angle)
+        pd = PointDoublet2D(xo=xo, yo=yo, strength=strength, angle=angle)
         phi = pd.potential(xp, yp)
         self.assertIsNone(npt.assert_allclose(phi, phi_ref, rtol=2e-5))
         psi = pd.stream_function(xp, yp)
