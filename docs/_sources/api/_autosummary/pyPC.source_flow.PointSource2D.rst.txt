@@ -1,0 +1,33 @@
+pyPC.source\_flow.PointSource2D
+===============================
+
+.. currentmodule:: pyPC.source_flow
+
+.. autoclass:: PointSource2D
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   
+      ~PointSource2D.__init__
+      ~PointSource2D.get_strength
+      ~PointSource2D.potential
+      ~PointSource2D.set_strength
+      ~PointSource2D.stream_function
+      ~PointSource2D.velocity
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PointSource2D.xo
+      ~PointSource2D.yo
+      ~PointSource2D.angle
+   
+   

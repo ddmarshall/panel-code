@@ -1,0 +1,33 @@
+pyPC.vortex\_flow.LineVortexConstant2D
+======================================
+
+.. currentmodule:: pyPC.vortex_flow
+
+.. autoclass:: LineVortexConstant2D
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   
+      ~LineVortexConstant2D.__init__
+      ~LineVortexConstant2D.get_panel_end
+      ~LineVortexConstant2D.get_panel_length
+      ~LineVortexConstant2D.get_panel_normal
+      ~LineVortexConstant2D.get_panel_start
+      ~LineVortexConstant2D.get_panel_tangent
+      ~LineVortexConstant2D.get_panel_xo
+      ~LineVortexConstant2D.get_panel_yo
+      ~LineVortexConstant2D.get_strength
+      ~LineVortexConstant2D.potential
+      ~LineVortexConstant2D.set_panel_coordinates
+      ~LineVortexConstant2D.set_strength
+      ~LineVortexConstant2D.stream_function
+      ~LineVortexConstant2D.velocity
+   
+   
+
+   
+   
+   

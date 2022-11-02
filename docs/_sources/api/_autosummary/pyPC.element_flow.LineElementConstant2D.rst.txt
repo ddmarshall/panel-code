@@ -1,0 +1,33 @@
+pyPC.element\_flow.LineElementConstant2D
+========================================
+
+.. currentmodule:: pyPC.element_flow
+
+.. autoclass:: LineElementConstant2D
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   
+      ~LineElementConstant2D.__init__
+      ~LineElementConstant2D.get_panel_end
+      ~LineElementConstant2D.get_panel_length
+      ~LineElementConstant2D.get_panel_normal
+      ~LineElementConstant2D.get_panel_start
+      ~LineElementConstant2D.get_panel_tangent
+      ~LineElementConstant2D.get_panel_xo
+      ~LineElementConstant2D.get_panel_yo
+      ~LineElementConstant2D.get_strength
+      ~LineElementConstant2D.potential
+      ~LineElementConstant2D.set_panel_coordinates
+      ~LineElementConstant2D.set_strength
+      ~LineElementConstant2D.stream_function
+      ~LineElementConstant2D.velocity
+   
+   
+
+   
+   
+   

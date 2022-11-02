@@ -1,0 +1,33 @@
+pyPC.source\_flow.LineSourceConstant2D
+======================================
+
+.. currentmodule:: pyPC.source_flow
+
+.. autoclass:: LineSourceConstant2D
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   
+      ~LineSourceConstant2D.__init__
+      ~LineSourceConstant2D.get_panel_end
+      ~LineSourceConstant2D.get_panel_length
+      ~LineSourceConstant2D.get_panel_normal
+      ~LineSourceConstant2D.get_panel_start
+      ~LineSourceConstant2D.get_panel_tangent
+      ~LineSourceConstant2D.get_panel_xo
+      ~LineSourceConstant2D.get_panel_yo
+      ~LineSourceConstant2D.get_strength
+      ~LineSourceConstant2D.potential
+      ~LineSourceConstant2D.set_panel_coordinates
+      ~LineSourceConstant2D.set_strength
+      ~LineSourceConstant2D.stream_function
+      ~LineSourceConstant2D.velocity
+   
+   
+
+   
+   
+   

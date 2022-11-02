@@ -7,11 +7,10 @@ cd sphinx
 make github
 
 # static code analyis
-pylint pyBL tests examples
+pylint pyPC tests examples
 
 # unit tests
 python -m unittest discover --start-directory tests
 
 # type checking
 mypy {optionally can provide specific directory or file to check}
-
