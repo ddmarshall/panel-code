@@ -177,7 +177,7 @@ class LineDoubletConstant2D(LineElementConstant2D):
             Value of the y-velocity.
         """
         xip, etap = self._get_xi_eta(xp, yp)
-        r2_i, r2_ip1, beta_i, beta_ip1 = self._get_I_terms(xip, etap, top)
+        r2_i, r2_ip1, _, _ = self._get_I_terms(xip, etap, top)
         uxi = self._strength_over_2pi*self._get_I04(etap, r2_i, r2_ip1)
         ueta = self._strength_over_2pi*self._get_I05(xip, r2_i, r2_ip1)
         u, v = self._get_u_v(uxi, ueta)

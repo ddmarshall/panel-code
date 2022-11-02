@@ -10,6 +10,7 @@ from os.path import abspath, dirname
 import unittest
 
 import numpy as np
+import numpy.typing as np_type
 import numpy.testing as npt
 
 from pyPC.vortex_flow import PointVortex2D
@@ -29,6 +30,7 @@ class TestPointVortex2D(unittest.TestCase):
         pv.set_strength(0.5)
 
         # test some hand calculations
+        phi_ref: float | np_type.NDArray
         phi = pv.potential(xpt[0], ypt[0])
         phi_ref = -0.0578243602
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
@@ -48,6 +50,7 @@ class TestPointVortex2D(unittest.TestCase):
         pv.set_strength(0.5)
 
         # test some hand calculations
+        psi_ref: float | np_type.NDArray
         psi = pv.stream_function(xpt[0], ypt[0])
         psi_ref = 0.0147840442
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
@@ -67,6 +70,8 @@ class TestPointVortex2D(unittest.TestCase):
         pv.set_strength(0.5)
 
         # test some hand calculations
+        u_ref: float | np_type.NDArray
+        v_ref: float | np_type.NDArray
         u, v = pv.velocity(xp[1], yp[1])
         u_ref = 0.0209108684
         v_ref = -0.0220725833

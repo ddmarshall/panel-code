@@ -97,6 +97,8 @@ class TestLineElement2D(unittest.TestCase):
 
     def testCoordinateSetting(self) -> None:
         """Test the setting of panel coordinates."""
+        # pylint: disable=too-many-locals
+
         # test construction and that normal, tangent, and length are correct
         le = LineElementTest((0, 1), (0, 0))
         x_i, y_i = le.get_panel_start()
@@ -134,10 +136,12 @@ class TestLineElement2D(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(sy, sy_ref))
         self.assertIsNone(npt.assert_allclose(nx, nx_ref))
         self.assertIsNone(npt.assert_allclose(ny, ny_ref))
-        pass
 
     def test_XiEta(self) -> None:
         """Test the calculation of xi- and eta-coordinates."""
+        # pylint: disable=too-many-locals
+        # pylint: disable=protected-access
+
         le = LineElementTest((0, 1), (0, 0))
         x_test = np.array([2.3, -0.2, 0, 3, -4])
         y_test = np.array([-3.1, 1.9, 2, 0, 0])
@@ -172,6 +176,8 @@ class TestLineElement2D(unittest.TestCase):
 
     def test_GetITerms(self) -> None:
         """Test the calculation of the terms needed for integration."""
+        # pylint: disable=protected-access
+
         le = LineElementTest((0, 1), (0, 0))
         x_test = np.array([2.3, -0.2, 0, 3, 0.5, -4])
         y_test = np.array([-3.1, 1.9, 2, 0, 0.0, 0])
@@ -244,6 +250,8 @@ class TestLineElement2D(unittest.TestCase):
 
     def test_I00(self) -> None:
         """Test the calculation of I0,0"""
+        # pylint: disable=protected-access
+
         le = LineElementTest((0, 1), (0, 0))
         x_test = np.array([2.3, -0.2, 0, 3, 0.5, -4])
         y_test = np.array([-3.1, 1.9, 2, 0, 0.0, 0])
@@ -266,6 +274,8 @@ class TestLineElement2D(unittest.TestCase):
 
     def test_I01(self) -> None:
         """Test the calculation of I0,1"""
+        # pylint: disable=protected-access
+
         le = LineElementTest((0, 1), (0, 0))
         x_test = np.array([2.3, -0.2, 0, 3, 0.5, -4])
         y_test = np.array([-3.1, 1.9, 2, 0, 0.0, 0])
@@ -306,6 +316,8 @@ class TestLineElement2D(unittest.TestCase):
 
     def test_I02(self) -> None:
         """Test the calculation of I0,2"""
+        # pylint: disable=protected-access
+
         le = LineElementTest((0, 1), (0, 0))
         x_test = np.array([2.3, -0.2, 0, 3, 0.5, -4])
         y_test = np.array([-3.1, 1.9, 2, 0, 0.0, 0])
@@ -354,6 +366,8 @@ class TestLineElement2D(unittest.TestCase):
 
     def test_I03(self) -> None:
         """Test the calculation of I0,3"""
+        # pylint: disable=protected-access
+
         le = LineElementTest((0, 1), (0, 0))
         x_test = np.array([2.3, -0.2, 0, 3, 0.5, -4])
         y_test = np.array([-3.1, 1.9, 2, 0, 0.0, 0])
@@ -402,6 +416,8 @@ class TestLineElement2D(unittest.TestCase):
 
     def test_I04(self) -> None:
         """Test the calculation of I0,4"""
+        # pylint: disable=protected-access
+
         le = LineElementTest((0, 1), (0, 0))
         x_test = np.array([2.3, -0.2, 0, 3, 0.5, -4])
         y_test = np.array([-3.1, 1.9, 2, 0, 0.0, 0])
@@ -424,6 +440,8 @@ class TestLineElement2D(unittest.TestCase):
 
     def test_I05(self) -> None:
         """Test the calculation of I0,5"""
+        # pylint: disable=protected-access
+
         le = LineElementTest((0, 1), (0, 0))
         x_test = np.array([2.3, -0.2, 0, 3, 0.5, -4])
         y_test = np.array([-3.1, 1.9, 2, 0, 0.0, 0])

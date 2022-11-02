@@ -9,6 +9,7 @@ Created on Tue Oct 18 17:15:25 2022
 import unittest
 
 import numpy as np
+import numpy.typing as np_type
 import numpy.testing as npt
 
 from approximate_elements import ApproxLineDoubletConstant2D
@@ -28,6 +29,7 @@ class TestLineDoubletConstant2D(unittest.TestCase):
         doublet.set_strength(0.5)
 
         # test some hand calculations
+        phi_ref: float | np_type.NDArray
         phi = doublet.potential(xpt[0], ypt[0], True)
         phi_ref = 0.00846647437
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
@@ -45,6 +47,7 @@ class TestLineDoubletConstant2D(unittest.TestCase):
         doublet.set_strength(0.5)
 
         # test some hand calculations
+        psi_ref: float | np_type.NDArray
         psi = doublet.stream_function(xpt[0], ypt[0], True)
         psi_ref = -0.0267646351
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
@@ -62,6 +65,8 @@ class TestLineDoubletConstant2D(unittest.TestCase):
         doublet.set_strength(0.5)
 
         # test some hand calculations
+        u_ref: float | np_type.NDArray
+        v_ref: float | np_type.NDArray
         u, v = doublet.velocity(xp[1], yp[1], True)
         u_ref = 0.00231212910
         v_ref = -0.00424681386

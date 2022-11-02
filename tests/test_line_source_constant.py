@@ -9,6 +9,7 @@ Created on Tue Oct 18 17:15:25 2022
 import unittest
 
 import numpy as np
+import numpy.typing as np_type
 import numpy.testing as npt
 
 from approximate_elements import ApproxLineSourceConstant2D
@@ -28,6 +29,7 @@ class TestLineSourceConstant2D(unittest.TestCase):
         source.set_strength(0.5)
 
         # test some hand calculations
+        phi_ref: float | np_type.NDArray
         phi = source.potential(xpt[0], ypt[0], True)
         phi_ref = 0.000748597907
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
@@ -45,6 +47,7 @@ class TestLineSourceConstant2D(unittest.TestCase):
         source.set_strength(0.5)
 
         # test some hand calculations
+        psi_ref: float | np_type.NDArray
         psi = source.stream_function(xpt[0], ypt[0], True)
         psi_ref = -0.00870528908
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
@@ -62,6 +65,8 @@ class TestLineSourceConstant2D(unittest.TestCase):
         source.set_strength(0.5)
 
         # test some hand calculations
+        u_ref: float | np_type.NDArray
+        v_ref: float | np_type.NDArray
         u, v = source.velocity(xp[1], yp[1], True)
         u_ref = 0.00868245416
         v_ref = 0.00794542082

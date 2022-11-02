@@ -10,6 +10,7 @@ from os.path import abspath, dirname
 import unittest
 
 import numpy as np
+import numpy.typing as np_type
 import numpy.testing as npt
 
 from pyPC.doublet_flow import PointDoublet2D
@@ -30,6 +31,7 @@ class TestPointDoublet2D(unittest.TestCase):
         pd.angle = np.pi/4
 
         # test some hand calculations
+        phi_ref: float | np_type.NDArray
         phi = pd.potential(xpt[0], ypt[0])
         phi_ref = -0.0659714542
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
@@ -50,6 +52,7 @@ class TestPointDoublet2D(unittest.TestCase):
         pd.angle = np.pi/4
 
         # test some hand calculations
+        psi_ref: float | np_type.NDArray
         psi = pd.stream_function(xpt[0], ypt[0])
         psi_ref = -0.00388067378
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
@@ -69,6 +72,8 @@ class TestPointDoublet2D(unittest.TestCase):
         pd.set_strength(0.5)
 
         # test some hand calculations
+        u_ref: float | np_type.NDArray
+        v_ref: float | np_type.NDArray
         u, v = pd.velocity(xp[1], yp[1])
         u_ref = 0.000627495646
         v_ref = 0.0116001898

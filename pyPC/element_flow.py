@@ -425,7 +425,7 @@ class LineElement2D(ABC):
                                               np.asarray(xip < self._ell)),
                                spec_idx)
         beta1[p_idx] = 0
-        if (top):
+        if top:
             beta1[l0_idx] = np.pi
             beta2[l0_idx] = np.pi
             beta2[p_idx] = np.pi
@@ -476,6 +476,7 @@ class LineElement2D(ABC):
         """
         return beta_ip1 - beta_i
 
+    # pylint: disable=too-many-arguments
     def _get_I02(self, xip: np_type.NDArray, etap: np_type.NDArray,
                  r2_i: np_type.NDArray, r2_ip1: np_type.NDArray,
                  beta_i: np_type.NDArray,
@@ -509,6 +510,7 @@ class LineElement2D(ABC):
         I01 = self._get_I01(beta_i, beta_ip1)
         return xip*I00 + etap*I01 + self._ell*(0.5*np.log(r2_ip1)-1)
 
+    # pylint: disable=too-many-arguments
     def _get_I03(self, xip: np_type.NDArray, etap: np_type.NDArray,
                  r2_i: np_type.NDArray, r2_ip1: np_type.NDArray,
                  beta_i: np_type.NDArray,
