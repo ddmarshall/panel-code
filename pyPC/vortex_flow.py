@@ -95,13 +95,13 @@ class PointVortex2D(PointElement2D):
 class LineVortexConstant2D(LineElementConstant2D):
     """Represents a constant strength line vortex in 2 dimensions."""
 
-    def __init__(self, x0: Tuple[float, float], y0: Tuple[float, float],
+    def __init__(self, xo: Tuple[float, float], yo: Tuple[float, float],
                  strength:float = 1) -> None:
-        super().__init__(x0=x0, y0=y0)
+        super().__init__(xo=xo, yo=yo)
         self.set_strength(strength)
 
-    def potential(self, xp: np_type.NDArray,
-                  yp: np_type.NDArray) -> np_type.NDArray:
+    def potential(self, xp: np_type.NDArray, yp: np_type.NDArray,
+                  top: bool) -> np_type.NDArray:
         """
         Calculate the velocity potential at given point.
 
@@ -111,16 +111,22 @@ class LineVortexConstant2D(LineElementConstant2D):
             X-coorindate of point to evaluate potential.
         yp : numpy.ndarray
             Y-coorindate of point to evaluate potential.
+        top : bool
+            Flag indicating whether the top (eta>0) or bottom (eta<0) should
+            be returned when the input point is collinear with panel.
 
         Returns
         -------
         numpy.ndarray
             Value of the velocity potential.
         """
-        return -self._strength_over_2pi*self._getI03(xp, yp)
+        xip, etap = self._get_xi_eta(xp, yp)
+        r2_i, r2_ip1, beta_i, beta_ip1 = self._get_I_terms(xip, etap, top)
+        return -self._strength_over_2pi*self._get_I03(xip, etap, r2_i, r2_ip1,
+                                                      beta_i, beta_ip1)
 
-    def stream_function(self, xp: np_type.NDArray,
-                        yp: np_type.NDArray) -> np_type.NDArray:
+    def stream_function(self, xp: np_type.NDArray, yp: np_type.NDArray,
+                        top: bool) -> np_type.NDArray:
         """
         Calculate the stream function at given point.
 
@@ -130,17 +136,22 @@ class LineVortexConstant2D(LineElementConstant2D):
             X-coorindate of point to evaluate potential.
         yp : numpy.ndarray
             Y-coorindate of point to evaluate potential.
+        top : bool
+            Flag indicating whether the top (eta>0) or bottom (eta<0) should
+            be returned when the input point is collinear with panel.
 
         Returns
         -------
         numpy.ndarray
             Value of the stream function.
         """
-        return self._strength_over_2pi*self._getI02(xp, yp)
+        xip, etap = self._get_xi_eta(xp, yp)
+        r2_i, r2_ip1, beta_i, beta_ip1 = self._get_I_terms(xip, etap, top)
+        return self._strength_over_2pi*self._get_I02(xip, etap, r2_i, r2_ip1,
+                                                     beta_i, beta_ip1)
 
-    def velocity(self, xp: np_type.NDArray,
-                 yp: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
+    def velocity(self, xp: np_type.NDArray, yp: np_type.NDArray,
+                 top: bool) -> Tuple[np_type.NDArray, np_type.NDArray]:
         """
         Calculate the induced velocity at given point.
 
@@ -150,6 +161,9 @@ class LineVortexConstant2D(LineElementConstant2D):
             X-coordinate of point to evaluate velocity.
         yp : numpy.ndarray
             Y-coordinate of point to evaluate velocity.
+        top : bool
+            Flag indicating whether the top (eta>0) or bottom (eta<0) should
+            be returned when the input point is collinear with panel.
 
         Returns
         -------
@@ -158,12 +172,9 @@ class LineVortexConstant2D(LineElementConstant2D):
         numpy.ndarray
             Value of the y-velocity.
         """
-        I00, I01, _, _, _, _, ell = self._getTerms(xp, yp)
-        uxi = self._strength_over_2pi*I01
-        ueta = -self._strength_over_2pi*I00
-
-        dxp = self.x0[1]-self.x0[0]
-        dyp = self.y0[1]-self.y0[0]
-        u = (uxi*dxp-ueta*dyp)/ell
-        v = (uxi*dyp+ueta*dxp)/ell
+        xip, etap = self._get_xi_eta(xp, yp)
+        r2_i, r2_ip1, beta_i, beta_ip1 = self._get_I_terms(xip, etap, top)
+        uxi = self._strength_over_2pi*self._get_I01(beta_i, beta_ip1)
+        ueta = -self._strength_over_2pi*self._get_I00(r2_i, r2_ip1)
+        u, v = self._get_u_v(uxi, ueta)
         return u, v

@@ -19,10 +19,10 @@ def draw_approximate_point_vortex_flow_field() -> None:
     # set mesh
     xg, yg = np.meshgrid(np.linspace(-1, 5, 100), np.linspace(-1, 5, 100))
 
-    vortex = LineVortexConstant2D((1, 2), (2, 4), strength=1)
-    ug, vg = vortex.velocity(xg, yg)
-    potential = vortex.potential(xg, yg)
-    stream_function = vortex.stream_function(xg, yg)
+    vortex = LineVortexConstant2D(xo=(1, 2), yo=(2, 4), strength=1)
+    ug, vg = vortex.velocity(xg, yg, True)
+    potential = vortex.potential(xg, yg, True)
+    stream_function = vortex.stream_function(xg, yg, True)
 
     fig = plt.figure()
     fig.set_figwidth(5)
@@ -35,16 +35,16 @@ def draw_approximate_point_vortex_flow_field() -> None:
     ax = stream_function_axis
     ax.contour(xg, yg, stream_function, levels=20, colors="blue",
                linestyles="solid")
-    ax.plot(vortex.x0, vortex.y0, linewidth=3,
+    ax.plot(vortex.get_panel_xo(), vortex.get_panel_yo(), linewidth=3,
             color="red", marker="o")
     ax = potential_axis
     ax.contour(xg, yg, potential, levels=20, colors="blue",
                linestyles="solid")
-    ax.plot(vortex.x0, vortex.y0, linewidth=3,
+    ax.plot(vortex.get_panel_xo(), vortex.get_panel_yo(), linewidth=3,
             color="red", marker="o")
     ax = velocity_axis
     ax.quiver(xg, yg, ug, vg, color="blue")
-    ax.plot(vortex.x0, vortex.y0, linewidth=3,
+    ax.plot(vortex.get_panel_xo(), vortex.get_panel_yo(), linewidth=3,
             color="red", marker="o")
     ax.set_xlim([0.8, 2.2])
     ax.set_ylim([1.8, 4.2])

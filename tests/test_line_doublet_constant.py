@@ -24,15 +24,15 @@ class TestLineDoubletConstant2D(unittest.TestCase):
         xpt = np.array([1., 2.])
         ypt = np.array([1., 2.])
 
-        doublet = LineDoubletConstant2D(x0=(0.1, 0.3), y0=(0.2, 0.5))
+        doublet = LineDoubletConstant2D(xo=(0.1, 0.3), yo=(0.2, 0.5))
         doublet.set_strength(0.5)
 
         # test some hand calculations
-        phi = doublet.potential(xpt[0], ypt[0])
+        phi = doublet.potential(xpt[0], ypt[0], True)
         phi_ref = 0.00846647437
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
 
-        phi = doublet.potential(xpt, ypt)
+        phi = doublet.potential(xpt, ypt, True)
         phi_ref = np.array([0.00846647437, 0.00281691205])
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
 
@@ -41,15 +41,15 @@ class TestLineDoubletConstant2D(unittest.TestCase):
         xpt = np.array([1., 2.])
         ypt = np.array([1., 2.])
 
-        doublet = LineDoubletConstant2D(x0=(0.1, 0.3), y0=(0.2, 0.5))
+        doublet = LineDoubletConstant2D(xo=(0.1, 0.3), yo=(0.2, 0.5))
         doublet.set_strength(0.5)
 
         # test some hand calculations
-        psi = doublet.stream_function(xpt[0], ypt[0])
+        psi = doublet.stream_function(xpt[0], ypt[0], True)
         psi_ref = -0.0267646351
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
 
-        psi = doublet.stream_function(xpt, ypt)
+        psi = doublet.stream_function(xpt, ypt, True)
         psi_ref = np.array([-0.0267646351, -0.0114271488])
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
 
@@ -58,17 +58,17 @@ class TestLineDoubletConstant2D(unittest.TestCase):
         xp = np.array([1., 2.])
         yp = np.array([1., 2.])
 
-        doublet = LineDoubletConstant2D(x0=(0.1, 0.3), y0=(0.2, 0.5))
+        doublet = LineDoubletConstant2D(xo=(0.1, 0.3), yo=(0.2, 0.5))
         doublet.set_strength(0.5)
 
         # test some hand calculations
-        u, v = doublet.velocity(xp[1], yp[1])
+        u, v = doublet.velocity(xp[1], yp[1], True)
         u_ref = 0.00231212910
         v_ref = -0.00424681386
         self.assertIsNone(npt.assert_allclose(u, u_ref))
         self.assertIsNone(npt.assert_allclose(v, v_ref))
 
-        u, v = doublet.velocity(xp, yp)
+        u, v = doublet.velocity(xp, yp, True)
         u_ref = np.array([0.00986374997, 0.00231212910])
         v_ref = np.array([-0.0258830732, -0.00424681386])
         self.assertIsNone(npt.assert_allclose(u, u_ref))
@@ -81,15 +81,15 @@ class TestLineDoubletConstant2D(unittest.TestCase):
                            np.linspace(-1, 5, 100))
 
         # values
-        doublet = LineDoubletConstant2D(x0=(1, 2), y0=(2, 4), strength=1)
-        u, v = doublet.velocity(x, y)
-        phi = doublet.potential(x, y)
-        psi = doublet.stream_function(x, y)
+        doublet = LineDoubletConstant2D(xo=(1, 2), yo=(2, 4), strength=1)
+        u, v = doublet.velocity(x, y, True)
+        phi = doublet.potential(x, y, True)
+        psi = doublet.stream_function(x, y, True)
 
         # approximate values
         ns = 6000
-        doublet_app = ApproxLineDoubletConstant2D(x0=doublet.x0,
-                                                  y0=doublet.y0,
+        doublet_app = ApproxLineDoubletConstant2D(xo=doublet.get_panel_xo(),
+                                                  yo=doublet.get_panel_yo(),
                                                   mu=doublet.get_strength(),
                                                   num_elements=ns)
         u_app, v_app = doublet_app.velocity(x, y)
