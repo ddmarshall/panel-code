@@ -1,0 +1,33 @@
+pyPC.vortex\_flow.PointVortex2D
+===============================
+
+.. currentmodule:: pyPC.vortex_flow
+
+.. autoclass:: PointVortex2D
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   
+      ~PointVortex2D.__init__
+      ~PointVortex2D.get_strength
+      ~PointVortex2D.potential
+      ~PointVortex2D.set_strength
+      ~PointVortex2D.stream_function
+      ~PointVortex2D.velocity
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PointVortex2D.xo
+      ~PointVortex2D.yo
+      ~PointVortex2D.angle
+   
+   

@@ -1,0 +1,33 @@
+pyPC.doublet\_flow.LineDoubletConstant2D
+========================================
+
+.. currentmodule:: pyPC.doublet_flow
+
+.. autoclass:: LineDoubletConstant2D
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   
+      ~LineDoubletConstant2D.__init__
+      ~LineDoubletConstant2D.get_panel_end
+      ~LineDoubletConstant2D.get_panel_length
+      ~LineDoubletConstant2D.get_panel_normal
+      ~LineDoubletConstant2D.get_panel_start
+      ~LineDoubletConstant2D.get_panel_tangent
+      ~LineDoubletConstant2D.get_panel_xo
+      ~LineDoubletConstant2D.get_panel_yo
+      ~LineDoubletConstant2D.get_strength
+      ~LineDoubletConstant2D.potential
+      ~LineDoubletConstant2D.set_panel_coordinates
+      ~LineDoubletConstant2D.set_strength
+      ~LineDoubletConstant2D.stream_function
+      ~LineDoubletConstant2D.velocity
+   
+   
+
+   
+   
+   

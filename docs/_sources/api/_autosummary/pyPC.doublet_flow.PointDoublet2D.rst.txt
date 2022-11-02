@@ -1,0 +1,33 @@
+pyPC.doublet\_flow.PointDoublet2D
+=================================
+
+.. currentmodule:: pyPC.doublet_flow
+
+.. autoclass:: PointDoublet2D
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   
+      ~PointDoublet2D.__init__
+      ~PointDoublet2D.get_strength
+      ~PointDoublet2D.potential
+      ~PointDoublet2D.set_strength
+      ~PointDoublet2D.stream_function
+      ~PointDoublet2D.velocity
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PointDoublet2D.xo
+      ~PointDoublet2D.yo
+      ~PointDoublet2D.angle
+   
+   
