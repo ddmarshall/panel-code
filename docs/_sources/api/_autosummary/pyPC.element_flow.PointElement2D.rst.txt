@@ -1,0 +1,33 @@
+pyPC.element\_flow.PointElement2D
+=================================
+
+.. currentmodule:: pyPC.element_flow
+
+.. autoclass:: PointElement2D
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   
+      ~PointElement2D.__init__
+      ~PointElement2D.get_strength
+      ~PointElement2D.potential
+      ~PointElement2D.set_strength
+      ~PointElement2D.stream_function
+      ~PointElement2D.velocity
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PointElement2D.xo
+      ~PointElement2D.yo
+      ~PointElement2D.angle
+   
+   

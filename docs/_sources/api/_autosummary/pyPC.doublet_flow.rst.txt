@@ -1,0 +1,33 @@
+pyPC.doublet\_flow
+==================
+
+.. automodule:: pyPC.doublet_flow
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+      :nosignatures:
+   
+      LineDoubletConstant2D
+      PointDoublet2D
+   
+   
+
+   
+   
+   
+
+
+

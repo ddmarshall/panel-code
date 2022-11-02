@@ -1,0 +1,35 @@
+﻿pyPC
+====
+
+.. automodule:: pyPC
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   pyPC.doublet_flow
+   pyPC.element_flow
+   pyPC.source_flow
+   pyPC.vortex_flow
+
