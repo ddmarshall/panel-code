@@ -97,9 +97,9 @@ class TestLineVortexConstant2D(unittest.TestCase):
                                                 yo=vortex.get_panel_yo(),
                                                 gamma=vortex.get_strength(),
                                                 num_elements=ns)
-        u_app, v_app = vortex_app.velocity(x, y)
-        phi_app = vortex_app.potential(x, y)
-        psi_app = vortex_app.stream_function(x, y)
+        u_app, v_app = vortex_app.velocity(x, y, True)
+        phi_app = vortex_app.potential(x, y, True)
+        psi_app = vortex_app.stream_function(x, y, True)
 
         self.assertIsNone(npt.assert_allclose(phi, phi_app, rtol=0, atol=2e-4))
         self.assertIsNone(npt.assert_allclose(psi, psi_app, rtol=0, atol=2e-4))

@@ -97,9 +97,9 @@ class TestLineSourceConstant2D(unittest.TestCase):
                                                 yo=source.get_panel_yo(),
                                                 sigma=source.get_strength(),
                                                 num_elements=ns)
-        u_app, v_app = source_app.velocity(x, y)
-        phi_app = source_app.potential(x, y)
-        psi_app = source_app.stream_function(x, y)
+        u_app, v_app = source_app.velocity(x, y, True)
+        phi_app = source_app.potential(x, y, True)
+        psi_app = source_app.stream_function(x, y, True)
 
         self.assertIsNone(npt.assert_allclose(phi, phi_app, rtol=0, atol=2e-4))
         self.assertIsNone(npt.assert_allclose(psi, psi_app, rtol=0, atol=2e-4))
