@@ -21,8 +21,8 @@ class PointVortex2D(PointElement2D):
         super().__init__(xo=xo, yo=yo, angle=angle)
         self.set_strength(strength)
 
-    def potential(self, xp: np_type.NDArray,
-                  yp: np_type.NDArray) -> np_type.NDArray:
+    def potential(self, xp: np_type.NDArray, yp: np_type.NDArray,
+                  top: bool) -> np_type.NDArray:
         """
         Calculate the velocity potential at given point.
 
@@ -32,6 +32,9 @@ class PointVortex2D(PointElement2D):
             X-coorindate of point to evaluate potential.
         yp : numpy.ndarray
             Y-coorindate of point to evaluate potential.
+        top : bool
+            Flag indicating whether the top or bottom of the branch cut should
+            be returned when the input point is on the branch cut.
 
         Returns
         -------
@@ -40,13 +43,17 @@ class PointVortex2D(PointElement2D):
         """
         rx, ry, _ = self._r_terms(xp, yp)
         angle = np.asarray(np.arctan2(ry, rx)-self.angle)
-        angle[angle > np.pi] = 2*np.pi - angle[angle > np.pi]
-        angle[angle <= -np.pi] = 2*np.pi + angle[angle <= -np.pi]
+        if top:
+            angle[angle > np.pi] = 2*np.pi - angle[angle > np.pi]
+            angle[angle <= -np.pi] = 2*np.pi + angle[angle <= -np.pi]
+        else:
+            angle[angle >= np.pi] = 2*np.pi - angle[angle >= np.pi]
+            angle[angle < -np.pi] = 2*np.pi + angle[angle < -np.pi]
 
         return -self._strength_over_2pi*angle
 
-    def stream_function(self, xp: np_type.NDArray,
-                        yp: np_type.NDArray) -> np_type.NDArray:
+    def stream_function(self, xp: np_type.NDArray, yp: np_type.NDArray,
+                        top: bool = True) -> np_type.NDArray:
         """
         Calculate the stream function at given point.
 
@@ -56,6 +63,8 @@ class PointVortex2D(PointElement2D):
             X-coorindate of point to evaluate potential.
         yp : numpy.ndarray
             Y-coorindate of point to evaluate potential.
+        top : bool
+            Branch cut flag that does not affect this class.
 
         Returns
         -------
@@ -66,9 +75,9 @@ class PointVortex2D(PointElement2D):
 
         return 0.5*self._strength_over_2pi*np.log(rmag2)
 
-    def velocity(self, xp: np_type.NDArray,
-                 yp: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
+    def velocity(self, xp: np_type.NDArray, yp: np_type.NDArray,
+                 top: bool = True) -> Tuple[np_type.NDArray,
+                                            np_type.NDArray]:
         """
         Calculate the induced velocity at given point.
 
@@ -78,6 +87,8 @@ class PointVortex2D(PointElement2D):
             X-coordinate of point to evaluate velocity.
         yp : numpy.ndarray
             Y-coordinate of point to evaluate velocity.
+        top : bool
+            Branch cut flag that does not affect this class.
 
         Returns
         -------

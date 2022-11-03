@@ -24,7 +24,7 @@ def draw_point_vortex_flow_field() -> None:
     xg, yg = np.meshgrid(np.linspace(-1, 5, nptsx), np.linspace(-1, 5, nptsy))
 
     stream_function = vortex.stream_function(xg, yg)
-    potential = vortex.potential(xg, yg)
+    potential = vortex.potential(xg, yg, True)
     ug, vg = vortex.velocity(xg, yg)
 
     fig = plt.figure()
