@@ -191,6 +191,8 @@ class LineElement2D(Element2D):
         self._sy = self._sy/self._ell
         self._nx = -self._sy
         self._ny = self._sx
+        self._xc = 0.5*(xo[1]+xo[0])
+        self._yc = 0.5*(yo[1]+yo[0])
 
     def get_panel_xo(self) -> Tuple[float, float]:
         """
@@ -265,6 +267,19 @@ class LineElement2D(Element2D):
             Y-component of the panel normal.
         """
         return self._nx, self._ny
+
+    def get_panel_collo_point(self) -> Tuple[float, float]:
+        """
+        Return the collocation point for the panel.
+
+        Returns
+        -------
+        float
+            X-component of the panel collocation point.
+        float
+            Y-component of the panel collocation point.
+        """
+        return self._xc, self._yc
 
     def get_panel_length(self) -> float:
         """
