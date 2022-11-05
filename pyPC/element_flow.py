@@ -292,6 +292,17 @@ class LineElement2D(Element2D):
         """
         return self._ell
 
+    def get_panel_angle(self) -> float:
+        """
+        Return the angle of the panel.
+
+        Returns
+        -------
+        float
+            Angle of panel.
+        """
+        return np.arctan2(self._yo[1]-self._yo[0], self._xo[1]-self._xo[0])
+
     def _get_xi_eta(self, xp: np_type.NDArray,
                     yp: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                   np_type.NDArray]:

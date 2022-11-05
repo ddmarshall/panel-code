@@ -164,9 +164,6 @@ class ApproxLineElementConstant2D(ApproxLineElement2D):
 
         return u, v
 
-    def _panel_angle(self) -> float:
-        return np.arctan2(self._yo[1]-self._yo[0], self._xo[1]-self._xo[0])
-
     @abstractmethod
     def _setup_element(self) -> PointElement2D:
         """
@@ -196,11 +193,11 @@ class ApproxLineSourceConstant2D(ApproxLineElementConstant2D):
         PointSource2D
             Point source class configured for analysis.
         """
-        angle = self._panel_angle()
         strength = self.strength*self.get_panel_length()/(self.ne-1)
 
         source = PointSource2D(xo=self._xo[0], yo=self._yo[0],
-                               strength=strength, angle=angle)
+                               strength=strength,
+                               angle=self.get_panel_angle())
 
         return source
 
@@ -222,11 +219,11 @@ class ApproxLineVortexConstant2D(ApproxLineElementConstant2D):
         PointVortex2D
             Point vortex class configured for analysis.
         """
-        angle = self._panel_angle()
         strength = self.strength*self.get_panel_length()/(self.ne-1)
 
         vortex = PointVortex2D(xo=self._xo[0], yo=self._yo[0],
-                               strength=strength, angle=angle)
+                               strength=strength,
+                               angle=self.get_panel_angle())
 
         return vortex
 
@@ -247,11 +244,11 @@ class ApproxLineDoubletConstant2D(ApproxLineElementConstant2D):
         PointDoublet2D
             Point doublet class configured for analysis.
         """
-        # doublet is orientied in the xi-direction, so need to rotate angle
-        angle = 0.5*np.pi+self._panel_angle()
         strength = self.strength*self.get_panel_length()/(self.ne-1)
 
+        # doublet is orientied in the xi-direction, so need to rotate angle
         doublet = PointDoublet2D(xo=self._xo[0], yo=self._yo[0],
-                                 strength=strength, angle=angle)
+                                 strength=strength,
+                                 angle=0.5*np.pi+self._panel_angle())
 
         return doublet
