@@ -144,18 +144,18 @@ class PointElement2D(Element2D):
 
         Parameters
         ----------
-        xp : np_type.NDArray
+        xp : numpy.ndarray
             X-coordinate of the point to calculate terms.
-        yp : np_type.NDArray
+        yp : numpy.ndarray
             Y-coordinate of the point to calculate terms.
 
         Returns
         -------
-        rx : np_type.NDArray
+        rx : numpy.ndarray
             X-component of the vector from element to point.
-        ry : np_type.NDArray
+        ry : numpy.ndarray
             Y-component of the vector from element to point.
-        rmag2 : np_type.NDArray
+        rmag2 : numpy.ndarray
             Square of the distance from element to point.
         """
         rx = xp - self.xo
