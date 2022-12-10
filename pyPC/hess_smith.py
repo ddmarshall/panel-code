@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 from pyPC.element_flow import LineElement2D
 from pyPC.freestream_flow import FreestreamFlow2D
 from pyPC.source_flow import LineSourceConstant2D
+from pyPC.geometry import Cylinder
 
 
 @dataclass
@@ -267,8 +268,11 @@ def main() -> None:
     npan = 101
     c = 2
     theta = np.linspace(2*np.pi, 0, npan+1)
-    af = Geometry(name="Cylinder", x=0.5*c*(np.cos(theta)+1),
-                  y=0.5*c*np.sin(theta))
+    xr = 0.5*c*(np.cos(theta)+1)
+    yr = 0.5*c*np.sin(theta)
+    surf = Cylinder(radius=0.5*c)
+    xb, yb = surf.xy_from_xi(np.linspace(-1, 1, npan+1))
+    af = Geometry(name="Cylinder", x=xr, y=yr)
 
     # solve for panel strengths
     pan_sol = hess_smith_solver(freestream, [af])
