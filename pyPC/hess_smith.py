@@ -228,6 +228,7 @@ def hess_smith_solver(freestream: FreestreamCondition,
     """
     # create freestream and surface elements
     fs = FreestreamFlow2D(U_inf=freestream.U_inf, alpha=freestream.alpha)
+    # TODO: this needs to be modified to handle multiple surfaces
     src: List[LineSourceConstant2D] = []
     j = 0
     npan = airfoil[j].number_panels()
@@ -297,6 +298,7 @@ def main() -> None:
     plt.quiver(xc, yc, nx, ny, scale=10, color="blue")
     plt.quiver(xc, yc, sx, sy, scale=10, color="blue")
     plt.title(f"{af.name} with {af.number_panels()} panels")
+    plt.show()
 
     # # plot the velocity vectors on surface
     xc, yc, u, v, cp = pan_sol.get_surface_properties()[0]
@@ -305,6 +307,7 @@ def main() -> None:
     fig.set_figheight(5)
     plt.plot(xp, yp, "-r")
     plt.quiver(xc, yc, u, v, scale=100, color="orange")
+    plt.show()
 
     # plot the pressure profile
     theta = np.arctan2(yc, xc-0.5*c)
@@ -316,6 +319,7 @@ def main() -> None:
     plt.xticks(np.linspace(0, 360, 9))
     plt.xlabel(r"$\theta\ (^\circ)$")
     plt.ylabel(r"$c_p$")
+    plt.show()
 
     # # plot the potentials
     potential = pan_sol.get_potential(xg, yg)
@@ -325,6 +329,7 @@ def main() -> None:
     plt.contour(xg, yg, potential, levels=60, colors="blue",
                 linestyles="solid")
     plt.plot(xp, yp, "-r")
+    plt.show()
 
     # plot the stream function
     stream_function = pan_sol.get_stream_function(xg, yg)
@@ -334,6 +339,7 @@ def main() -> None:
     plt.contour(xg, yg, stream_function, levels=60, colors="blue",
                 linestyles="solid")
     plt.plot(xp, yp, "-r")
+    plt.show()
 
     # plot the flow field
     ug, vg = pan_sol.get_velocity(xg, yg)
@@ -346,6 +352,7 @@ def main() -> None:
                                           np.linspace(-4, 4, 40)]).T,
                    linewidth=0.5, cmap="jet")
     plt.plot(xp, yp, "-k", linewidth=0.5)
+    plt.show()
 
 
 if __name__ == "__main__":
