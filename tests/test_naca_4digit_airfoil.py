@@ -12,7 +12,9 @@ import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
 
-from pyPC.airfoil import Naca4DigitCamber, Naca4DigitThickness
+from pyPC.airfoil import Naca4DigitCamber, Naca4DigitThicknessBase
+from pyPC.airfoil import Naca4DigitThicknessClassic
+from pyPC.airfoil import Naca4DigitThicknessEnhanced
 
 
 class TestNaca4Digit(unittest.TestCase):
@@ -74,12 +76,90 @@ class TestNaca4Digit(unittest.TestCase):
         xi = np.linspace(0, 1, 12)
         compare_values(xi, af)
 
+    def testEnhancedThickness(self) -> None:
+        """Test the enhanced thickness coefficient calculation."""
+        af = Naca4DigitThicknessEnhanced(thickness=0.20, closed_te=True,
+                                         le_radius=False)
+        xi_max = 0.3
+        xi_1c = 0.1
+        xi_te = 1.0
+
+        # test open trailing edge, original leading edge shape
+        af.reset(closed_te=False, le_radius=False)
+        y_max_ref = 0.1
+        y_te_ref = 0.002
+        y_pte_ref = -0.234
+        y_1c_ref = 0.078
+        y_max = af.y(xi_max)
+        y_pmax = af.y_p(xi_max)
+        y_te = af.y(xi_te)
+        y_pte = af.y_p(xi_te)
+        y_1c = af.y(xi_1c)
+        self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
+        self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
+        self.assertIsNone(npt.assert_allclose(y_pte, y_pte_ref))
+        self.assertIsNone(npt.assert_allclose(y_1c, y_1c_ref))
+
+        # test open trailing edge, leading edge radius
+        af.reset(closed_te=False, le_radius=True)
+        y_max_ref = 0.1
+        y_te_ref = 0.002
+        y_pte_ref = -0.234
+        r_le_ref = 0.5*0.29690**2
+        y_max = af.y(xi_max)
+        y_pmax = af.y_p(xi_max)
+        y_te = af.y(xi_te)
+        y_pte = af.y_p(xi_te)
+        r_le = 0.5*af._a[0]**2
+        self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
+        self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
+        self.assertIsNone(npt.assert_allclose(y_pte, y_pte_ref))
+        self.assertIsNone(npt.assert_allclose(r_le, r_le_ref))
+
+        # test closed trailing edge, original leading edge shape
+        af.reset(closed_te=True, le_radius=False)
+        y_max_ref = 0.1
+        y_te_ref = 0.0
+        y_pte_ref = -0.234
+        y_1c_ref = 0.078
+        y_max = af.y(xi_max)
+        y_pmax = af.y_p(xi_max)
+        y_te = af.y(xi_te)
+        y_pte = af.y_p(xi_te)
+        y_1c = af.y(xi_1c)
+        self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
+        self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
+        self.assertIsNone(npt.assert_allclose(y_pte, y_pte_ref))
+        self.assertIsNone(npt.assert_allclose(y_1c, y_1c_ref))
+
+        # test closed trailing edge, leading edge radius
+        af.reset(closed_te=True, le_radius=True)
+        y_max_ref = 0.1
+        y_te_ref = 0.0
+        y_pte_ref = -0.234
+        r_le_ref = 0.5*0.29690**2
+        y_max = af.y(xi_max)
+        y_pmax = af.y_p(xi_max)
+        y_te = af.y(xi_te)
+        y_pte = af.y_p(xi_te)
+        r_le = 0.5*af._a[0]**2
+        self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
+        self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
+        self.assertIsNone(npt.assert_allclose(y_pte, y_pte_ref))
+        self.assertIsNone(npt.assert_allclose(r_le, r_le_ref))
+
     def testThickness(self) -> None:
         """Test the thickness relations."""
-        af = Naca4DigitThickness(t_max=0.3, closed_te=False)
+        af_open = Naca4DigitThicknessClassic(thickness=0.3)
+        af_closed = Naca4DigitThicknessEnhanced(thickness=0.3, closed_te=True,
+                                                le_radius=False)
 
         def compare_values(xi: np_type.NDArray,
-                           af: Naca4DigitThickness) -> None:
+                           af: Naca4DigitThicknessBase) -> None:
             eps = 1e-7
 
             xi_a = np.asarray(xi)
@@ -114,15 +194,19 @@ class TestNaca4Digit(unittest.TestCase):
 
         # test point on front
         xi = 0.25
-        compare_values(xi, af)
+        compare_values(xi, af_closed)
+        compare_values(xi, af_open)
 
         # test point on back
         xi = 0.6
-        compare_values(xi, af)
+        compare_values(xi, af_closed)
+        compare_values(xi, af_open)
 
-        # test points on lower and upper surface
+        # test points on lower and upper surface (avoid leading edge because
+        # the derivatives are infinite)
         xi = np.linspace(0.001, 1, 12)
-        compare_values(xi, af)
+        compare_values(xi, af_closed)
+        compare_values(xi, af_open)
 
 
 if __name__ == "__main__":

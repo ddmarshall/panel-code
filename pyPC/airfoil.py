@@ -134,9 +134,9 @@ class Naca4DigitCamber:
                             [lambda xi: fore(xi), lambda xi: aft(xi)])
 
 
-class Naca4DigitThickness:
+class Naca4DigitThicknessBase:
     """
-    Thickness for the NACA 4-digit airfoils.
+    Base class for the NACA 4-digit airfoil thickness.
 
     Attributes
     ----------
@@ -144,14 +144,9 @@ class Naca4DigitThickness:
         Maximum thickness per chord length.
     """
 
-    def __init__(self, t_max: float, closed_te: bool) -> None:
+    def __init__(self, t_max: float, a: np_type.NDArray) -> None:
         self._t_max = t_max
-        if closed_te:
-            self._a = np.array([0.2968999832, -0.1283341279, -0.3358822557,
-                                0.2516169539, -0.0843005535])
-        else:
-            self._a = np.array([0.29690, -0.12600, -0.35160,
-                                0.28430, -0.10150])
+        self._a = a
 
     @property
     def t_max(self) -> float:
@@ -216,6 +211,102 @@ class Naca4DigitThickness:
                                   + 2*(self._a[2]
                                        + 3*xi*(self._a[3]
                                                + 2*xi*self._a[4])))
+
+
+class Naca4DigitThicknessClassic(Naca4DigitThicknessBase):
+    """Classic NACA 4-digit airfoil thickness."""
+
+    def __init__(self, thickness: float) -> None:
+        super().__init__(t_max=thickness, a=np.array([0.29690, -0.12600,
+                                                      -0.35160, 0.28430,
+                                                      -0.10150]))
+
+
+class Naca4DigitThicknessEnhanced(Naca4DigitThicknessBase):
+    """
+    Enhanced NACA 4-digit airfoil thickness relation.
+
+    This class extends the standard thickness distribution relations by
+    - Solving for the coefficients based on the original constraints used to
+      describe the thickness
+    - Allowing the trailing edge to be closed instead of the default thickness
+    - Allowing the setting of the leading edge radius value instead of the
+      approximate way it is set in the original formulations.
+
+    Attributes
+    ----------
+    closed_te : bool
+        True if the thickness should be zero at the trailing edge
+    le_radius : bool
+        True if the leading edge radius should be same as classic airfoil or
+        False if original method of setting the thickness near the leading
+        edge should be used.
+    """
+
+    def __init__(self, thickness: float, closed_te: bool,
+                 le_radius: bool) -> None:
+        self.reset(closed_te, le_radius)
+        super().__init__(t_max=thickness, a=self._a)
+
+    def reset(self, closed_te: bool, le_radius: bool) -> None:
+        """
+        Reset the flags for the leading edge and trailing edge shape.
+
+        Parameters
+        ----------
+        closed_te : bool
+            True if the thickness should be zero at the trailing edge
+        le_radius : bool
+            True if the leading edge radius should be same as classic airfoil
+            or False if original method of setting the thickness near the
+            leading edge should be used.
+        """
+        self._closed_te = closed_te
+        self._le_radius = le_radius
+
+        # solve for new values of the coefficients
+        B = np.zeros([5,5])
+        r = np.zeros([5,1])
+
+        # first row is leading edge condition
+        i = 0
+        if le_radius:
+            B[i, :] = [1, 0, 0, 0, 0]
+            r[i] = 0.29690
+        else:
+            xi_1c = 0.1
+            t_1c = 0.078
+            B[i, :] = [np.sqrt(xi_1c), xi_1c, xi_1c**2, xi_1c**3, xi_1c**4]
+            r[i] = t_1c
+
+        # second row is the maximum thickness at 0.3c
+        i = 1
+        xi_max = 0.3
+        B[i, :] = [0.5/np.sqrt(xi_max), 1, 2*xi_max, 3*xi_max**2, 4*xi_max**3]
+        r[i] = 0.0
+
+        # third row is the maximum thickness of 0.2c
+        i = 2
+        t_max = 0.1
+        B[i, :] = [np.sqrt(xi_max), xi_max, xi_max**2, xi_max**3, xi_max**4]
+        r[i] = t_max
+
+        # fourth row is trailing edge slope
+        i = 3
+        te_slope = -0.234
+        B[i, :] = [0.5, 1, 2, 3, 4]
+        r[i] = te_slope
+
+        # fith row is trailing edge thickness
+        i = 4
+        if closed_te:
+            t_te = 0
+        else:
+            t_te = 0.002
+        B[i, :] = [1, 1, 1, 1, 1]
+        r[i] = t_te
+
+        self._a = np.linalg.solve(B, r).transpose()[0]
 
 
 class Naca5DigitCamberRegular:
