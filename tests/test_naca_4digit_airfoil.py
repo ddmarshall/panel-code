@@ -8,6 +8,9 @@ Created on Fri Dec  9 22:37:52 2022
 
 import unittest
 
+from os.path import abspath, dirname
+from typing import Tuple
+
 import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
@@ -75,6 +78,93 @@ class TestNaca4Digit(unittest.TestCase):
         # test points on lower and upper surface
         xi = np.linspace(0, 1, 12)
         compare_values(xi, af)
+
+    def testClassicThickness(self) -> None:
+        """Test the classic thickness coordinates to published data."""
+
+        def read_thickness_data(filename) -> Tuple[np_type.NDArray,
+                                                   np_type.NDArray]:
+            directory = dirname(abspath(__file__))
+            fq_filename = (directory
+                           + "/data/Theory of Wing Sections/Thickness/"
+                           + filename)
+            file = open(fq_filename, "r", encoding="utf8")
+            lines = file.readlines()
+            file.close()
+
+            n = len(lines)-3
+            x = np.zeros(n)
+            y = np.zeros(n)
+
+            for i in range(0,n):
+                col = lines[i+3].split(",")
+                x[i] = float(col[0])/100.0
+                y[i] = float(col[1])/100.0
+
+            return x, y
+
+        # NACA 0006
+        af = Naca4DigitThicknessClassic(thickness=0.06)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+
+        # NACA 0008
+        af = Naca4DigitThicknessClassic(thickness=0.08)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+
+        # NACA 0009
+        af = Naca4DigitThicknessClassic(thickness=0.09)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+
+        # NACA 0010
+        af = Naca4DigitThicknessClassic(thickness=0.10)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1.2e-5))
+
+        # NACA 0012
+        af = Naca4DigitThicknessClassic(thickness=0.12)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+
+        # NACA 0015
+        af = Naca4DigitThicknessClassic(thickness=0.15)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+
+        # NACA 0018
+        af = Naca4DigitThicknessClassic(thickness=0.18)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+
+        # NACA 0021
+        af = Naca4DigitThicknessClassic(thickness=0.21)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+
+        # NACA 0024
+        af = Naca4DigitThicknessClassic(thickness=0.24)
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+                                           ".dat")
+        y = af.y(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
     def testEnhancedThickness(self) -> None:
         """Test the enhanced thickness coefficient calculation."""
