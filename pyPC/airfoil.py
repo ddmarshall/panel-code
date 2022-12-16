@@ -351,7 +351,176 @@ class Naca4DigitThicknessEnhanced(Naca4DigitThicknessBase):
         self._a = np.linalg.solve(B, r).transpose()[0]
 
 
-class Naca5DigitCamberRegular:
+class Naca5DigitCamberBase:
+    """
+    Base class for the NACA 5-digit airfoil camber.
+
+    Attributes
+    ----------
+    m : float
+        Camber transition relative chord location.
+    k1 : float
+        Scale factor for camber.
+    """
+
+    def __init__(self, m: float, k1: float) -> None:
+        self._m = m
+        self._k1 = k1
+
+    @property
+    def m(self) -> float:
+        """Camber transition relative chord location."""
+        return self._m
+
+    @property
+    def k1(self) -> float:
+        """Scale factor for camber."""
+        return self._k1
+
+    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the camber location at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Camber at specified point.
+        """
+
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            m = self.m
+            return (self.k1/6)*(xi**3 - 3*m*xi**2 + m**2*(3-m)*xi)
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return (self.k1*self.m**3/6)*(1 - xi)
+
+        return np.piecewise(xi, [xi <= self.m, xi > self.m],
+                            [lambda xi: fore(xi), lambda xi: aft(xi)])
+
+    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of camber at specified point.
+        """
+
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            m = self.m
+            return (self.k1/6)*(3*xi**2 - 6*m*xi + m**2*(3-m))
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return -(self.k1*self.m**3/6)*np.ones_like(xi)
+
+        return np.piecewise(xi, [xi <= self.m, xi > self.m],
+                            [lambda xi: fore(xi), lambda xi: aft(xi)])
+
+    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of camber at specified point.
+        """
+
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return (self.k1)*(xi - self.m)
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return np.zeros_like(xi)
+
+        return np.piecewise(xi, [xi <= self.m, xi > self.m],
+                            [lambda xi: fore(xi), lambda xi: aft(xi)])
+
+    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return third derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Third derivative of camber at specified point.
+        """
+
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return self.k1*np.ones_like(xi)
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return np.zeros_like(xi)
+
+        return np.piecewise(xi, [xi <= self.m, xi > self.m],
+                            [lambda xi: fore(xi), lambda xi: aft(xi)])
+
+
+class Naca5DigitCamberClassic(Naca5DigitCamberBase):
+    """
+    Camber for the classic NACA 5-digit airfoils.
+
+    Attributes
+    ----------
+    camber_location : int
+        Relative chord location of maximum camber. The only valid values are 1,
+        2, 3, 4, and 5.
+    """
+
+    def __init__(self, camber_loc: int) -> None:
+        self.camber_location = camber_loc
+        super().__init__(m=self.m, k1=self.k1)
+
+    @property
+    def camber_location(self) -> int:
+        """Relative chord location of maximum camber."""
+        return self._camber_location
+
+    @camber_location.setter
+    def camber_location(self, camber_loc: int) -> None:
+        if camber_loc == 1:
+            self._m = 0.0580
+            self._k1 = 361.4
+        elif camber_loc == 2:
+            self._m = 0.1260
+            self._k1 = 51.64
+        elif camber_loc == 3:
+            self._m = 0.2025
+            self._k1 = 15.957
+        elif camber_loc == 4:
+            self._m = 0.2900
+            self._k1 = 6.643
+        elif camber_loc == 5:
+            self._m = 0.3910
+            self._k1 = 3.230
+        else:
+            raise ValueError("Invalid NACA 5-Digit max. camber location: "
+                             f"{camber_loc}.")
+
+        self._camber_location = camber_loc
+
+
+class Naca5DigitCamberEnhanced(Naca5DigitCamberBase):
     """
     Camber for the regular NACA 5-digit airfoils.
 
@@ -401,102 +570,6 @@ class Naca5DigitCamberRegular:
     def _determine_k1(Cl_ideal: float, m: float) -> float:
         return 6*Cl_ideal/(-3/2*(1-2*m)*np.arccos(1-2*m)
                            + (4*m**2-4*m+3)*np.sqrt(m*(1-m)))
-
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return the camber location at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Camber at specified point.
-        """
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.m/self.p**2)*(2*self.p*xi - xi**2)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.m/(1-self.p)**2)*(1 + 2*self.p*(xi - 1) - xi**2)
-
-        return np.piecewise(xi, [xi <= self.p, xi > self.p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return first derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            First derivative of camber at specified point.
-        """
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return 2*(self.m/self.p**2)*(self.p - xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return 2*(self.m/(1-self.p)**2)*(self.p - xi)
-
-        return np.piecewise(xi, [xi <= self.p, xi > self.p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return second derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Second derivative of camber at specified point.
-        """
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return -2*(self.m/self.p**2)*np.ones_like(xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return -2*(self.m/(1-self.p)**2)*np.ones_like(xi)
-
-        return np.piecewise(xi, [xi <= self.p, xi > self.p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return third derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Third derivative of camber at specified point.
-        """
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return np.zeros_like(xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return np.zeros_like(xi)
-
-        return np.piecewise(xi, [xi <= self.p, xi > self.p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
 
 
 class Airfoil(Geometry):
