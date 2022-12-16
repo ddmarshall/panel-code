@@ -140,18 +140,22 @@ class Naca4DigitThicknessBase:
 
     Attributes
     ----------
-    t_max : float
+    thickness : float
         Maximum thickness per chord length.
     """
 
-    def __init__(self, t_max: float, a: np_type.NDArray) -> None:
-        self._t_max = t_max
+    def __init__(self, thickness: float, a: np_type.NDArray) -> None:
+        self._t = thickness
         self._a = a
 
     @property
-    def t_max(self) -> float:
+    def thickness(self) -> float:
         """Maximum thickness."""
-        return self._t_max
+        return self._t
+
+    @thickness.setter
+    def thickness(self, thickness: float) -> None:
+        self._t = thickness
 
     def y(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -167,11 +171,11 @@ class Naca4DigitThicknessBase:
         numpy.ndarray
             Thickness at specified point.
         """
-        return (self.t_max/0.20)*(self._a[0]*np.sqrt(xi)
-                                  + xi*(self._a[1]
-                                        + xi*(self._a[2]
-                                              + xi*(self._a[3]
-                                                    + xi*self._a[4]))))
+        return (self.thickness/0.20)*(self._a[0]*np.sqrt(xi)
+                                      + xi*(self._a[1]
+                                            + xi*(self._a[2]
+                                                  + xi*(self._a[3]
+                                                        + xi*self._a[4]))))
 
     def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -187,11 +191,11 @@ class Naca4DigitThicknessBase:
         numpy.ndarray
             First derivative of thickness at specified point.
         """
-        return (self.t_max/0.20)*(0.5*self._a[0]/np.sqrt(xi)
-                                  + (self._a[1]
-                                     + xi*(2*self._a[2]
-                                           + xi*(3*self._a[3]
-                                                 + 4*xi*self._a[4]))))
+        return (self.thickness/0.20)*(0.5*self._a[0]/np.sqrt(xi)
+                                      + (self._a[1]
+                                         + xi*(2*self._a[2]
+                                               + xi*(3*self._a[3]
+                                                     + 4*xi*self._a[4]))))
 
     def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -207,19 +211,19 @@ class Naca4DigitThicknessBase:
         numpy.ndarray
             Second derivative of thickness at specified point.
         """
-        return (self.t_max/0.20)*(-0.25*self._a[0]/(xi*np.sqrt(xi))
-                                  + 2*(self._a[2]
-                                       + 3*xi*(self._a[3]
-                                               + 2*xi*self._a[4])))
+        return (self.thickness/0.20)*(-0.25*self._a[0]/(xi*np.sqrt(xi))
+                                      + 2*(self._a[2]
+                                           + 3*xi*(self._a[3]
+                                                   + 2*xi*self._a[4])))
 
 
 class Naca4DigitThicknessClassic(Naca4DigitThicknessBase):
     """Classic NACA 4-digit airfoil thickness."""
 
     def __init__(self, thickness: float) -> None:
-        super().__init__(t_max=thickness, a=np.array([0.29690, -0.12600,
-                                                      -0.35160, 0.28430,
-                                                      -0.10150]))
+        super().__init__(thickness=thickness, a=np.array([0.29690, -0.12600,
+                                                          -0.35160, 0.28430,
+                                                          -0.10150]))
 
 
 class Naca4DigitThicknessEnhanced(Naca4DigitThicknessBase):
@@ -246,7 +250,7 @@ class Naca4DigitThicknessEnhanced(Naca4DigitThicknessBase):
     def __init__(self, thickness: float, closed_te: bool,
                  le_radius: bool) -> None:
         self.reset(closed_te, le_radius)
-        super().__init__(t_max=thickness, a=self._a)
+        super().__init__(thickness=thickness, a=self._a)
 
     def reset(self, closed_te: bool, le_radius: bool) -> None:
         """
