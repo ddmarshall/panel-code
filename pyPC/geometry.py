@@ -534,6 +534,10 @@ class Cylinder(Geometry):
         """Radius of the cylinder."""
         return self._r
 
+    @radius.setter
+    def radius(self, radius) -> float:
+        self._r = radius
+
     def camber(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of camber at specified chord location.
