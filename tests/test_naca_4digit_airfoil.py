@@ -9,7 +9,6 @@ Created on Fri Dec  9 22:37:52 2022
 import unittest
 
 from os.path import abspath, dirname
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as np_type
@@ -19,41 +18,21 @@ from pyPC.airfoil import Naca4DigitCamber, Naca4DigitThicknessBase
 from pyPC.airfoil import Naca4DigitThicknessClassic
 from pyPC.airfoil import Naca4DigitThicknessEnhanced
 
+from theory_of_wing_sections import read_camber_data, read_thickness_data
+
 
 class TestNaca4Digit(unittest.TestCase):
     """Class to test the NACA 4-digit airfoil geometry."""
 
     def testCamberClassic(self) -> None:
         """Test the camber coordinates and slope against published data."""
-        def read_camber_data(filename) -> Tuple[np_type.NDArray,
-                                                np_type.NDArray,
-                                                np_type.NDArray]:
-            directory = dirname(abspath(__file__))
-            fq_filename = (directory
-                           + "/data/Theory of Wing Sections/Camber/"
-                           + filename)
-            file = open(fq_filename, "r", encoding="utf8")
-            lines = file.readlines()
-            file.close()
-
-            header_offset = 5
-            n = len(lines) - header_offset
-            x = np.zeros(n)
-            y = np.zeros(n)
-            dydx = np.zeros(n)
-
-            for i in range(0,n):
-                col = lines[i + header_offset].split(",")
-                x[i] = float(col[0])/100.0
-                y[i] = float(col[1])/100.0
-                dydx[i] = float(col[2])
-
-            return x, y, dydx
+        directory = dirname(abspath(__file__))
 
         # NACA 62xx
         af = Naca4DigitCamber(m=0.06, p=0.2)
-        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
-                                                f"{int(af.p*10):1d}.dat")
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA{int(af.m*100):1d}{int(af.p*10):1d}.dat")
+        x_ref, y_ref, yp_ref = read_camber_data(filename)
         y = af.y(x_ref)
         yp = af.y_p(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
@@ -61,8 +40,9 @@ class TestNaca4Digit(unittest.TestCase):
 
         # NACA 63xx
         af = Naca4DigitCamber(m=0.06, p=0.3)
-        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
-                                                f"{int(af.p*10):1d}.dat")
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA{int(af.m*100):1d}{int(af.p*10):1d}.dat")
+        x_ref, y_ref, yp_ref = read_camber_data(filename)
         y = af.y(x_ref)
         yp = af.y_p(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
@@ -70,8 +50,9 @@ class TestNaca4Digit(unittest.TestCase):
 
         # NACA 64xx
         af = Naca4DigitCamber(m=0.06, p=0.3)
-        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
-                                                f"{int(af.p*10):1d}.dat")
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA{int(af.m*100):1d}{int(af.p*10):1d}.dat")
+        x_ref, y_ref, yp_ref = read_camber_data(filename)
         y = af.y(x_ref)
         yp = af.y_p(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
@@ -79,8 +60,9 @@ class TestNaca4Digit(unittest.TestCase):
 
         # NACA 65xx
         af = Naca4DigitCamber(m=0.06, p=0.3)
-        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
-                                                f"{int(af.p*10):1d}.dat")
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA{int(af.m*100):1d}{int(af.p*10):1d}.dat")
+        x_ref, y_ref, yp_ref = read_camber_data(filename)
         y = af.y(x_ref)
         yp = af.y_p(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
@@ -88,8 +70,9 @@ class TestNaca4Digit(unittest.TestCase):
 
         # NACA 66xx
         af = Naca4DigitCamber(m=0.06, p=0.3)
-        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
-                                                f"{int(af.p*10):1d}.dat")
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA{int(af.m*100):1d}{int(af.p*10):1d}.dat")
+        x_ref, y_ref, yp_ref = read_camber_data(filename)
         y = af.y(x_ref)
         yp = af.y_p(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
@@ -97,8 +80,9 @@ class TestNaca4Digit(unittest.TestCase):
 
         # NACA 67xx
         af = Naca4DigitCamber(m=0.06, p=0.3)
-        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
-                                                f"{int(af.p*10):1d}.dat")
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA{int(af.m*100):1d}{int(af.p*10):1d}.dat")
+        x_ref, y_ref, yp_ref = read_camber_data(filename)
         y = af.y(x_ref)
         yp = af.y_p(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
@@ -162,89 +146,77 @@ class TestNaca4Digit(unittest.TestCase):
 
     def testClassicThickness(self) -> None:
         """Test the classic thickness coordinates to published data."""
-
-        def read_thickness_data(filename) -> Tuple[np_type.NDArray,
-                                                   np_type.NDArray]:
-            directory = dirname(abspath(__file__))
-            fq_filename = (directory
-                           + "/data/Theory of Wing Sections/Thickness/"
-                           + filename)
-            file = open(fq_filename, "r", encoding="utf8")
-            lines = file.readlines()
-            file.close()
-
-            header_offset = 3
-            n = len(lines) - header_offset
-            x = np.zeros(n)
-            y = np.zeros(n)
-
-            for i in range(0,n):
-                col = lines[i + header_offset].split(",")
-                x[i] = float(col[0])/100.0
-                y[i] = float(col[1])/100.0
-
-            return x, y
+        directory = dirname(abspath(__file__))
 
         # NACA 0006
         af = Naca4DigitThicknessClassic(thickness=0.06)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0008
         af = Naca4DigitThicknessClassic(thickness=0.08)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0009
         af = Naca4DigitThicknessClassic(thickness=0.09)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0010
         af = Naca4DigitThicknessClassic(thickness=0.10)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1.2e-5))
 
         # NACA 0012
         af = Naca4DigitThicknessClassic(thickness=0.12)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0015
         af = Naca4DigitThicknessClassic(thickness=0.15)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0018
         af = Naca4DigitThicknessClassic(thickness=0.18)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0021
         af = Naca4DigitThicknessClassic(thickness=0.21)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0024
         af = Naca4DigitThicknessClassic(thickness=0.24)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
-                                           ".dat")
+        filename = (directory + "/data/Theory of Wing Sections/Thickness/"
+                    + f"NACA00{int(af.thickness*100):02d}.dat")
+        x_ref, y_ref = read_thickness_data(filename)
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
