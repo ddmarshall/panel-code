@@ -32,10 +32,18 @@ class Naca4DigitCamber:
         """Maximum amount of camber."""
         return self._m
 
+    @m.setter
+    def m(self, m: float) -> None:
+        self._m = m
+
     @property
     def p(self) -> float:
         """Location of maximum camber."""
         return self._p
+
+    @p.setter
+    def p(self, p: float) -> None:
+        self._p = p
 
     def y(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
