@@ -283,7 +283,7 @@ class TestNaca4Digit(unittest.TestCase):
         y_pmax = af.y_p(xi_max)
         y_te = af.y(xi_te)
         y_pte = af.y_p(xi_te)
-        r_le = 0.5*af._a[0]**2
+        r_le = 0.5*af.a[0]**2
         self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
         self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
         self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
@@ -317,7 +317,7 @@ class TestNaca4Digit(unittest.TestCase):
         y_pmax = af.y_p(xi_max)
         y_te = af.y(xi_te)
         y_pte = af.y_p(xi_te)
-        r_le = 0.5*af._a[0]**2
+        r_le = 0.5*af.a[0]**2
         self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
         self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
         self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
@@ -340,11 +340,11 @@ class TestNaca4Digit(unittest.TestCase):
                                                     ["writeonly"]])
             with it:
                 for xir, yr in it:
-                    yr[...] = (af.thickness/0.20)*(af._a[0]*np.sqrt(xir)
-                                                   + af._a[1]*xir
-                                                   + af._a[2]*xir**2
-                                                   + af._a[3]*xir**3
-                                                   + af._a[4]*xir**4)
+                    yr[...] = (af.thickness/0.20)*(af.a[0]*np.sqrt(xir)
+                                                   + af.a[1]*xir
+                                                   + af.a[2]*xir**2
+                                                   + af.a[3]*xir**3
+                                                   + af.a[4]*xir**4)
 
             # compare point values
             y = af.y(xi)

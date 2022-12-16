@@ -150,6 +150,8 @@ class Naca4DigitThicknessBase:
     ----------
     thickness : float
         Maximum thickness per chord length.
+    a : numpy.ndarray
+        Coefficients for equation.
     """
 
     def __init__(self, thickness: float, a: np_type.NDArray) -> None:
@@ -165,6 +167,11 @@ class Naca4DigitThicknessBase:
     def thickness(self, thickness: float) -> None:
         self._t = thickness
 
+    @property
+    def a(self) -> float:
+        """Equation coefficients."""
+        return self._a
+
     def y(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
         Return the thickness at specified chord location.
@@ -179,11 +186,11 @@ class Naca4DigitThicknessBase:
         numpy.ndarray
             Thickness at specified point.
         """
-        return (self.thickness/0.20)*(self._a[0]*np.sqrt(xi)
-                                      + xi*(self._a[1]
-                                            + xi*(self._a[2]
-                                                  + xi*(self._a[3]
-                                                        + xi*self._a[4]))))
+        return (self.thickness/0.20)*(self.a[0]*np.sqrt(xi)
+                                      + xi*(self.a[1]
+                                            + xi*(self.a[2]
+                                                  + xi*(self.a[3]
+                                                        + xi*self.a[4]))))
 
     def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -199,11 +206,11 @@ class Naca4DigitThicknessBase:
         numpy.ndarray
             First derivative of thickness at specified point.
         """
-        return (self.thickness/0.20)*(0.5*self._a[0]/np.sqrt(xi)
-                                      + (self._a[1]
-                                         + xi*(2*self._a[2]
-                                               + xi*(3*self._a[3]
-                                                     + 4*xi*self._a[4]))))
+        return (self.thickness/0.20)*(0.5*self.a[0]/np.sqrt(xi)
+                                      + (self.a[1]
+                                         + xi*(2*self.a[2]
+                                               + xi*(3*self.a[3]
+                                                     + 4*xi*self.a[4]))))
 
     def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -219,10 +226,10 @@ class Naca4DigitThicknessBase:
         numpy.ndarray
             Second derivative of thickness at specified point.
         """
-        return (self.thickness/0.20)*(-0.25*self._a[0]/(xi*np.sqrt(xi))
-                                      + 2*(self._a[2]
-                                           + 3*xi*(self._a[3]
-                                                   + 2*xi*self._a[4])))
+        return (self.thickness/0.20)*(-0.25*self.a[0]/(xi*np.sqrt(xi))
+                                      + 2*(self.a[2]
+                                           + 3*xi*(self.a[3]
+                                                   + 2*xi*self.a[4])))
 
 
 class Naca4DigitThicknessClassic(Naca4DigitThicknessBase):
@@ -259,6 +266,29 @@ class Naca4DigitThicknessEnhanced(Naca4DigitThicknessBase):
                  le_radius: bool) -> None:
         self.reset(closed_te, le_radius)
         super().__init__(thickness=thickness, a=self._a)
+
+    def is_trailing_edge_closed(self) -> bool:
+        """
+        Return state of trailing edge condition.
+
+        Returns
+        -------
+        bool
+            True if the trailing edge is closed.
+        """
+        return self._closed_te
+
+    def using_leading_edge_radius(self) -> bool:
+        """
+        Return state of leading edge treatment.
+
+        Returns
+        -------
+        bool
+            True if the leading edge radius is set otherwise the original
+            approximate leading edge condition used.
+        """
+        return self._le_radius
 
     def reset(self, closed_te: bool, le_radius: bool) -> None:
         """
