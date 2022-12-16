@@ -92,7 +92,7 @@ class TestNaca5Digit(unittest.TestCase):
         # k1 from ref.    [361.4000,       51.6400,       15.9570,
         #                  6.6430,       3.2300]
         k1_ref = np.array([350.3324130671, 51.5774898103, 15.9196523168,
-                            6.6240446646, 3.2227606900])
+                           6.6240446646, 3.2227606900])
 
         # test the static methods
         for pit, mit, k1it in np.nditer([p, m_ref, k1_ref]):

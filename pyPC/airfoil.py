@@ -550,6 +550,7 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamberBase):
                            bracket=[p, 2*p])
         self._m = root.root
         self._p = p
+        # This sets the new k1 since m changed
         self.Cl_ideal = self.Cl_ideal
 
     @property
