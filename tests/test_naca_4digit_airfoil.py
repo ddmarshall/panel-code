@@ -105,63 +105,63 @@ class TestNaca4Digit(unittest.TestCase):
 
         # NACA 0006
         af = Naca4DigitThicknessClassic(thickness=0.06)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0008
         af = Naca4DigitThicknessClassic(thickness=0.08)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0009
         af = Naca4DigitThicknessClassic(thickness=0.09)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0010
         af = Naca4DigitThicknessClassic(thickness=0.10)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1.2e-5))
 
         # NACA 0012
         af = Naca4DigitThicknessClassic(thickness=0.12)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0015
         af = Naca4DigitThicknessClassic(thickness=0.15)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0018
         af = Naca4DigitThicknessClassic(thickness=0.18)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0021
         af = Naca4DigitThicknessClassic(thickness=0.21)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
         # NACA 0024
         af = Naca4DigitThicknessClassic(thickness=0.24)
-        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.t_max*100):02d}"
+        x_ref, y_ref = read_thickness_data(f"NACA00{int(af.thickness*100):02d}"
                                            ".dat")
         y = af.y(x_ref)
         self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
@@ -258,11 +258,11 @@ class TestNaca4Digit(unittest.TestCase):
                                                     ["writeonly"]])
             with it:
                 for xir, yr in it:
-                    yr[...] = (af.t_max/0.20)*(af._a[0]*np.sqrt(xir)
-                                               + af._a[1]*xir
-                                               + af._a[2]*xir**2
-                                               + af._a[3]*xir**3
-                                               + af._a[4]*xir**4)
+                    yr[...] = (af.thickness/0.20)*(af._a[0]*np.sqrt(xir)
+                                                   + af._a[1]*xir
+                                                   + af._a[2]*xir**2
+                                                   + af._a[3]*xir**3
+                                                   + af._a[4]*xir**4)
 
             # compare point values
             y = af.y(xi)
