@@ -23,6 +23,87 @@ from pyPC.airfoil import Naca4DigitThicknessEnhanced
 class TestNaca4Digit(unittest.TestCase):
     """Class to test the NACA 4-digit airfoil geometry."""
 
+    def testCamberClassic(self) -> None:
+        """Test the camber coordinates and slope against published data."""
+        def read_camber_data(filename) -> Tuple[np_type.NDArray,
+                                                np_type.NDArray,
+                                                np_type.NDArray]:
+            directory = dirname(abspath(__file__))
+            fq_filename = (directory
+                           + "/data/Theory of Wing Sections/Camber/"
+                           + filename)
+            file = open(fq_filename, "r", encoding="utf8")
+            lines = file.readlines()
+            file.close()
+
+            header_offset = 5
+            n = len(lines) - header_offset
+            x = np.zeros(n)
+            y = np.zeros(n)
+            dydx = np.zeros(n)
+
+            for i in range(0,n):
+                col = lines[i + header_offset].split(",")
+                x[i] = float(col[0])/100.0
+                y[i] = float(col[1])/100.0
+                dydx[i] = float(col[2])
+
+            return x, y, dydx
+
+        # NACA 62xx
+        af = Naca4DigitCamber(m=0.06, p=0.2)
+        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
+                                                f"{int(af.p*10):1d}.dat")
+        y = af.y(x_ref)
+        yp = af.y_p(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+
+        # NACA 63xx
+        af = Naca4DigitCamber(m=0.06, p=0.3)
+        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
+                                                f"{int(af.p*10):1d}.dat")
+        y = af.y(x_ref)
+        yp = af.y_p(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+
+        # NACA 64xx
+        af = Naca4DigitCamber(m=0.06, p=0.3)
+        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
+                                                f"{int(af.p*10):1d}.dat")
+        y = af.y(x_ref)
+        yp = af.y_p(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+
+        # NACA 65xx
+        af = Naca4DigitCamber(m=0.06, p=0.3)
+        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
+                                                f"{int(af.p*10):1d}.dat")
+        y = af.y(x_ref)
+        yp = af.y_p(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+
+        # NACA 66xx
+        af = Naca4DigitCamber(m=0.06, p=0.3)
+        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
+                                                f"{int(af.p*10):1d}.dat")
+        y = af.y(x_ref)
+        yp = af.y_p(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+
+        # NACA 67xx
+        af = Naca4DigitCamber(m=0.06, p=0.3)
+        x_ref, y_ref, yp_ref = read_camber_data(f"NACA{int(af.m*100):1d}"
+                                                f"{int(af.p*10):1d}.dat")
+        y = af.y(x_ref)
+        yp = af.y_p(x_ref)
+        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+
     def testCamber(self) -> None:
         """Test the camber relations."""
         af = Naca4DigitCamber(m=0.03, p=0.4)
@@ -92,12 +173,13 @@ class TestNaca4Digit(unittest.TestCase):
             lines = file.readlines()
             file.close()
 
-            n = len(lines)-3
+            header_offset = 3
+            n = len(lines) - header_offset
             x = np.zeros(n)
             y = np.zeros(n)
 
             for i in range(0,n):
-                col = lines[i+3].split(",")
+                col = lines[i + header_offset].split(",")
                 x[i] = float(col[0])/100.0
                 y[i] = float(col[1])/100.0
 
