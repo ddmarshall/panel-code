@@ -417,14 +417,15 @@ class Naca5DigitCamberBase:
             First derivative of camber at specified point.
         """
 
+        m = self.m
+
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            m = self.m
             return (self.k1/6)*(3*xi**2 - 6*m*xi + m**2*(3-m))
 
         def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return -(self.k1*self.m**3/6)*np.ones_like(xi)
+            return -(self.k1*m**3/6)*np.ones_like(xi)
 
-        return np.piecewise(xi, [xi <= self.m, xi > self.m],
+        return np.piecewise(xi, [xi <= m, xi > m],
                             [lambda xi: fore(xi), lambda xi: aft(xi)])
 
     def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
@@ -559,7 +560,7 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamberBase):
         return self._Cl_ideal
 
     @Cl_ideal.setter
-    def Cl_ideal(self, Cl_ideal) -> float:
+    def Cl_ideal(self, Cl_ideal: float) -> float:
         self._Cl_ideal = Cl_ideal
         self._k1 = self._determine_k1(Cl_ideal, self._m)
 
