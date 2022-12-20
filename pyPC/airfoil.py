@@ -352,6 +352,295 @@ class Naca4DigitThicknessEnhanced(Naca4DigitThicknessBase):
         self._a = np.linalg.solve(B, r).transpose()[0]
 
 
+class Naca4DigitModifiedThicknessBase:
+    """
+    Base class for the NACA modified 4-digit airfoil thickness.
+
+    Attributes
+    ----------
+    thickness : float
+        Maximum thickness per chord length.
+    m_xi : float
+        Location of end of fore section and start of aft section.
+    a : numpy.ndarray
+        Coefficients for fore equation.
+    d : numpy.ndarray
+        Coefficients for aft equation.
+    """
+
+    def __init__(self, thickness: float, xi_m: float, a: np_type.NDArray,
+                 d: np_type.NDArray) -> None:
+        self._t = thickness
+        self._xi_m = xi_m
+        self._a = a
+        self._d = d
+
+    @property
+    def thickness(self) -> float:
+        """Maximum thickness."""
+        return self._t
+
+    @thickness.setter
+    def thickness(self, thickness: float) -> None:
+        self._t = thickness
+
+    @property
+    def xi_m(self) -> float:
+        """Location where fore and aft equations meet."""
+        return self._xi_m
+
+    @property
+    def a(self) -> float:
+        """Fore equation coefficients."""
+        return self._a
+
+    @property
+    def d(self) -> float:
+        """Aft equation coefficients."""
+        return self._d
+
+    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the thickness at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Thickness at specified point.
+        """
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return self.a[0]*np.sqrt(xi) + xi*(self.a[1]
+                                               + xi*(self.a[2]
+                                                     + (xi*self.a[3])))
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return self.d[0] + (1-xi)*(self.d[1]
+                                       + (1-xi)*(self.d[2]
+                                                 + ((1-xi)*self.d[3])))
+
+        return self.thickness*np.piecewise(xi, [xi <= self.xi_m,
+                                                xi > self.xi_m],
+                                           [lambda xi: fore(xi),
+                                            lambda xi: aft(xi)])
+
+    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of thickness at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of thickness at specified point.
+        """
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return 0.5*self.a[0]/np.sqrt(xi) + (self.a[1]
+                                                + xi*(2*self.a[2]
+                                                      + (3*xi*self.a[3])))
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return -self.d[1] + (1-xi)*(-2*self.d[2] + (-3*(1-xi)*self.d[3]))
+
+        return self.thickness*np.piecewise(xi, [xi <= self.xi_m,
+                                                xi > self.xi_m],
+                                           [lambda xi: fore(xi),
+                                            lambda xi: aft(xi)])
+
+    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of thickness at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of thickness at specified point.
+        """
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return (-0.25*self.a[0]/(xi*np.sqrt(xi)) + 2*self.a[2]
+                    + 6*xi*self.a[3])
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return 2*self.d[2] + 6*(1-xi)*self.d[3]
+
+        return self.thickness*np.piecewise(xi, [xi <= self.xi_m,
+                                                xi > self.xi_m],
+                                           [lambda xi: fore(xi),
+                                            lambda xi: aft(xi)])
+
+    def _reset(self, le_radius: float, xi_m: float, eta: float) -> None:
+        tau = self._tau(xi_m)
+        k_m = self._k_m(eta=eta, tau=tau, xi_m=xi_m)
+        self._xi_m = xi_m
+        self._d = self._calc_d_terms(eta=eta, tau=tau, xi_m=xi_m)
+        self._a = self._calc_a_terms(Iterm=le_radius, k_m=k_m, xi_m=xi_m)
+
+    @staticmethod
+    def _tau(xi_m: float) -> float:
+        p = [1.0310900853, -2.7171508529, 4.8594083156]
+        q = [1.0, -1.8252487562, 1.1771499645]
+        return ((p[0] + p[1]*xi_m + p[2]*xi_m**2)
+                / (q[0] + q[1]*xi_m + q[2]*xi_m**2))
+
+    @staticmethod
+    def _Q(Iterm: float) -> float:
+        a_tilda2 = 0.08814961
+        if Iterm < 9:
+            return 25*a_tilda2/72
+        else:
+            return 25*a_tilda2/54
+
+    @staticmethod
+    def _calc_d_terms(eta: float, tau: float, xi_m: float) -> np_type.NDArray:
+        d = np.zeros(4)
+        d[0] = 0.5*eta
+        d[1] = tau
+        d[2] = (2*tau*(xi_m-1)-1.5*(eta-1))/(xi_m-1)**2
+        d[3] = (tau*(xi_m-1)-(eta-1))/(xi_m-1)**3
+        return d
+
+    @staticmethod
+    def _k_m(eta: float, tau: float, xi_m: float) -> float:
+        return (3*(eta-1)-2*tau*(xi_m-1))/(xi_m-1)**2
+
+    @staticmethod
+    def _calc_a_terms(Iterm: float, k_m: float,
+                      xi_m: float) -> np_type.NDArray:
+        Q = Naca4DigitModifiedThicknessBase._Q(Iterm)
+        a = np.zeros(4)
+        sqrt_term = np.sqrt(2*Q)
+        sqrt_term2 = np.sqrt(2*Q*xi_m)
+        a[0] = Iterm*sqrt_term
+        a[1] = 0.5*xi_m*(k_m + (3-3.75*Iterm*sqrt_term2)/xi_m**2)
+        a[2] = -(k_m + (1.5-1.25*Iterm*sqrt_term2)/xi_m**2)
+        a[3] = 0.5/xi_m*(k_m + (1-0.75*Iterm*sqrt_term2)/xi_m**2)
+        return a
+
+
+class Naca4DigitModifiedThicknessClassic(Naca4DigitModifiedThicknessBase):
+    """
+    Classic NACA modified 4-digit airfoil thickness.
+
+    Attributes
+    ----------
+    max_thickness_loc : int
+        Location of maximum thickness in tenth of chord.
+    le_radius : int
+        Index to specify the radius of the leading edge.
+    """
+
+    def __init__(self, thickness: float, le_radius: int,
+                 max_t_loc: int) -> None:
+        super().__init__(thickness=thickness, xi_m=0.4, a=np.zeros(4),
+                         d=np.zeros(4))
+        self.reset(le_radius, max_t_loc)
+
+    @property
+    def max_thickness_loc(self) -> int:
+        """Parameter specifying the location of maximum thickness."""
+        return self._max_t_loc
+
+    @property
+    def le_radius(self) -> int:
+        """Parameter specifying the leading edge radius."""
+        return self._le_radius
+
+    def reset(self, le_radius: int, max_t_loc: int) -> None:
+        """
+        Reset the thickness parameters to new values.
+
+        Parameters
+        ----------
+        le_radius : int
+            Indicator of leading edge radius.
+        max_t_loc : int
+            Indicator of location of maximum thickness.
+        """
+        self._le_radius = le_radius
+        self._max_t_loc = max_t_loc
+        self._reset(le_radius=le_radius, xi_m=max_t_loc/10.0, eta=0.02)
+
+
+class Naca4DigitModifiedThicknessEnhanced(Naca4DigitModifiedThicknessBase):
+    """
+    Enhanced NACA modified 4-digit airfoil thickness relation.
+
+    This class extends the standard modified thickness distribution relations
+    by
+    - Solving for the coefficients based on the original constraints used to
+      describe the thickness for non-integer values of parameters
+    - Allowing the trailing edge to be closed instead of the default thickness
+
+    Attributes
+    ----------
+    closed_te : bool
+        True if the thickness should be zero at the trailing edge
+    max_thickness_loc : float
+        Location of maximum thickness per chord.
+    le_radius : float
+        Parameter to specify the radius of the leading edge.
+    """
+
+    def __init__(self, thickness: float,  le_radius: float, max_t_loc: float,
+                 closed_te: bool) -> None:
+        super().__init__(thickness=thickness, xi_m=0.4, a=np.zeros(4),
+                         d=np.zeros(4))
+        self.reset(le_radius, max_t_loc, closed_te)
+
+    @property
+    def max_thickness_loc(self) -> float:
+        """Location of maximum thickness per chord."""
+        return self._xi_m
+
+    @property
+    def le_radius(self) -> float:
+        """Parameter specifying the leading edge radius."""
+        return self._le_radius
+
+    @property
+    def closed_te(self) -> bool:
+        """Flag whether trailing edge should be closed."""
+        return self._closed_te
+
+    @closed_te.setter
+    def closed_te(self, closed_te: bool) -> None:
+        self.reset(le_radius=self.le_radius, max_t_loc=self.max_thickness_loc,
+                   closed_te=closed_te)
+
+    def reset(self, le_radius: float, max_t_loc: float,
+              closed_te: bool) -> None:
+        """
+        Reset the thickness parameters to new values.
+
+        Parameters
+        ----------
+        le_radius : int
+            Indicator of leading edge radius.
+        max_t_loc : int
+            Indicator of location of maximum thickness.
+        """
+        self._le_radius = le_radius
+        self._closed_te = closed_te
+        if closed_te:
+            eta = 0
+        else:
+            eta = 0.02
+        self._reset(le_radius=le_radius, xi_m=max_t_loc, eta=eta)
+
+
 class Naca5DigitCamberBase:
     """
     Base class for the NACA 5-digit airfoil camber.
