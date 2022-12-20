@@ -775,6 +775,7 @@ class Naca5DigitCamberReflexedEnhanced(Naca5DigitCamberReflexedBase):
         self._Cl_ideal = 1  # Need to bootstrap initialization
         self.p = p
         self.Cl_ideal = Cl_ideal
+        super().__init__(m=self.m, k1=self.k1, k2=self.k2)
 
     @property
     def p(self) -> float:
