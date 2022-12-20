@@ -247,8 +247,9 @@ class Naca4DigitThicknessEnhanced(Naca4DigitThicknessBase):
 
     This class extends the standard thickness distribution relations by
     - Solving for the coefficients based on the original constraints used to
-      describe the thickness
-    - Allowing the trailing edge to be closed instead of the default thickness
+      describe the thickness even with non-integer parameters,
+    - Allowing the trailing edge to be closed instead of the default
+      thickness, and
     - Allowing the setting of the leading edge radius value instead of the
       approximate way it is set in the original formulations.
 
