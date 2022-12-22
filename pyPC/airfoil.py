@@ -1229,6 +1229,14 @@ class Naca4DigitAirfoilClassic(Geometry):
     def scale(self, scale: float) -> None:
         self._scale = scale
 
+    @staticmethod
+    def _convert_xi(xi: np_type.NDArray) -> np_type.NDArray:
+        xic = np.asarray(xi).copy()
+        sgn = np.ones_like(xic)
+        sgn[xic < 0] = -1.0
+        xic[xic < 0] = -xic[xic < 0]
+        return xic, sgn
+
     def camber(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of camber at specified chord location.
@@ -1243,8 +1251,7 @@ class Naca4DigitAirfoilClassic(Geometry):
         numpy.ndarray
             Camber at specified point.
         """
-        xic = xi.copy()
-        xic[xic < 0] = 1-xic[xic < 0]
+        xic, _ = self._convert_xi(xi)
         return self.scale*self._yc.y(xic)
 
     def thickness(self, xi: np_type.NDArray) -> np_type.NDArray:
@@ -1261,8 +1268,7 @@ class Naca4DigitAirfoilClassic(Geometry):
         numpy.ndarray
             Thickness at specified point.
         """
-        xic = xi.copy()
-        xic[xic < 0] = 1-xic[xic < 0]
+        xic, _ = self._convert_xi(xi)
         return self.scale*self._delta_t.y(xic)
 
     def xy_from_xi(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
@@ -1287,9 +1293,15 @@ class Naca4DigitAirfoilClassic(Geometry):
         numpy.ndarray
             Y-coordinate of point.
         """
-        x = np.zeros_like(xi)
-        y = np.zeros_like(xi)
-        return x, y
+        xic, sgn = self._convert_xi(xi)
+
+        delta_t = self._delta_t.y(xic)
+        yc = self._yc.y(xic)
+        yc_p = self._yc.y_p(xic)
+        denom = np.sqrt(1+yc_p**2)
+        x = xic - sgn*delta_t*yc_p/denom
+        y = yc + sgn*delta_t/denom
+        return self.scale*x, self.scale*y
 
     def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                  np_type.NDArray]:
