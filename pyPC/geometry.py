@@ -411,8 +411,13 @@ class Geometry(ABC):
             bracket = [-1, 0]
         with it:
             for x, xi in it:
-                root = root_scalar(lambda xi: fun(xi, x), bracket=bracket)
-                xi[...] = root.root
+                if np.abs(fun(bracket[0], x)) < 1e-8:
+                    xi[...] = bracket[0]
+                elif np.abs(fun(bracket[1], x)) < 1e-8:
+                    xi[...] = bracket[1]
+                else:
+                    root = root_scalar(lambda xi: fun(xi, x), bracket=bracket)
+                    xi[...] = root.root
 
             return it.operands[1]
 
