@@ -61,10 +61,16 @@ class Naca4DigitCamber:
         """
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.m/self.p**2)*(2*self.p*xi - xi**2)
+            if self.m == 0:
+                return np.zeros_like(xi)
+            else:
+                return (self.m/self.p**2)*(2*self.p*xi - xi**2)
 
         def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.m/(1-self.p)**2)*(1 + 2*self.p*(xi - 1) - xi**2)
+            if self.m == 0:
+                return np.zeros_like(xi)
+            else:
+                return (self.m/(1-self.p)**2)*(1 + 2*self.p*(xi - 1) - xi**2)
 
         return np.piecewise(xi, [xi <= self.p, xi > self.p],
                             [lambda xi: fore(xi), lambda xi: aft(xi)])
@@ -85,10 +91,16 @@ class Naca4DigitCamber:
         """
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return 2*(self.m/self.p**2)*(self.p - xi)
+            if self.m == 0:
+                return np.zeros_like(xi)
+            else:
+                return 2*(self.m/self.p**2)*(self.p - xi)
 
         def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return 2*(self.m/(1-self.p)**2)*(self.p - xi)
+            if self.m == 0:
+                return np.zeros_like(xi)
+            else:
+                return 2*(self.m/(1-self.p)**2)*(self.p - xi)
 
         return np.piecewise(xi, [xi <= self.p, xi > self.p],
                             [lambda xi: fore(xi), lambda xi: aft(xi)])
@@ -109,10 +121,16 @@ class Naca4DigitCamber:
         """
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return -2*(self.m/self.p**2)*np.ones_like(xi)
+            if self.m == 0:
+                return np.zeros_like(xi)
+            else:
+                return -2*(self.m/self.p**2)*np.ones_like(xi)
 
         def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return -2*(self.m/(1-self.p)**2)*np.ones_like(xi)
+            if self.m == 0:
+                return np.zeros_like(xi)
+            else:
+                return -2*(self.m/(1-self.p)**2)*np.ones_like(xi)
 
         return np.piecewise(xi, [xi <= self.p, xi > self.p],
                             [lambda xi: fore(xi), lambda xi: aft(xi)])
