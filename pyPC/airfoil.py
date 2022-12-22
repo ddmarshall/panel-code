@@ -1133,23 +1133,101 @@ class Naca5DigitCamberReflexedEnhanced(Naca5DigitCamberReflexedBase):
                                        * np.sqrt(m*(1-m)))
 
 
-class Airfoil(Geometry):
+class Naca4DigitAirfoilClassic(Geometry):
     """
-    Cylinderical shaped 2D airfoil.
+    Classic NACA 4-digit airfoil.
 
     Attributes
     ----------
-    radius : float
-        Radius of the cylinder.
+    max_camber : int
+        Maximum camber parameter. 100 time the actual maximum camber per chord.
+    max_camber_location : int
+        Location of maximum camber parameter. 10 times the actual location per
+        chord.
+    max_thickness : int
+        Maximum thickness parameter. 100 times the actual thickness per chord.
+    scale : float
+        Amount to scale the final airfoil.
     """
 
-    def __init__(self, radius) -> None:
-        self._r = radius
+    def __init__(self, max_camber: int, max_camber_location: int,
+                 max_thickness: int, scale: float) -> None:
+        self._scale = scale
+        self._max_camber = max_camber
+        self._max_camber_loc = max_camber_location
+        self._max_thickness = max_thickness
+        self._delta_t = Naca4DigitThicknessClassic(max_thickness/100.0)
+        self._yc = Naca4DigitCamber(m=max_camber/100.0,
+                                    p=max_camber_location/10.0)
 
     @property
-    def radius(self) -> float:
-        """Radius of the cylinder."""
-        return self._r
+    def m(self) -> int:
+        """Maximum camber parameter."""
+        return self.max_camber
+
+    @m.setter
+    def m(self, m: int) -> None:
+        self.max_camber = m
+
+    @property
+    def p(self) -> int:
+        """Location of maximum camber parameter."""
+        return self.max_camber_location
+
+    @p.setter
+    def p(self, p: int) -> None:
+        self.max_camber_location = p
+
+    @property
+    def t(self) -> int:
+        """Maximum thickness parameter."""
+        return self.max_thickness
+
+    @t.setter
+    def t(self, t: int) -> None:
+        self.max_thickness = t
+
+    @property
+    def max_camber(self) -> int:
+        """Maximum camber parameter."""
+        return self._max_camber
+
+    @max_camber.setter
+    def max_camber(self, max_camber: int) -> None:
+        self._max_camber = max_camber
+        self._yc.m = max_camber/100.0
+
+    @property
+    def max_camber_location(self) -> int:
+        """Location of maximum camber parameter."""
+        return self._max_camber_loc
+
+    @max_camber_location.setter
+    def max_camber_location(self, max_camber_loc: int) -> None:
+        self._max_camber = max_camber_loc
+        self._yc.p = max_camber_loc/10.0
+
+    @property
+    def max_thickness(self) -> int:
+        """Maximum thickness parameter."""
+        return self._max_thickness
+
+    @max_thickness.setter
+    def max_thickness(self, max_thickness: int) -> None:
+        if max_thickness <= 0:
+            raise ValueError("Maximum thickness must be non-zero and "
+                             "positive.")
+        self._delta_t.thickness(thickness=max_thickness/100.0)
+        self._max_Dthickness = max_thickness
+
+    @property
+    def scale(self) -> float:
+        """Scale factor for airfiol."""
+        return self._scale
+
+    @scale.setter
+    def scale(self, scale: float) -> None:
+        self._scale = scale
 
     def camber(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -1165,7 +1243,9 @@ class Airfoil(Geometry):
         numpy.ndarray
             Camber at specified point.
         """
-        return np.zeros_like(xi)
+        xic = xi.copy()
+        xic[xic < 0] = 1-xic[xic < 0]
+        return self.scale*self._yc.y(xic)
 
     def thickness(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -1181,8 +1261,9 @@ class Airfoil(Geometry):
         numpy.ndarray
             Thickness at specified point.
         """
-        _, th = self.xy_from_xi(xi)
-        return th
+        xic = xi.copy()
+        xic[xic < 0] = 1-xic[xic < 0]
+        return self.scale*self._delta_t.y(xic)
 
     def xy_from_xi(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                        np_type.NDArray]:
@@ -1206,9 +1287,8 @@ class Airfoil(Geometry):
         numpy.ndarray
             Y-coordinate of point.
         """
-        theta = np.pi*(1-xi)
-        x = self.radius*(1+np.cos(theta))
-        y = self.radius*np.sin(theta)
+        x = np.zeros_like(xi)
+        y = np.zeros_like(xi)
         return x, y
 
     def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
@@ -1233,9 +1313,8 @@ class Airfoil(Geometry):
         numpy.ndarray
             Parametric rate of change of the y-coordinate of point.
         """
-        theta = np.pi*(1-xi)
-        x_p = np.pi*self.radius*np.sin(theta)
-        y_p = -np.pi*self.radius*np.cos(theta)
+        x_p = np.zeros_like(xi)
+        y_p = np.zeros_like(xi)
         return x_p, y_p
 
     def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
@@ -1260,7 +1339,6 @@ class Airfoil(Geometry):
         numpy.ndarray
             Parametric second derivative of the y-coordinate of point.
         """
-        theta = np.pi*(1-xi)
-        x_pp = -np.pi**2*self.radius*np.cos(theta)
-        y_pp = -np.pi**2*self.radius*np.sin(theta)
+        x_pp = np.zeros_like(xi)
+        y_pp = np.zeros_like(xi)
         return x_pp, y_pp

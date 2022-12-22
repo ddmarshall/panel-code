@@ -13,10 +13,12 @@ from os.path import abspath, dirname
 import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
+from numpy.random import default_rng
 
 from pyPC.airfoil import Naca4DigitCamber, Naca4DigitThicknessBase
 from pyPC.airfoil import Naca4DigitThicknessClassic
 from pyPC.airfoil import Naca4DigitThicknessEnhanced
+from pyPC.airfoil import Naca4DigitAirfoilClassic
 
 from theory_of_wing_sections import read_camber_data, read_thickness_data
 
@@ -351,6 +353,81 @@ class TestNaca4Digit(unittest.TestCase):
         xi = np.linspace(0.001, 1, 12)
         compare_values(xi, af_closed)
         compare_values(xi, af_open)
+
+    def testAirfoilSetters(self) -> None:
+        """Test setters for airfoil."""
+        af_c = Naca4DigitAirfoilClassic(max_camber=1, max_camber_location=4,
+                                        max_thickness=8, scale=1.8)
+        # af_e = Naca4DigitEnhanced(max_camber=1.2, max_camber_location=4.3,
+        #                           max_thickness=12.6, scale=2.1)
+
+        self.assertIs(af_c.max_camber, 1)
+        self.assertIs(int(100*af_c._yc.m), af_c.max_camber)
+        self.assertIs(af_c.max_camber_location, 4)
+        self.assertIs(int(10*af_c._yc.p), af_c.max_camber_location)
+        self.assertIs(af_c.max_thickness, 8)
+        self.assertIs(int(100*af_c._delta_t.thickness), af_c.max_thickness)
+        self.assertIsNone(npt.assert_allclose(af_c.scale, 1.8))
+
+    def testAirfoilCamber(self) -> None:
+        """Test camber calculation for airfoil."""
+        af = Naca4DigitAirfoilClassic(max_camber=4, max_camber_location=2,
+                                      max_thickness=12, scale=1.4)
+
+        def camber_calc(xi: np_type.NDArray) -> np_type.NDArray:
+            cam = Naca4DigitCamber(m=af.m/100.0, p=af.p/10.0)
+            y = np.zeros_like(xi)
+            it = np.nditer([xi, y], op_flags=[["readonly"], ["writeonly"]])
+            with it:
+                for xir, yr in it:
+                    if (xir < 0):
+                        yr[...] = cam.y(1-xir)
+                    else:
+                        yr[...] = cam.y(xir)
+            return y
+
+        rg = default_rng(42)
+        xi = 2*rg.random((20,))-1
+        yc_ref = af.scale*camber_calc(xi)
+        yc = af.camber(xi)
+        self.assertIsNone(npt.assert_allclose(yc, yc_ref))
+
+    def testAirfoilThickness(self) -> None:
+        """Test thickness calculation for airfoil."""
+        af = Naca4DigitAirfoilClassic(max_camber=4, max_camber_location=2,
+                                      max_thickness=12, scale=1.4)
+
+        def thickness_calc(xi: np_type.NDArray) -> np_type.NDArray:
+            thick = Naca4DigitThicknessClassic(thickness=af.t/100.0)
+            y = np.zeros_like(xi)
+            it = np.nditer([xi, y], op_flags=[["readonly"], ["writeonly"]])
+            with it:
+                for xir, yr in it:
+                    if (xir < 0):
+                        yr[...] = thick.y(1-xir)
+                    else:
+                        yr[...] = thick.y(xir)
+            return y
+
+        rg = default_rng(42)
+        xi = 2*rg.random((20,))-1
+        yt_ref = af.scale*thickness_calc(xi)
+        yt = af.thickness(xi)
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref))
+
+    def testClassicAirfoil(self) -> None:
+        """Test classic airfoil against published data."""
+        directory = dirname(abspath(__file__))
+
+        # NACA 1408
+        af = Naca4DigitAirfoilClassic(max_camber=1, max_camber_location=4,
+                                      max_thickness=8, scale=1.0)
+        filename = (directory + "/data/Theory of Wing Sections/Airfoil/"
+                    + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
+                    + f"{af.max_thickness:02d}.dat")
+        # x_ref, y_ref = read_thickness_data(filename)
+        # y = af.y(x_ref)
+        # self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
 
 
 if __name__ == "__main__":
