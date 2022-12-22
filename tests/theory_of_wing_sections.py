@@ -79,3 +79,50 @@ def read_thickness_data(filename:str) -> Tuple[np_type.NDArray,
         y[i] = float(col[1])/100.0
 
     return x, y
+
+
+def read_airfoil_data(filename:str) -> Tuple[np_type.NDArray, np_type.NDArray]:
+    """
+    Read Theory of Wing Sections airfoil data from file.
+
+    Parameters
+    ----------
+    filename : str
+        Name of file to be read.
+
+    Returns
+    -------
+    xu : numpy.ndarray
+        Upper surface x-coordinate.
+    yu : numpy.ndarray
+        Upper surface y-coordinate.
+    xl : numpy.ndarray
+        Lower surface x-coordinate.
+    yl : numpy.ndarray
+        Lower surface y-coordinate.
+    """
+    file = open(filename, "r", encoding="utf8")
+    lines = file.readlines()
+    file.close()
+
+    header_offset = 5
+    n = lines[header_offset:-1].index("\n")
+    xu = np.zeros(n)
+    yu = np.zeros(n)
+
+    for i in range(0,n):
+        col = lines[i + header_offset].split(",")
+        xu[i] = float(col[0])/100.0
+        yu[i] = float(col[1])/100.0
+
+    header_offset = header_offset + n + 3
+    n = len(lines) - header_offset
+    xl = np.zeros(n)
+    yl = np.zeros(n)
+
+    for i in range(0,n):
+        col = lines[i + header_offset].split(",")
+        xl[i] = float(col[0])/100.0
+        yl[i] = float(col[1])/100.0
+
+    return xu, yu, xl, yl
