@@ -711,6 +711,37 @@ class TestNaca4Digit(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yu, yu_ref, rtol=0, atol=2.5e-5))
         self.assertIsNone(npt.assert_allclose(yl, yl_ref, rtol=0, atol=2.5e-5))
 
+    def testAirfoilParametricDerivatives(self) -> None:
+        """Test camber calculation for airfoil."""
+        af_c = Naca4DigitAirfoilClassic(max_camber=4, max_camber_location=2,
+                                        max_thickness=12, scale=1.4)
+
+        def compare_values(xi: np_type.NDArray,
+                           af: Naca4DigitAirfoilClassic) -> None:
+            eps = 1e-7
+
+            # compare first derivatives
+            xpl, ypl = af.xy_from_xi(xi+eps)
+            xmi, ymi = af.xy_from_xi(xi-eps)
+            xp_ref = 0.5*(xpl-xmi)/eps
+            yp_ref = 0.5*(ypl-ymi)/eps
+            xp, yp = af.xy_p(xi)
+            self.assertIsNone(npt.assert_allclose(xp, xp_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(yp, yp_ref, atol=1e-7))
+
+            # compare second derivatives
+            xtp, ytp = af.xy_p(xi+eps)
+            xtm, ytm = af.xy_p(xi-eps)
+            xpp_ref = 0.5*(xtp-xtm)/eps
+            ypp_ref = 0.5*(ytp-ytm)/eps
+            xpp, ypp = af.xy_pp(xi)
+            self.assertIsNone(npt.assert_allclose(xpp, xpp_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref, atol=1e-7))
+
+        rg = default_rng(42)
+        xi = 2*rg.random((20,))-1
+        compare_values(xi, af_c)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=1)

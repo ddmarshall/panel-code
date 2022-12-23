@@ -1325,9 +1325,16 @@ class Naca4DigitAirfoilClassic(Geometry):
         numpy.ndarray
             Parametric rate of change of the y-coordinate of point.
         """
-        x_p = np.zeros_like(xi)
-        y_p = np.zeros_like(xi)
-        return x_p, y_p
+        xic, sgn = self._convert_xi(xi)
+
+        delta_t = self._delta_t.y(xic)
+        delta_tp = self._delta_t.y_p(xic)
+        yc_p = self._yc.y_p(xic)
+        yc_pp = self._yc.y_pp(xic)
+        denom = np.sqrt(1+yc_p**2)
+        x_p = 1.0 - sgn/denom*(delta_tp*yc_p + delta_t*yc_pp/denom**2)
+        y_p = yc_p + sgn/denom*(delta_tp - delta_t*yc_p*yc_pp/denom**2)
+        return sgn*self.scale*x_p, sgn*self.scale*y_p
 
     def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                   np_type.NDArray]:
@@ -1351,6 +1358,20 @@ class Naca4DigitAirfoilClassic(Geometry):
         numpy.ndarray
             Parametric second derivative of the y-coordinate of point.
         """
-        x_pp = np.zeros_like(xi)
-        y_pp = np.zeros_like(xi)
-        return x_pp, y_pp
+        xic, sgn = self._convert_xi(xi)
+
+        delta_t = self._delta_t.y(xic)
+        delta_tp = self._delta_t.y_p(xic)
+        delta_tpp = self._delta_t.y_pp(xic)
+        yc_p = self._yc.y_p(xic)
+        yc_pp = self._yc.y_pp(xic)
+        yc_ppp = self._yc.y_ppp(xic)
+        denom = np.sqrt(1+yc_p**2)
+        x_pp = -sgn/denom*(delta_tpp*yc_p + (2*delta_tp*yc_pp
+                                             + delta_t*yc_ppp)/denom**2
+                           - 3*delta_t*yc_p*yc_pp**2/denom**4)
+        y_pp = yc_pp + sgn/denom*(delta_tpp - (yc_p*(2*delta_tp*yc_pp
+                                                     + delta_t*yc_ppp)
+                                               - 2*delta_t*yc_pp**2)/denom**2
+                                  - 3*delta_t*yc_pp**2/denom**4)
+        return self.scale*x_pp, self.scale*y_pp
