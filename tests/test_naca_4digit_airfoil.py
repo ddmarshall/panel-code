@@ -20,8 +20,9 @@ from pyPC.airfoil import Naca4DigitThicknessClassic
 from pyPC.airfoil import Naca4DigitThicknessEnhanced
 from pyPC.airfoil import Naca4DigitAirfoilClassic
 
-from theory_of_wing_sections import read_camber_data, read_thickness_data
+from theory_of_wing_sections import read_camber_data
 from theory_of_wing_sections import read_airfoil_data
+from theory_of_wing_sections import thickness_data
 
 
 class TestNaca4Digit(unittest.TestCase):
@@ -150,78 +151,106 @@ class TestNaca4Digit(unittest.TestCase):
     def testClassicThickness(self) -> None:
         """Test the classic thickness coordinates to published data."""
         directory = dirname(abspath(__file__))
+        tows = thickness_data(filename=None)
 
         # NACA 0006
         af = Naca4DigitThicknessClassic(thickness=0.06)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=5e-5))
 
         # NACA 0008
         af = Naca4DigitThicknessClassic(thickness=0.08)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=6e-5))
 
         # NACA 0009
         af = Naca4DigitThicknessClassic(thickness=0.09)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=3e-5))
 
         # NACA 0010
         af = Naca4DigitThicknessClassic(thickness=0.10)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1.2e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1.2e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=2e-5))
 
         # NACA 0012
         af = Naca4DigitThicknessClassic(thickness=0.12)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=7e-5))
 
         # NACA 0015
         af = Naca4DigitThicknessClassic(thickness=0.15)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=1e-5))
 
         # NACA 0018
         af = Naca4DigitThicknessClassic(thickness=0.18)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=1e-5))
 
         # NACA 0021
         af = Naca4DigitThicknessClassic(thickness=0.21)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=1e-5))
 
         # NACA 0024
         af = Naca4DigitThicknessClassic(thickness=0.24)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA00{int(af.thickness*100):02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        y = af.y(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        le_radius = -1/af.le_k()
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+                                              rtol=0, atol=4e-5))
 
     def testEnhancedThickness(self) -> None:
         """Test the enhanced thickness coefficient calculation."""
@@ -418,6 +447,7 @@ class TestNaca4Digit(unittest.TestCase):
 
     def testClassicSymmetricAirfoil(self) -> None:
         directory = dirname(abspath(__file__))
+        tows = thickness_data(filename=None)
 
         # NACA 0006
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -425,11 +455,14 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
         # NACA 0008
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -437,11 +470,14 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
         # NACA 0009
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -449,11 +485,14 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
         # NACA 0010
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -461,11 +500,16 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1.2e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1.2e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0,
+                                              atol=1.2e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0,
+                                              atol=1.2e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
         # NACA 0012
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -473,11 +517,14 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
         # NACA 0015
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -485,11 +532,14 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
         # NACA 0018
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -497,11 +547,14 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
         # NACA 0021
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -509,11 +562,14 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
         # NACA 0024
         af = Naca4DigitAirfoilClassic(max_camber=0, max_camber_location=0,
@@ -521,11 +577,14 @@ class TestNaca4Digit(unittest.TestCase):
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
                     + f"NACA{af.max_camber:1d}{af.max_camber_location:1d}"
                     + f"{af.max_thickness:02d}.dat")
-        x_ref, y_ref = read_thickness_data(filename)
-        yu = af.y(x=x_ref, upper=True)
-        yl = af.y(x=x_ref, upper=False)
-        self.assertIsNone(npt.assert_allclose(yu, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -y_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        # le_radius = -1/af.le_k()
+        yu = af.y(x=tows.x, upper=True)
+        yl = af.y(x=tows.x, upper=False)
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
+        #                                       rtol=0, atol=1e-5))
 
     def testClassicCamberedAirfoil(self) -> None:
         """Test classic airfoil against published data."""

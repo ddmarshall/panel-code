@@ -249,6 +249,17 @@ class Naca4DigitThicknessBase:
                                            + 3*xi*(self.a[3]
                                                    + 2*xi*self.a[4])))
 
+    def le_k(self) -> float:
+        """
+        Return the curvature of the leading edge.
+
+        Returns
+        -------
+        float
+            Leading edge curvature.
+        """
+        return -2/((self.thickness/0.20)*self.a[0])**2
+
 
 class Naca4DigitThicknessClassic(Naca4DigitThicknessBase):
     """Classic NACA 4-digit airfoil thickness."""
@@ -546,6 +557,17 @@ class Naca4DigitModifiedThicknessBase:
         a[2] = -(k_m + (1.5-1.25*Iterm*sqrt_term2)/xi_m**2)
         a[3] = 0.5/xi_m*(k_m + (1-0.75*Iterm*sqrt_term2)/xi_m**2)
         return a
+
+    def le_k(self) -> float:
+        """
+        Return the curvature of the leading edge.
+
+        Returns
+        -------
+        float
+            Leading edge curvature.
+        """
+        return -2/(self.thickness*self.a[0])**2
 
 
 class Naca4DigitModifiedThicknessClassic(Naca4DigitModifiedThicknessBase):
