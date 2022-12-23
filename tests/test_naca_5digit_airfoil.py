@@ -19,7 +19,7 @@ from pyPC.airfoil import Naca5DigitCamberClassic, Naca5DigitCamberEnhanced
 from pyPC.airfoil import Naca5DigitCamberReflexedClassic
 from pyPC.airfoil import Naca5DigitCamberReflexedEnhanced
 
-from theory_of_wing_sections import read_camber_data
+from theory_of_wing_sections import camber_data
 
 
 class TestNaca5Digit(unittest.TestCase):
@@ -28,56 +28,62 @@ class TestNaca5Digit(unittest.TestCase):
     def testCamberClassic(self) -> None:
         """Test the camber coordinates and slope against published data."""
         directory = dirname(abspath(__file__))
+        tows = camber_data(filename=None)
 
         # NACA 210xx
         af = Naca5DigitCamberClassic(camber_loc=1)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
                     + f"NACA2{af.camber_location:1d}0.dat")
-        x_ref, y_ref, yp_ref = read_camber_data(filename)
-        y = af.y(x_ref)
-        yp = af.y_p(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=3e-5))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=2e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=3e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=2e-5))
 
         # NACA 220xx
         af = Naca5DigitCamberClassic(camber_loc=2)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
                     + f"NACA2{af.camber_location:1d}0.dat")
-        x_ref, y_ref, yp_ref = read_camber_data(filename)
-        y = af.y(x_ref)
-        yp = af.y_p(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=2e-5))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=2e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=1e-5))
 
         # NACA 230xx
         af = Naca5DigitCamberClassic(camber_loc=3)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
                     + f"NACA2{af.camber_location:1d}0.dat")
-        x_ref, y_ref, yp_ref = read_camber_data(filename)
-        y = af.y(x_ref)
-        yp = af.y_p(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=1e-5))
 
         # NACA 240xx
         af = Naca5DigitCamberClassic(camber_loc=4)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
                     + f"NACA2{af.camber_location:1d}0.dat")
-        x_ref, y_ref, yp_ref = read_camber_data(filename)
-        y = af.y(x_ref)
-        yp = af.y_p(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=1e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=1e-5))
 
         # NACA 250xx
         af = Naca5DigitCamberClassic(camber_loc=5)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
                     + f"NACA2{af.camber_location:1d}0.dat")
-        x_ref, y_ref, yp_ref = read_camber_data(filename)
-        y = af.y(x_ref)
-        yp = af.y_p(x_ref)
-        self.assertIsNone(npt.assert_allclose(y, y_ref, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref, rtol=0, atol=2e-5))
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=2e-5))
 
     def testSetters(self) -> None:
         """Test the setting of the max. camber location and ideal lift coef."""

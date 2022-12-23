@@ -93,43 +93,107 @@ class thickness_data:
             self._delta_va[i] = float(col[4])
 
 
-def read_camber_data(filename: str) -> Tuple[np_type.NDArray,
-                                             np_type.NDArray,
-                                             np_type.NDArray]:
+class camber_data:
     """
-    Read Theory of Wing Sections camber data from file.
+    Theory of Wing Sections thickness data class.
 
-    Parameters
+    Attributes
     ----------
-    filename : str
-        Name of file to be read.
-
-    Returns
-    -------
+    ideal_Cl : float
+        Ideal lift coefficient
+    ideal_alpha : float
+        Ideal angle of attack (radians)
+    Cm_c4 : float
+        Quarter-chord moment coefficient
     x : numpy.ndarray
-        X-coordinate.
+        X-coordinate
     y : numpy.ndarray
-        Y-coordinate.
+        Y-coordinate
     dydx : numpy.ndarray
-        Slope, dy/dx.
+        Slope of camber line
+    delta_v : numpy.ndarray
+        Relative increment of vertical velocity due to camber
     """
-    file = open(filename, "r", encoding="utf8")
-    lines = file.readlines()
-    file.close()
 
-    header_offset = 5
-    n = len(lines) - header_offset
-    x = np.zeros(n)
-    y = np.zeros(n)
-    dydx = np.zeros(n)
+    def __init__(self, filename: str):
+        self._ideal_Cl = 0.0
+        self._ideal_alpha = 0.0
+        self._Cm_c4 = 0.0
+        self._x = np.zeros(1)
+        self._y = np.zeros(1)
+        self._dydx = np.zeros(1)
+        self._delta_va = np.zeros(1)
+        if filename is not None:
+            self.change_case_data(filename=filename)
 
-    for i in range(0,n):
-        col = lines[i + header_offset].split(",")
-        x[i] = float(col[0])/100.0
-        y[i] = float(col[1])/100.0
-        dydx[i] = float(col[2])
+    @property
+    def ideal_Cl(self) -> float:
+        """Ideal lift coefficient."""
+        return self._ideal_Cl
 
-    return x, y, dydx
+    @property
+    def ideal_alpha(self) -> float:
+        """Ideal angle of attack."""
+        return self._ideal_alpha
+
+    @property
+    def Cm_c4(self) -> float:
+        """Quarter-chord moment coefficient."""
+        return self._Cm_c4
+
+    @property
+    def x(self) -> np_type.NDArray:
+        """X-coordinate."""
+        return self._x
+
+    @property
+    def y(self) -> np_type.NDArray:
+        """Y-coordinate."""
+        return self._y
+
+    @property
+    def dydx(self) -> np_type.NDArray:
+        """Slope of camber line."""
+        return self._dydx
+
+    @property
+    def delta_v(self) -> np_type.NDArray:
+        """Relative increment of vertical velocity due to camber."""
+        return self._delta_v
+
+    def change_case_data(self, filename: str) -> None:
+        """
+        Change case data to be stored.
+
+        Parameters
+        ----------
+        filename : str
+            Filename of the new case data.
+        """
+        # read in data
+        file = open(filename, "r", encoding="utf8")
+        lines = file.readlines()
+        file.close()
+
+        # get header info
+        self._ideal_Cl = float(lines[0][5:-1])
+        self._ideal_alpha = float(lines[1][8:-1])*np.pi/180.0
+        self._Cm_c4 = float(lines[2][7:-1])
+
+        # get rest of data
+        header_offset = 5
+        n = len(lines) - header_offset
+        self._x = np.zeros(n)
+        self._y = np.zeros(n)
+        self._dydx = np.zeros(n)
+        self._delta_v = np.zeros(n)
+
+        for i in range(0,n):
+            col = lines[i + header_offset].split(",")
+            self._x[i] = float(col[0])/100.0
+            self._y[i] = float(col[1])/100.0
+            self._dydx[i] = float(col[2])
+            self._delta_v[i] = float(col[3])
 
 
 def read_airfoil_data(filename:str) -> Tuple[np_type.NDArray, np_type.NDArray]:
