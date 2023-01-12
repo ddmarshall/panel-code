@@ -196,6 +196,106 @@ class camber_data:
             self._delta_v[i] = float(col[3])
 
 
+class airfoil_data:
+    """
+    Theory of Wing Sections airfoil data class.
+
+    Attributes
+    ----------
+    le_radius : float
+        Leading edge radius
+    le_slope : float
+        Slope at leading edge
+    x_upper : numpy.ndarray
+        Upper surface x-coordinate
+    y_upper : numpy.ndarray
+        Upper surface y-coordinate
+    x_lower : numpy.ndarray
+        Lower surface x-coordinate
+    y_lower : numpy.ndarray
+        Lower surface y-coordinate
+    """
+
+    def __init__(self, filename: str):
+        self._le_radius = 0.0
+        self._le_slope = 0.0
+        self._x_upper = np.zeros(1)
+        self._y_upper = np.zeros(1)
+        self._x_lower = np.zeros(1)
+        self._y_lower = np.zeros(1)
+        if filename is not None:
+            self.change_case_data(filename=filename)
+
+    @property
+    def le_radius(self) -> float:
+        """Leading edge radius."""
+        return self._le_radius
+
+    @property
+    def le_slope(self) -> float:
+        """Leading edge slope."""
+        return self._le_slope
+
+    @property
+    def x_upper(self) -> np_type.NDArray:
+        """Upper surface x-coordinate."""
+        return self._x_upper
+
+    @property
+    def y_upper(self) -> np_type.NDArray:
+        """Upper surface y-coordinate."""
+        return self._y_upper
+
+    @property
+    def x_lower(self) -> np_type.NDArray:
+        """Lower surface x-coordinate."""
+        return self._x_lower
+
+    @property
+    def y_lower(self) -> np_type.NDArray:
+        """Lower surface y-coordinate."""
+        return self._y_lower
+
+    def change_case_data(self, filename: str) -> None:
+        """
+        Change case data to be stored.
+
+        Parameters
+        ----------
+        filename : str
+            Filename of the new case data.
+        """
+        # read in data
+        file = open(filename, "r", encoding="utf8")
+        lines = file.readlines()
+        file.close()
+
+        # get header info
+        self._le_radius = float(lines[0][12:-1])/100.0
+        self._le_slope = float(lines[1][29:-1])
+
+        # get rest of data
+        header_offset = 5
+        n = lines[header_offset:-1].index("\n")
+        self._x_upper = np.zeros(n)
+        self._y_upper = np.zeros(n)
+
+        for i in range(0,n):
+            col = lines[i + header_offset].split(",")
+            self._x_upper[i] = float(col[0])/100.0
+            self._y_upper[i] = float(col[1])/100.0
+
+        header_offset = header_offset + n + 3
+        n = len(lines) - header_offset
+        self._x_lower = np.zeros(n)
+        self._y_lower = np.zeros(n)
+
+        for i in range(0,n):
+            col = lines[i + header_offset].split(",")
+            self._x_lower[i] = float(col[0])/100.0
+            self._y_lower[i] = float(col[1])/100.0
+
+
 def read_airfoil_data(filename:str) -> Tuple[np_type.NDArray, np_type.NDArray]:
     """
     Read Theory of Wing Sections airfoil data from file.
