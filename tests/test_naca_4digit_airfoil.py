@@ -605,8 +605,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=1e-7, upper=True)  # FIX: should be at x=0
+        yp0l = af.dydx(x=1e-7, upper=False)
+        le_radius = -1/af.k(xi=1e-7)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=1.5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=1.5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 1410
         af = Naca4DigitAirfoilClassic(max_camber=1, max_camber_location=4,
@@ -617,8 +623,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=2e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=2e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 1412
         af = Naca4DigitAirfoilClassic(max_camber=1, max_camber_location=4,
@@ -629,8 +641,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=1.5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=1.5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 2408
         af = Naca4DigitAirfoilClassic(max_camber=2, max_camber_location=4,
@@ -641,8 +659,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=1.5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=1.5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 2410
         af = Naca4DigitAirfoilClassic(max_camber=2, max_camber_location=4,
@@ -653,8 +677,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=2e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=1.5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 2412
         af = Naca4DigitAirfoilClassic(max_camber=2, max_camber_location=4,
@@ -665,8 +695,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 2415
         af = Naca4DigitAirfoilClassic(max_camber=2, max_camber_location=4,
@@ -677,8 +713,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 2418
         af = Naca4DigitAirfoilClassic(max_camber=2, max_camber_location=4,
@@ -689,8 +731,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 2421
         af = Naca4DigitAirfoilClassic(max_camber=2, max_camber_location=4,
@@ -701,8 +749,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 2424
         af = Naca4DigitAirfoilClassic(max_camber=2, max_camber_location=4,
@@ -713,8 +767,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=2e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=2e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 4412
         af = Naca4DigitAirfoilClassic(max_camber=4, max_camber_location=4,
@@ -725,8 +785,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 4415
         af = Naca4DigitAirfoilClassic(max_camber=4, max_camber_location=4,
@@ -737,8 +803,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 4418
         af = Naca4DigitAirfoilClassic(max_camber=4, max_camber_location=4,
@@ -749,8 +821,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 4421
         af = Naca4DigitAirfoilClassic(max_camber=4, max_camber_location=4,
@@ -761,8 +839,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
         # NACA 4424
         af = Naca4DigitAirfoilClassic(max_camber=4, max_camber_location=4,
@@ -773,8 +857,14 @@ class TestNaca4Digit(unittest.TestCase):
         tows.change_case_data(filename=filename)
         yu = af.y(x=tows.x_upper, upper=True)
         yl = af.y(x=tows.x_lower, upper=False)
+        yp0u = af.dydx(x=0.0, upper=True)
+        yp0l = af.dydx(x=0.0, upper=False)
+        le_radius = af.k(xi=0.0)
         self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0, atol=2.5e-5))
         self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0, atol=2.5e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0u, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(yp0l, tows.le_slope, rtol=0, atol=1e-5))
+        # self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius, rtol=0, atol=1e-5))
 
     def testAirfoilParametricDerivatives(self) -> None:
         """Test camber calculation for airfoil."""
