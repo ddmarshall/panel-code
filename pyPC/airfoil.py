@@ -240,7 +240,7 @@ class Naca4DigitModifiedThicknessBase:
     ----------
     thickness : float
         Maximum thickness per chord length.
-    m_xi : float
+    xi_m : float
         Location of end of fore section and start of aft section.
     a : numpy.ndarray
         Coefficients for fore equation.
