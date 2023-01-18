@@ -87,7 +87,8 @@ class Geometry(ABC):
         xu, yu = self.xy_from_xi(1)
         return 0.5*(xl+xu), 0.5*(yl+yu)
 
-    def tangent(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def tangent(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                    np_type.NDArray]:
         """
         Calculate the unit tangent at parameter location.
 
@@ -98,7 +99,7 @@ class Geometry(ABC):
 
         Returns
         -------
-        numpy.ndarray
+        numpy.ndarray, numpy.ndarray
             Unit tangent at point.
         """
         sx, sy = self.xy_p(xi)
@@ -107,7 +108,8 @@ class Geometry(ABC):
         sy = sy/temp
         return sx, sy
 
-    def normal(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def normal(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                   np_type.NDArray]:
         """
         Calculate the unit normal at parameter location.
 
@@ -118,7 +120,7 @@ class Geometry(ABC):
 
         Returns
         -------
-        numpy.ndarray
+        numpy.ndarray, numpy.ndarray
             Unit normal at point.
         """
         sx, sy = self.tangent(xi)
