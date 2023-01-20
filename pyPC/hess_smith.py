@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from pyPC.element_flow import LineElement2D
 from pyPC.freestream_flow import FreestreamFlow2D
 from pyPC.source_flow import LineSourceConstant2D
-from pyPC.geometry import Cylinder
+from pyPC.airfoil.cylinder import Cylinder
 
 
 @dataclass

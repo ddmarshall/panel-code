@@ -12,7 +12,7 @@ import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
 
-from pyPC.geometry import Cylinder
+from pyPC.airfoil.cylinder import Cylinder
 
 
 class TestCylinder(unittest.TestCase):
