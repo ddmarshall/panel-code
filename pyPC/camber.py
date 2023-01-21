@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Classes associated with airfoil camber lines"""
+"""Classes associated with airfoil camber lines."""
 
 from abc import ABC, abstractmethod
 from typing import List
@@ -89,181 +89,6 @@ class CamberBase(ABC):
             Xi-coordinates of any discontinuities.
         """
 
-class Naca4DigitCamber(CamberBase):
-    """
-    Camber for the NACA 4-digit airfoils.
-
-    Attributes
-    ----------
-    m : float
-        Maximum amount of camber per chord length.
-    p : float
-        Relative chord location of maximum camber.
-    """
-
-    def __init__(self, m: float, p: float) -> None:
-        self._m = m
-        self._p = p
-
-    @property
-    def m(self) -> float:
-        """Maximum amount of camber."""
-        return self._m
-
-    @m.setter
-    def m(self, m: float) -> None:
-        self._m = m
-
-    @property
-    def p(self) -> float:
-        """Location of maximum camber."""
-        return self._p
-
-    @p.setter
-    def p(self, p: float) -> None:
-        self._p = p
-
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return the camber location at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Camber at specified point.
-        """
-
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            if self.m == 0:
-                return np.zeros_like(xi)
-            else:
-                return (self.m/self.p**2)*(2*self.p*xi - xi**2)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            if self.m == 0:
-                return np.zeros_like(xi)
-            else:
-                return (self.m/(1-self.p)**2)*(1 + 2*self.p*(xi - 1) - xi**2)
-
-        return np.piecewise(xi, [xi <= self.p, xi > self.p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return first derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            First derivative of camber at specified point.
-        """
-
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            if self.m == 0:
-                return np.zeros_like(xi)
-            else:
-                return 2*(self.m/self.p**2)*(self.p - xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            if self.m == 0:
-                return np.zeros_like(xi)
-            else:
-                return 2*(self.m/(1-self.p)**2)*(self.p - xi)
-
-        return np.piecewise(xi, [xi <= self.p, xi > self.p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return second derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Second derivative of camber at specified point.
-        """
-
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            if self.m == 0:
-                return np.zeros_like(xi)
-            else:
-                return -2*(self.m/self.p**2)*np.ones_like(xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            if self.m == 0:
-                return np.zeros_like(xi)
-            else:
-                return -2*(self.m/(1-self.p)**2)*np.ones_like(xi)
-
-        return np.piecewise(xi, [xi <= self.p, xi > self.p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return third derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Third derivative of camber at specified point.
-        """
-
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return np.zeros_like(xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return np.zeros_like(xi)
-
-        return np.piecewise(xi, [xi <= self.p, xi > self.p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def joints(self) -> List[float]:
-        """
-        Return the locations of any joints/discontinuities in the camber line.
-
-        Returns
-        -------
-        List[float]
-            Xi-coordinates of any discontinuities.
-        """
-        return [self.p]
-
 
 class Naca5DigitCamberBase(CamberBase):
     """
@@ -305,7 +130,6 @@ class Naca5DigitCamberBase(CamberBase):
         numpy.ndarray
             Camber at specified point.
         """
-
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -334,7 +158,6 @@ class Naca5DigitCamberBase(CamberBase):
         numpy.ndarray
             First derivative of camber at specified point.
         """
-
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -364,7 +187,6 @@ class Naca5DigitCamberBase(CamberBase):
         numpy.ndarray
             Second derivative of camber at specified point.
         """
-
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -392,7 +214,6 @@ class Naca5DigitCamberBase(CamberBase):
         numpy.ndarray
             Third derivative of camber at specified point.
         """
-
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -563,7 +384,6 @@ class Naca5DigitCamberReflexedBase:
         numpy.ndarray
             Camber at specified point.
         """
-
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -595,7 +415,6 @@ class Naca5DigitCamberReflexedBase:
         numpy.ndarray
             First derivative of camber at specified point.
         """
-
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -627,7 +446,6 @@ class Naca5DigitCamberReflexedBase:
         numpy.ndarray
             Second derivative of camber at specified point.
         """
-
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -655,7 +473,6 @@ class Naca5DigitCamberReflexedBase:
         numpy.ndarray
             Third derivative of camber at specified point.
         """
-
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
