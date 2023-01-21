@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Example implementation of a cylinder shape as an airfoil."""
 
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy as np
 import numpy.typing as np_type
@@ -32,41 +32,8 @@ class Cylinder(Airfoil):
     def radius(self, radius) -> float:
         self._r = radius
 
-    def camber(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return the amount of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Camber at specified point.
-        """
-        return np.zeros_like(xi)
-
-    def thickness(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return the amount of thickness at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Thickness at specified point.
-        """
-        _, th = self.xy_from_xi(xi)
-        return th
-
-    def xy_from_xi(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                       np_type.NDArray]:
+    def xy(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                               np_type.NDArray]:
         """
         Calculate the coordinates of geometry at parameter location.
 
@@ -145,3 +112,47 @@ class Cylinder(Airfoil):
         x_pp = -np.pi**2*self.radius*np.cos(theta)
         y_pp = -np.pi**2*self.radius*np.sin(theta)
         return x_pp, y_pp
+
+    def camber(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the amount of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Camber at specified point.
+        """
+        return np.zeros_like(xi)
+
+    def thickness(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the amount of thickness at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Thickness at specified point.
+        """
+        _, th = self.xy(xi)
+        return th
+
+    def joints(self) -> List[float]:
+        """
+        Return the locations of any joints/discontinuities in the curve.
+
+        Returns
+        -------
+        List[float]
+            Xi-coordinates of any discontinuities.
+        """
+        return [-1.0, 1.0]

@@ -3,7 +3,7 @@
 """Classes associated with airfoils and their analysis."""
 
 from abc import ABC, abstractmethod
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy as np
 import numpy.typing as np_type
@@ -14,7 +14,111 @@ from scipy.optimize import root_scalar
 class Curve(ABC):
     """
     Base class for 1-d curves.
+
+    Curves can be interrogated based on their natural parameterization, using
+    the parameter, xi.
     """
+
+    #
+    # Parameteric Interface
+    #
+    @abstractmethod
+    def xy(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                               np_type.NDArray]:
+        """
+        Calculate the coordinates of geometry at parameter location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Parameter for desired locations.
+
+        Returns
+        -------
+        numpy.ndarray
+            X-coordinate of point.
+        numpy.ndarray
+            Y-coordinate of point.
+        """
+
+    @abstractmethod
+    def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                 np_type.NDArray]:
+        """
+        Calculate rates of change of the coordinates at parameter location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Parameter for desired locations.
+
+        Returns
+        -------
+        numpy.ndarray
+            Parametric rate of change of the x-coordinate of point.
+        numpy.ndarray
+            Parametric rate of change of the y-coordinate of point.
+        """
+
+    @abstractmethod
+    def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                  np_type.NDArray]:
+        """
+        Calculate second derivative of the coordinates at parameter location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Parameter for desired locations.
+
+        Returns
+        -------
+        numpy.ndarray
+            Parametric second derivative of the x-coordinate of point.
+        numpy.ndarray
+            Parametric second derivative of the y-coordinate of point.
+        """
+
+    def normal(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                   np_type.NDArray]:
+        """
+        Calculate the unit normal at parameter location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Parameter for desired locations.
+
+        Returns
+        -------
+        numpy.ndarray, numpy.ndarray
+            Unit normal at point.
+        """
+        sx, sy = self.tangent(xi)
+        nx = -sy
+        ny = sx
+        return nx, ny
+
+    def tangent(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                    np_type.NDArray]:
+        """
+        Calculate the unit tangent at parameter location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Parameter for desired locations.
+
+        Returns
+        -------
+        numpy.ndarray, numpy.ndarray
+            Unit tangent at point.
+        """
+        sx, sy = self.xy_p(xi)
+        temp = np.sqrt(sx**2 + sy**2)
+        sx = sx/temp
+        sy = sy/temp
+        return sx, sy
 
     def k(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -69,221 +173,20 @@ class Curve(ABC):
 
             return it.operands[1]
 
-    #
-    # Parameteric Interface
-    #
     @abstractmethod
-    def xy_from_xi(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                       np_type.NDArray]:
+    def joints(self) -> List[float]:
         """
-        Calculate the coordinates of geometry at parameter location.
+        Return the locations of any joints/discontinuities in the curve.
 
-        Notes
-        -----
-        Parameter goes from -1 (trailing edge lower surface) to +1 (trailing
-        edge upper surface) with 0 representing the leading edge.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
+        The resulting list needs to contain any parameteric locations where
+        some non-standard discontinuity (slope, curvature, etc.) occurs as
+        well as the end points for the curve (if they exist).
 
         Returns
         -------
-        numpy.ndarray
-            X-coordinate of point.
-        numpy.ndarray
-            Y-coordinate of point.
+        List[float]
+            Xi-coordinates of any discontinuities.
         """
-
-    @abstractmethod
-    def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                 np_type.NDArray]:
-        """
-        Calculate rates of change of the coordinates at parameter location.
-
-        Notes
-        -----
-        Parameter goes from -1 (trailing edge lower surface) to +1 (trailing
-        edge upper surface) with 0 representing the leading edge.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Parametric rate of change of the x-coordinate of point.
-        numpy.ndarray
-            Parametric rate of change of the y-coordinate of point.
-        """
-
-    @abstractmethod
-    def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                  np_type.NDArray]:
-        """
-        Calculate second derivative of the coordinates at parameter location.
-
-        Notes
-        -----
-        Parameter goes from -1 (trailing edge lower surface) to +1 (trailing
-        edge upper surface) with 0 representing the leading edge.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Parametric second derivative of the x-coordinate of point.
-        numpy.ndarray
-            Parametric second derivative of the y-coordinate of point.
-        """
-
-    #
-    # Arc-length Interface
-    #
-    def xy_from_s(self, s: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the coordinates of geometry at arc-length location.
-
-        Parameters
-        ----------
-        s : numpy.ndarray
-            Arc-length location for point.
-
-        Returns
-        -------
-        numpy.ndarray
-            X-coordinate of point.
-        numpy.ndarray
-            Y-coordinate of point.
-        """
-        xi = self._xi_from_s(s)
-        return self.xy_from_xi(xi)
-
-    def xy_dot(self, s: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                  np_type.NDArray]:
-        """
-        Calculate rates of change of the coordinates at arc-length location.
-
-        Parameters
-        ----------
-        s : numpy.ndarray
-            Arc-length location for point.
-
-        Returns
-        -------
-        numpy.ndarray
-            Arc-length rate of change of the x-coordinate of point.
-        numpy.ndarray
-            Arc-length rate of change of the y-coordinate of point.
-        """
-        xi = self._xi_from_s(s)
-        return self.tangent(xi)
-
-    def xy_ddot(self, s: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                   np_type.NDArray]:
-        """
-        Calculate second derivative of the coordinates at arc-length location.
-
-        Parameters
-        ----------
-        s : numpy.ndarray
-            Arc-length location for point.
-
-        Returns
-        -------
-        numpy.ndarray
-            Arc-length second derivative of the x-coordinate of point.
-        numpy.ndarray
-            Arc-length second derivative of the y-coordinate of point.
-        """
-        xi = self._xi_from_s(s)
-        nx, ny = self.normal(xi)
-        k = self.k(xi)
-        return k*nx, k*ny
-
-    def tangent(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                    np_type.NDArray]:
-        """
-        Calculate the unit tangent at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray, numpy.ndarray
-            Unit tangent at point.
-        """
-        sx, sy = self.xy_p(xi)
-        temp = np.sqrt(sx**2 + sy**2)
-        sx = sx/temp
-        sy = sy/temp
-        return sx, sy
-
-    def normal(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                   np_type.NDArray]:
-        """
-        Calculate the unit normal at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray, numpy.ndarray
-            Unit normal at point.
-        """
-        sx, sy = self.tangent(xi)
-        nx = -sy
-        ny = sx
-        return nx, ny
-
-    def _xi_from_s(self, s: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the parametric value for arc-length provided.
-
-        Parameters
-        ----------
-        s : numpy.ndarray
-            Arc-length location of point.
-
-        Raises
-        ------
-        ValueError
-            When arc-length provided is larger than airfoil surface length.
-
-        Returns
-        -------
-        numpy.ndarray
-            Parametric value for location provided.
-        """
-        s_max = self.arc_length(-1.0, 1.0)
-        s_a = np.asarray(s)
-        if (s_a > s_max).any() or (s_a < 0).any():
-            raise ValueError("Invalid arc length provided.")
-
-        def fun(xi: float, s: float) -> float:
-            return self.arc_length(-1, xi) - s
-
-        # pylint: disable=cell-var-from-loop
-        it = np.nditer([s_a, None])
-        with it:
-            for ss, xi in it:
-                root = root_scalar(lambda xi: fun(xi, ss), bracket=[-1, 1])
-                xi[...] = root.root
-
-            return it.operands[1]
 
 
 class Airfoil(Curve):
@@ -339,7 +242,7 @@ class Airfoil(Curve):
             If there is no surface point at the given x-location.
         """
         xi = self._xi_from_x(x, upper)
-        _, y = self.xy_from_xi(xi)
+        _, y = self.xy(xi)
         return y
 
     def dydx(self, x: np_type.NDArray, upper: bool) -> np_type.NDArray:
@@ -421,7 +324,7 @@ class Airfoil(Curve):
             raise ValueError("Invalid x-coordinate provided.")
 
         def fun(xi: float, x: float) -> float:
-            xr, _ = self.xy_from_xi(xi)
+            xr, _ = self.xy(xi)
             return xr - x
 
         it = np.nditer([x_a, None])
@@ -439,6 +342,110 @@ class Airfoil(Curve):
                 else:
                     root = root_scalar(lambda xi: fun(xi, xx), bracket=bracket)
                     xi[...] = root.root
+
+            return it.operands[1]
+
+    #
+    # Arc-length Interface
+    #
+    def xy_from_s(self, s: np_type.NDArray) -> np_type.NDArray:
+        """
+        Calculate the coordinates of geometry at arc-length location.
+
+        Parameters
+        ----------
+        s : numpy.ndarray
+            Arc-length location for point.
+
+        Returns
+        -------
+        numpy.ndarray
+            X-coordinate of point.
+        numpy.ndarray
+            Y-coordinate of point.
+        """
+        xi = self._xi_from_s(s)
+        return self.xy(xi)
+
+    def xy_s(self, s: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                np_type.NDArray]:
+        """
+        Calculate rates of change of the coordinates at arc-length location.
+
+        Parameters
+        ----------
+        s : numpy.ndarray
+            Arc-length location for point.
+
+        Returns
+        -------
+        numpy.ndarray
+            Arc-length rate of change of the x-coordinate of point.
+        numpy.ndarray
+            Arc-length rate of change of the y-coordinate of point.
+        """
+        xi = self._xi_from_s(s)
+        return self.tangent(xi)
+
+    def xy_ss(self, s: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                 np_type.NDArray]:
+        """
+        Calculate second derivative of the coordinates at arc-length location.
+
+        Parameters
+        ----------
+        s : numpy.ndarray
+            Arc-length location for point.
+
+        Returns
+        -------
+        numpy.ndarray
+            Arc-length second derivative of the x-coordinate of point.
+        numpy.ndarray
+            Arc-length second derivative of the y-coordinate of point.
+        """
+        xi = self._xi_from_s(s)
+        nx, ny = self.normal(xi)
+        k = self.k(xi)
+        return k*nx, k*ny
+
+    def _xi_from_s(self, s: np_type.NDArray) -> np_type.NDArray:
+        """
+        Calculate the parametric value for arc-length provided.
+
+        Parameters
+        ----------
+        s : numpy.ndarray
+            Arc-length location of point.
+
+        Raises
+        ------
+        ValueError
+            When arc-length provided is larger than airfoil surface length.
+
+        Returns
+        -------
+        numpy.ndarray
+            Parametric value for location provided.
+        """
+        # TODO: This needs to be optimized so that s_max is stored and does not
+        #       need to be calculated each time this method is called. This
+        #       will require some abstract method that make the properties
+        #       consistent one the shape has changed.
+        s_max = self.arc_length(-1.0, 1.0)
+        s_a = np.asarray(s)
+        if (s_a > s_max).any() or (s_a < 0).any():
+            raise ValueError("Invalid arc length provided.")
+
+        def fun(xi: float, s: float) -> float:
+            return self.arc_length(-1, xi) - s
+
+        # pylint: disable=cell-var-from-loop
+        it = np.nditer([s_a, None])
+        with it:
+            for ss, xi in it:
+                root = root_scalar(lambda xi: fun(xi, ss), bracket=[-1, 1])
+                xi[...] = root.root
 
             return it.operands[1]
 
@@ -466,7 +473,7 @@ class Airfoil(Curve):
         float
             Y-coordinate of leading edge.
         """
-        return self.xy_from_xi(0)
+        return self.xy(0)
 
     def trailing_edge(self) -> Tuple[float, float]:
         """
@@ -488,8 +495,8 @@ class Airfoil(Curve):
         float
             Y-coordinate of leading edge.
         """
-        xl, yl = self.xy_from_xi(-1)
-        xu, yu = self.xy_from_xi(1)
+        xl, yl = self.xy(-1)
+        xu, yu = self.xy(1)
         return 0.5*(xl+xu), 0.5*(yl+yu)
 
     @abstractmethod
@@ -535,6 +542,7 @@ class Airfoil(Curve):
 
 class OrthogonalAirfoil(Airfoil):
     """Airfoils that can be decomposed to camber and thickness."""
+
     def __init__(self) -> None:
         pass
 

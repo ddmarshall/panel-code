@@ -18,6 +18,13 @@ from pyPC.airfoil.cylinder import Cylinder
 class TestCylinder(unittest.TestCase):
     """Class to test the cylinder geometry."""
 
+    def testJoints(self) -> None:
+        """Test the joints determination."""
+        R = 1.5
+        surf = Cylinder(radius=R)
+
+        self.assertIsNone(npt.assert_allclose(surf.joints(), [-1, 1]))
+
     def testAirfoilTerms(self) -> None:
         """Test the airfoil specific calculations."""
         R = 1.5
@@ -149,13 +156,13 @@ class TestCylinder(unittest.TestCase):
             y_ref = surf.radius*np.sin(np.pi*(1-xi))
 
             # compare point values
-            x, y = surf.xy_from_xi(xi)
+            x, y = surf.xy(xi)
             self.assertIsNone(npt.assert_allclose(x, x_ref, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(y, y_ref, atol=1e-7))
 
             # compare first derivatives
-            xpl, ypl = surf.xy_from_xi(xi+eps)
-            xmi, ymi = surf.xy_from_xi(xi-eps)
+            xpl, ypl = surf.xy(xi+eps)
+            xmi, ymi = surf.xy(xi-eps)
             xp_ref = 0.5*(xpl-xmi)/eps
             yp_ref = 0.5*(ypl-ymi)/eps
             xp, yp = surf.xy_p(xi)
@@ -191,7 +198,7 @@ class TestCylinder(unittest.TestCase):
         def compare_values(xi: np_type.NDArray, surf: Cylinder) -> None:
             eps = 1e-7
             upper = (np.asarray(xi) > 0).all()
-            x, y = surf.xy_from_xi(xi)
+            x, y = surf.xy(xi)
 
             # compare point values
             self.assertIsNone(npt.assert_allclose(xi,
@@ -253,16 +260,16 @@ class TestCylinder(unittest.TestCase):
             xmi, ymi = surf.xy_from_s(s-eps)
             xs_ref = 0.5*(xpl-xmi)/eps
             ys_ref = 0.5*(ypl-ymi)/eps
-            xs, ys = surf.xy_dot(s)
+            xs, ys = surf.xy_s(s)
             self.assertIsNone(npt.assert_allclose(xs, xs_ref, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(ys, ys_ref, atol=1e-7))
 
             # compare second derivatives
-            xsp, ysp = surf.xy_dot(s+eps)
-            xsm, ysm = surf.xy_dot(s-eps)
+            xsp, ysp = surf.xy_s(s+eps)
+            xsm, ysm = surf.xy_s(s-eps)
             xss_ref = 0.5*(xsp-xsm)/eps
             yss_ref = 0.5*(ysp-ysm)/eps
-            xss, yss = surf.xy_ddot(s)
+            xss, yss = surf.xy_ss(s)
             self.assertIsNone(npt.assert_allclose(xss, xss_ref, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(yss, yss_ref, atol=1e-7))
 

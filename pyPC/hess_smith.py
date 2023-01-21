@@ -271,7 +271,7 @@ def main() -> None:
     xr = 0.5*c*(np.cos(theta)+1)
     yr = 0.5*c*np.sin(theta)
     surf = Cylinder(radius=0.5*c)
-    xb, yb = surf.xy_from_xi(np.linspace(-1, 1, npan+1))
+    xb, yb = surf.xy(np.linspace(-1, 1, npan+1))
     af = Geometry(name="Cylinder", x=xr, y=yr)
 
     # solve for panel strengths
