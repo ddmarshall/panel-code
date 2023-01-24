@@ -91,7 +91,10 @@ class TestNaca5DigitCamber(unittest.TestCase):
         self.assertEqual(af.p, 4)
         self.assertEqual(af.ci, 2)
 
-        af = Naca5DigitCamberEnhanced(p=1.0, ci=2.0)
+        af = Naca5DigitCamberEnhanced(ci=2.4, p=1.2)
+
+        self.assertEqual(af.p, 1.2)
+        self.assertEqual(af.ci, 2.4)
 
         # Note: while published data from Jacobs and Pinkerton (1936) has
         #       values, they are noticable off from actual values. These
@@ -117,7 +120,7 @@ class TestNaca5DigitCamber(unittest.TestCase):
     def testCamber(self) -> None:
         """Test the camber relations."""
         af_classic = Naca5DigitCamberClassic(p=2)
-        af_enhanced = Naca5DigitCamberEnhanced(p=2.4, ci=3.7)
+        af_enhanced = Naca5DigitCamberEnhanced(ci=3.7, p=2.4)
 
         def compare_values(xi: np_type.NDArray, af: Naca5DigitCamber) -> None:
             eps = 1e-7
@@ -224,7 +227,7 @@ class TestNaca5DigitCamber(unittest.TestCase):
         self.assertListEqual([0.0, 0.2025, 1.0], af.joints())
 
     def testMaxCamber(self) -> None:
-        af = Naca5DigitCamberClassic(p=3.0)
+        af = Naca5DigitCamberClassic(p=3)
 
         self.assertTupleEqual((0.15, af.y(0.15)), af.max_camber())
 

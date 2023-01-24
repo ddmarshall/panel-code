@@ -348,21 +348,21 @@ class Naca5DigitCamber(Camber):
 
     Attributes
     ----------
-    p : float
-        Relative chord location of maximum camber times 20.
     ci : float
         Ideal lift coefficient times 20/3.
+    p : float
+        Relative chord location of maximum camber times 20.
     m : float
         Camber transition relative chord location.
     k1 : float
         Scale factor for camber.
     """
 
-    def __init__(self, ci: float, p: float, m: float, k1: float) -> None:
-        self._ci = (3.0/20.0)*ci
-        self._p = p/20.0
-        self._m = m
-        self._k1 = k1
+    def __init__(self, ci: float, p: float) -> None:
+        self._m = 0.2
+        self._k1 = 0.0
+        self._p_setter(p)
+        self._ci_setter(ci)
 
     @property
     def p(self) -> float:
@@ -533,7 +533,7 @@ class Naca5DigitCamber(Camber):
         float
             Maximum camber.
         """
-        return self._p, self.y(self._p)
+        return self._p, self.y(xi=self._p)
 
 
 class Naca5DigitCamberClassic(Naca5DigitCamber):
@@ -546,8 +546,7 @@ class Naca5DigitCamberClassic(Naca5DigitCamber):
     """
 
     def __init__(self, p: int) -> None:
-        self._p_setter(p)
-        super().__init__(2, p, self._m, self._k1)
+        super().__init__(ci=2, p=p)
 
     def _p_setter(self, p: int) -> None:
         if p == 1:
@@ -581,19 +580,14 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamber):
     """
     Camber for the regular NACA 5-digit airfoils.
 
-    Attributes
-    ----------
-    p : float
-        Relative chord location of maximum camber.
-    Cl_ideal : float
-        Ideal lift coefficient.
+    The valid range of the relative chord location of maximum camber term is
+    [1, 6). The valid range for the ideal lift coefficient term is [1, 4).
     """
 
-    def __init__(self, p: float, ci: float) -> None:
+    def __init__(self, ci: float, p: float) -> None:
         # Need to bootstrap initialization
-        self._ci = 0.3
-        self._p_setter(p)
-        super().__init__(ci, p, self._m, self._k1)
+        self._ci = (3.0/20.0)*ci
+        super().__init__(ci=ci, p=p)
 
     def _p_setter(self, p: float) -> None:
         if p < 1 or p >= 6:
@@ -608,17 +602,323 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamber):
         root = root_scalar(lambda x: camber_slope(x),
                            bracket=[self._p, 2*self._p])
         self._m = root.root
-        self._p = p
         self._determine_k1()
 
     def _ci_setter(self, ci: int) -> None:
         if ci < 1 or ci >= 4:
             raise ValueError("Invalid NACA 5-Digit ideal lift coefficient: "
                              f"{ci}.")
+
         self._ci = (3.0/20.0)*ci
         self._determine_k1()
 
-    def _determine_k1(self):
+    def _determine_k1(self) -> None:
         self._k1 = 6*self._ci/(-3/2*(1-2*self._m)*np.arccos(1-2*self._m)
                                + (4*self._m**2-4*self._m
                                   + 3)*np.sqrt(self._m*(1-self._m)))
+
+
+class Naca5DigitCamberReflexed:
+    """
+    Base class for the NACA 5-digit reflexed camber airfoil.
+
+    Attributes
+    ----------
+    ci : float
+        Ideal lift coefficient times 20/3.
+    p : float
+        Relative chord location of maximum camber times 20.
+    m : float
+        Camber transition relative chord location.
+    k1 : float
+        First scale factor for camber.
+    k2 : float
+        Second scale factor for camber.
+    """
+
+    def __init__(self, ci: float, p: float,) -> None:
+        self._m = 0.2
+        self._k1 = 0.0
+        self._k2 = 0.0
+        self._p_setter(p)
+        self._ci_setter(ci)
+
+    @property
+    def p(self) -> float:
+        """Location of maximum camber."""
+        return 20.0*self._p
+
+    @p.setter
+    def p(self, p: float) -> None:
+        self._p_setter(p)
+
+    @abstractmethod
+    def _p_setter(self, p: float) -> None:
+        pass
+
+    @property
+    def ci(self) -> float:
+        """Ideal lift coefficient term."""
+        return (20.0/3.0)*self._ci
+
+    @ci.setter
+    def ci(self, ci: float) -> None:
+        self._ci_setter(ci)
+
+    @abstractmethod
+    def _ci_setter(self, ci: float) -> None:
+        pass
+
+    @property
+    def m(self) -> float:
+        """Camber transition relative chord location."""
+        return self._m
+
+    @property
+    def k1(self) -> float:
+        """First scale factor for camber."""
+        return self._k1
+
+    @property
+    def k2(self) -> float:
+        """Second scale factor for camber."""
+        return self._k2
+
+    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the camber location at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Camber at specified point.
+        """
+        xi = np.asarray(xi)
+        if issubclass(xi.dtype.type, np.integer):
+            xi = xi.astype(np.float64)
+
+        m = self.m
+        k1 = self.k1
+        k2ok1 = self.k2/k1
+
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return (k1/6)*((xi-m)**3 - k2ok1*(1-m)**3*xi + m**3*(1-xi))
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return (k1/6)*(k2ok1*(xi-m)**3 - k2ok1*(1-m)**3*xi + m**3*(1-xi))
+
+        return np.piecewise(xi, [xi <= m, xi > m],
+                            [lambda xi: fore(xi), lambda xi: aft(xi)])
+
+    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of camber at specified point.
+        """
+        xi = np.asarray(xi)
+        if issubclass(xi.dtype.type, np.integer):
+            xi = xi.astype(np.float64)
+
+        m = self.m
+        k1 = self.k1
+        k2ok1 = self.k2/k1
+
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return (k1/6)*(3*(xi-m)**2 - k2ok1*(1-m)**3 - m**3)
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return (k1/6)*(3*k2ok1*(xi-m)**2 - k2ok1*(1-m)**3 - m**3)
+
+        return np.piecewise(xi, [xi <= m, xi > m],
+                            [lambda xi: fore(xi), lambda xi: aft(xi)])
+
+    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of camber at specified point.
+        """
+        xi = np.asarray(xi)
+        if issubclass(xi.dtype.type, np.integer):
+            xi = xi.astype(np.float64)
+
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return (self.k1)*(xi - self.m)
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return (self.k2)*(xi - self.m)
+
+        return np.piecewise(xi, [xi <= self.m, xi > self.m],
+                            [lambda xi: fore(xi), lambda xi: aft(xi)])
+
+    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return third derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Third derivative of camber at specified point.
+        """
+        xi = np.asarray(xi)
+        if issubclass(xi.dtype.type, np.integer):
+            xi = xi.astype(np.float64)
+
+        def fore(xi: np_type.NDArray) -> np_type.NDArray:
+            return self.k1*np.ones_like(xi)
+
+        def aft(xi: np_type.NDArray) -> np_type.NDArray:
+            return self.k2*np.ones_like(xi)
+
+        return np.piecewise(xi, [xi <= self.m, xi > self.m],
+                            [lambda xi: fore(xi), lambda xi: aft(xi)])
+
+    def joints(self) -> List[float]:
+        """
+        Return the locations of any joints/discontinuities in the camber line.
+
+        Returns
+        -------
+        List[float]
+            Xi-coordinates of any discontinuities.
+        """
+        return [0.0, self.m, 1.0]
+
+    def max_camber(self) -> Tuple[float, float]:
+        """
+        Return chord location of maximum camber and the maximum camber.
+
+        Returns
+        -------
+        float
+            Chord location of maximum camber.
+        float
+            Maximum camber.
+        """
+        return self._p, self.y(self._p)
+
+
+class Naca5DigitCamberReflexedClassic(Naca5DigitCamberReflexed):
+    """
+    Camber for the classic NACA 5-digit reflexed airfoils.
+
+    The only valid values for the relative chord location of maximum camber
+    term are 1, 2, 3, 4, and 5. The only valid value for the ideal lift
+    coefficient term is 2.
+    """
+
+    def __init__(self, p: int) -> None:
+        super().__init__(ci=2, p=p)
+
+    def _p_setter(self, p: int) -> None:
+        if p == 2:
+            self._m = 0.1300
+            self._k1 = 51.99
+            self._k2 = 0.03972036
+        elif p == 3:
+            self._m = 0.2170
+            self._k1 = 15.793
+            self._k2 = 0.10691861
+        elif p == 4:
+            self._m = 0.3180
+            self._k1 = 6.520
+            self._k2 = 0.197556
+        elif p == 5:
+            self._m = 0.4410
+            self._k1 = 3.191
+            self._k2 = 0.4323805
+        else:
+            raise ValueError("Invalid NACA 5-Digit reflexed max. camber "
+                             f"location: {p}.")
+
+        self._p = p/20.0
+
+    def _ci_setter(self, ci: int) -> None:
+        if ci != 2:
+            raise ValueError("Invalid NACA 5-Digit reflexed ideal lift "
+                             f"coefficient: {ci}.")
+        self._ci = (3.0/20.0)*ci
+
+
+class Naca5DigitCamberReflexedEnhanced(Naca5DigitCamberReflexed):
+    """
+    Camber for the regular NACA 5-digit reflexed airfoils.
+
+    The valid range of the relative chord location of maximum camber term is
+    [1, 6). The valid range for the ideal lift coefficient term is [1, 4).
+    """
+
+    def __init__(self, ci: float, p: float) -> None:
+        # Need to bootstrap initialization
+        self._ci = (3.0/20.0)*ci
+        super().__init__(ci=ci, p=p)
+
+    def _p_setter(self, p) -> float:
+        if p < 1 or p >= 6:
+            raise ValueError("Invalid NACA 5-Digit reflexed max. camber "
+                             f"location: {p}")
+
+        self._p = p/20.0
+
+        def m_fun(m: float) -> float:
+            k1 = 1.0
+            k2ok1 = self._k2ok1(m, self._p)
+            Cl_id = self._Cl_id(m, k1, k2ok1)
+            return -0.25*Cl_id + (k1/192)*(3*k2ok1*np.pi
+                                           + 3*(1-k2ok1)*np.arccos(1-2*m)
+                                           + 2*(1-k2ok1)*(1-2*m)*(8*m**2-8*m-3)
+                                           * np.sqrt(m*(1-m)))
+
+        root = root_scalar(m_fun, bracket=[self._p, 3*self._p])
+        self._m = root.root
+        self._determine_k1k2()
+
+    def _ci_setter(self, ci: float) -> float:
+        if ci < 1 or ci >= 4:
+            raise ValueError("Invalid NACA 5-Digit reflexed ideal lift "
+                             f"coefficient: {ci}.")
+
+        self._ci = (3.0/20.0)*ci
+        self._determine_k1k2()
+
+    def _determine_k1k2(self) -> None:
+        k2ok1 = self._k2ok1(self.m, self._p)
+        self._k1 = self._ci/self._Cl_id(self.m, 1, k2ok1)
+        self._k2 = k2ok1*self._k1
+
+    @staticmethod
+    def _Cl_id(m: float, k1: float, k2ok1: float) -> float:
+        return (k1/12)*(3*k2ok1*(2*m-1)*np.pi
+                        + 3*(1-k2ok1)*(2*m-1)*np.arccos(1-2*m)
+                        + 2*(1-k2ok1)*(4*m**2-4*m+3)*np.sqrt(m*(1-m)))
+
+    @staticmethod
+    def _k2ok1(m: float, p: float) -> float:
+        return (3*(p-m)**2 - m**3)/(1 - m)**3

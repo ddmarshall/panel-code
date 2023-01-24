@@ -1,27 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jan 12 14:11:28 2023
+Created on Mon Jan 23 16:09:35 2023
 
 @author: ddmarshall
 """
 
 import unittest
 
-from os.path import abspath, dirname
-
 import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
 
-from pyPC.camber import Naca5DigitCamberBase
-from pyPC.camber import Naca5DigitCamberClassic
-from pyPC.camber import Naca5DigitCamberEnhanced
-from pyPC.camber import Naca5DigitCamberReflexedBase
-from pyPC.camber import Naca5DigitCamberReflexedClassic
-from pyPC.camber import Naca5DigitCamberReflexedEnhanced
-
-from theory_of_wing_sections import camber_data
+from pyPC.airfoil.camber import (Naca5DigitCamberReflexed,
+                                 Naca5DigitCamberReflexedClassic,
+                                 Naca5DigitCamberReflexedEnhanced)
 
 
 class TestNaca5DigitReflexed(unittest.TestCase):
@@ -29,13 +22,21 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testSetters(self) -> None:
         """Test the setting of the max. camber location and ideal lift coef."""
-        af = Naca5DigitCamberReflexedEnhanced(0.05, 0.30)
+        af = Naca5DigitCamberReflexedClassic(p=3)
+
+        self.assertEqual(af.p, 3)
+        self.assertEqual(af.ci, 2)
+
+        af = Naca5DigitCamberReflexedEnhanced(ci=2.3, p=3.2)
+
+        self.assertEqual(af.p, 3.2)
+        self.assertEqual(af.ci, 2.3)
 
         # Note: while published data from Jacobs and Pinkerton (1936) has
         #       values, they are noticable off from actual values. These
         #       reference values come from previous Matlab implementation.
-        p = np.array([0.10, 0.15, 0.20, 0.25])
-        Cl_ideal = 0.3
+        p = 20*np.array([0.10, 0.15, 0.20, 0.25])
+        ci = (20/3.0)*0.3
         # m from ref.    [0.1300,       0.2170,       0.3180,
         #                 0.4410]
         m_ref = np.array([0.1307497584, 0.2160145029, 0.3179188983,
@@ -52,15 +53,13 @@ class TestNaca5DigitReflexed(unittest.TestCase):
         # test the static methods
         for pit, mit, k1it, k2it in np.nditer([p, m_ref, k1_ref, k2_ref]):
             Cl_id = af._Cl_id(m=mit, k1=k1it, k2ok1=k2it/k1it)
-            k2ok1 = af._k2ok1(m=mit, p=pit)
+            k2ok1 = af._k2ok1(m=mit, p=pit/20)
             k2ok1_ref = k2it/k1it
-            Cmc4 = af._Cmc4(m=mit, k1=k1it, k2ok1=k2it/k1it, Cl_id=Cl_ideal)
-            self.assertIsNone(npt.assert_allclose(Cl_id, Cl_ideal))
+            self.assertIsNone(npt.assert_allclose(Cl_id, 3.0*ci/20))
             self.assertIsNone(npt.assert_allclose(k2ok1, k2ok1_ref))
-            self.assertIsNone(npt.assert_allclose(Cmc4, 0, atol=1e-7))
 
         # test the initialization of camber
-        af.Cl_ideal = Cl_ideal
+        af.ci = ci
         for pit, mit, k1it, k2it in np.nditer([p, m_ref, k1_ref, k2_ref]):
             af.p = pit
             self.assertIsNone(npt.assert_allclose(af.m, mit))
@@ -69,11 +68,11 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testCamber(self) -> None:
         """Test the camber relations."""
-        af_classic = Naca5DigitCamberReflexedClassic(camber_loc=2)
-        af_enhanced = Naca5DigitCamberReflexedEnhanced(p=0.25, Cl_ideal=0.35)
+        af_classic = Naca5DigitCamberReflexedClassic(p=2)
+        af_enhanced = Naca5DigitCamberReflexedEnhanced(ci=3.7, p=2.4)
 
         def compare_values(xi: np_type.NDArray,
-                           af: Naca5DigitCamberReflexedBase) -> None:
+                           af: Naca5DigitCamberReflexed) -> None:
             eps = 1e-7
 
             xi_a = np.asarray(xi)
@@ -133,7 +132,7 @@ class TestNaca5DigitReflexed(unittest.TestCase):
         compare_values(xi, af_enhanced)
 
     def testEndpoints(self) -> None:
-        af = Naca5DigitCamberReflexedClassic(camber_loc=3)
+        af = Naca5DigitCamberReflexedClassic(p=3)
 
         # reference values
         coef = [af.k1/6, af.k1/6]
@@ -177,9 +176,14 @@ class TestNaca5DigitReflexed(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yppp, yppp_ref))
 
     def testJoints(self) -> None:
-        af = Naca5DigitCamberReflexedClassic(camber_loc=3)
+        af = Naca5DigitCamberReflexedClassic(p=3)
 
-        self.assertListEqual([0.2170], af.joints())
+        self.assertListEqual([0.0, 0.2170, 1.0], af.joints())
+
+    def testMaxCamber(self) -> None:
+        af = Naca5DigitCamberReflexedClassic(p=3)
+
+        self.assertTupleEqual((0.15, af.y(0.15)), af.max_camber())
 
 
 if __name__ == "__main__":
