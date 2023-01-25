@@ -96,9 +96,9 @@ class TestNaca5DigitCamber(unittest.TestCase):
         self.assertEqual(af.p, 1.2)
         self.assertEqual(af.ci, 2.4)
 
-        # Note: while published data from Jacobs and Pinkerton (1936) has
-        #       values, they are noticable off from actual values. These
-        #       reference values come from previous Matlab implementation.
+        # Note: The published data from Jacobs and Pinkerton (1936) are
+        #       noticably off from actual values. These reference values come
+        #       from previous Matlab implementation.
         p = 20*np.array([0.05, 0.10, 0.15, 0.20, 0.25])
         ci = (20/3.0)*0.3
         # m from ref.    [0.0580,       0.1260,       0.2025,
