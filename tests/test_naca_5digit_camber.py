@@ -179,6 +179,7 @@ class TestNaca5DigitCamber(unittest.TestCase):
         compare_values(xi, af_enhanced)
 
     def testEndpoints(self) -> None:
+        """Test accessing the end points of camber with integers."""
         af = Naca5DigitCamberClassic(p=3)
 
         # reference values
@@ -222,11 +223,13 @@ class TestNaca5DigitCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yppp, yppp_ref))
 
     def testJoints(self) -> None:
+        """Test correct joints are being reported."""
         af = Naca5DigitCamberClassic(p=3)
 
         self.assertListEqual([0.0, 0.2025, 1.0], af.joints())
 
     def testMaxCamber(self) -> None:
+        """Test maximum camber."""
         af = Naca5DigitCamberClassic(p=3)
 
         self.assertTupleEqual((0.15, af.y(0.15)), af.max_camber())
