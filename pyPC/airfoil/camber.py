@@ -565,7 +565,8 @@ class Naca5DigitCamberClassic(Naca5DigitCamber):
             self._m = 0.3910
             self._k1 = 3.230
         else:
-            raise ValueError("Invalid NACA 5-Digit max. camber location: {p}.")
+            raise ValueError("Invalid NACA 5-Digit max. camber location:"
+                             f" {p}.")
 
         self._p = p/20.0
 
