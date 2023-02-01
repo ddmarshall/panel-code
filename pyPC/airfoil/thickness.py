@@ -182,7 +182,7 @@ class Thickness(Curve):
 
 class Naca45DigitThickness(Thickness):
     """
-    Base class for the NACA 4-digit and 5-digit airfoil thickness.
+    Class for the classic NACA 4-digit and 5-digit airfoil thickness.
 
     Attributes
     ----------
@@ -190,10 +190,17 @@ class Naca45DigitThickness(Thickness):
         Maximum thickness per chord length times 100.
     a : numpy.ndarray
         Coefficients for equation.
+
+    Notes
+    -----
+    To obtain a classic thickness profile the maximum thickness should be set
+    to an integer value, i.e. 12. However, any floating point value can be
+    passed in, i.e. 12.3, if a more accurate maximum thickness is needed to
+    be specified.
     """
 
     def __init__(self, tmax: float) -> None:
-        self._a = np.zeros(5)
+        self._a = np.array([0.29690, -0.12600, -0.35160, 0.28430, -0.10150])
         self.tmax = tmax
 
     @property
@@ -203,7 +210,7 @@ class Naca45DigitThickness(Thickness):
 
     @tmax.setter
     def tmax(self, tmax: float) -> None:
-        if tmax < 0 or tmax > 99:
+        if tmax < 0 or tmax >= 100:
             raise ValueError(f"Invalid NACA 4/5-digit max. thicknes: {tmax}")
 
         self._tmax = tmax/100.0
@@ -247,7 +254,6 @@ class Naca45DigitThickness(Thickness):
         numpy.ndarray
             First derivative of thickness at specified point.
         """
-        eps = 1e-6
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -289,17 +295,6 @@ class Naca45DigitThickness(Thickness):
         return np.piecewise(xi, [xi == 0, xi != 0],
                             [lambda xi: -np.inf, lambda xi: fun(xi)])
 
-    def le_k(self) -> float:
-        """
-        Return the curvature of the leading edge.
-
-        Returns
-        -------
-        float
-            Leading edge curvature.
-        """
-        return -2/((self._tmax/0.20)*self.a[0])**2
-
     def joints(self) -> List[float]:
         """
         Return the locations of any joints/discontinuities in the thickness.
@@ -324,19 +319,16 @@ class Naca45DigitThickness(Thickness):
         """
         return 0.3, self.y(0.3)
 
+    def le_k(self) -> float:
+        """
+        Return the curvature of the leading edge.
 
-class Naca45DigitThicknessClassic(Naca45DigitThickness):
-    """
-    Classic NACA 4-digit and 5-digit airfoil thickness.
-
-    The only valid values for the maximum thickness are [1, 99]. Note that
-    thicknesses above 25 are uncommon and might cause problems is certain
-    situations.
-    """
-
-    def __init__(self, tmax: float) -> None:
-        super().__init__(tmax=tmax)
-        self._a = np.array([0.29690, -0.12600, -0.35160, 0.28430, -0.10150])
+        Returns
+        -------
+        float
+            Leading edge curvature.
+        """
+        return -2/((self._tmax/0.20)*self.a[0])**2
 
 
 class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
@@ -359,6 +351,13 @@ class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
         True if the leading edge radius should be same as classic airfoil or
         False if original method of setting the thickness near the leading
         edge should be used.
+
+    Notes
+    -----
+    Specifying the same parameters as the classic thickness profile will not
+    result in an identical thickness profile because the cannonical
+    coefficients do not match the stated constraints in the original source
+    from Jacobs, Ward, and Pinkerton (1933).
     """
 
     def __init__(self, tmax: float, closed_te: bool, use_radius: bool) -> None:
@@ -434,42 +433,74 @@ class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
         self._a = np.linalg.solve(B, r).transpose()[0]
 
 
-class Naca4DigitModifiedThicknessBase:
+class Naca45DigitModifiedThickness(Thickness):
     """
-    Base class for the NACA modified 4-digit airfoil thickness.
+    Base class for the NACA modified 4-digit and 5-digit airfoil thickness.
 
     Attributes
     ----------
-    thickness : float
-        Maximum thickness per chord length.
-    xi_m : float
-        Location of end of fore section and start of aft section.
+    tmax : float
+        Maximum thickness per chord length times 100.
+    leading_edge_index: float
+        Parameter to specify the radius of the leading edge.
+    max_thickness_index : float
+        Location of end of fore section and start of aft section times 10.
     a : numpy.ndarray
         Coefficients for fore equation.
     d : numpy.ndarray
         Coefficients for aft equation.
     """
 
-    def __init__(self, thickness: float, xi_m: float, a: np_type.NDArray,
-                 d: np_type.NDArray) -> None:
-        self._t = thickness
-        self._xi_m = xi_m
-        self._a = a
-        self._d = d
+    def __init__(self, tmax: float, lei: float, xi_m: float) -> None:
+        # start with valid defaults for setters to work
+        self._closed_te = False
+        self._lei = 4
+        self._xi_m = 4
+        self._a = np.zeros(4)
+        self._d = np.zeros(4)
+
+        # use settters to ensure valid data
+        self.tmax = tmax
+        self.max_thickness_index = xi_m
+        self.leading_edge_index = lei
 
     @property
-    def thickness(self) -> float:
+    def tmax(self) -> float:
         """Maximum thickness."""
-        return self._t
+        return 100*self._tmax
 
-    @thickness.setter
-    def thickness(self, thickness: float) -> None:
-        self._t = thickness
+    @tmax.setter
+    def tmax(self, tmax: float) -> None:
+        if tmax < 0 or tmax >= 100:
+            raise ValueError("Invalid NACA modified 4/5-digit max. thickness: "
+                             f"{tmax}")
+        self._tmax = tmax/100.0
 
     @property
-    def xi_m(self) -> float:
+    def leading_edge_index(self) -> float:
+        """Leading edge index parameter."""
+        return self._lei
+
+    @leading_edge_index.setter
+    def leading_edge_index(self, lei: float) -> None:
+        if lei < 1 or lei >= 10:
+            raise ValueError("Invalid NACA modified 4/5-digit leading edge "
+                             f"parameter: {lei}")
+        self._lei = lei
+        self._calculate_coefficients()
+
+    @property
+    def max_thickness_index(self) -> float:
         """Location where fore and aft equations meet."""
-        return self._xi_m
+        return 10*self._xi_m
+
+    @max_thickness_index.setter
+    def max_thickness_index(self, xi_m: float) -> None:
+        if xi_m < 1 or xi_m >= 10:
+            raise ValueError("Invalid NACA modified 4/5-digit max. thickness "
+                             f"location parameter: {xi_m}")
+        self._xi_m = xi_m/10.0
+        self._calculate_coefficients()
 
     @property
     def a(self) -> float:
@@ -509,10 +540,9 @@ class Naca4DigitModifiedThicknessBase:
                                        + (1-xi)*(self.d[2]
                                                  + ((1-xi)*self.d[3])))
 
-        return self.thickness*np.piecewise(xi, [xi <= self.xi_m,
-                                                xi > self.xi_m],
-                                           [lambda xi: fore(xi),
-                                            lambda xi: aft(xi)])
+        return self._tmax*np.piecewise(xi, [xi <= self._xi_m, xi > self._xi_m],
+                                       [lambda xi: fore(xi),
+                                        lambda xi: aft(xi)])
 
     def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -540,10 +570,12 @@ class Naca4DigitModifiedThicknessBase:
         def aft(xi: np_type.NDArray) -> np_type.NDArray:
             return -self.d[1] + (1-xi)*(-2*self.d[2] + (-3*(1-xi)*self.d[3]))
 
-        return self.thickness*np.piecewise(xi, [xi <= self.xi_m,
-                                                xi > self.xi_m],
-                                           [lambda xi: fore(xi),
-                                            lambda xi: aft(xi)])
+        return self._tmax*np.piecewise(xi,
+                                       [xi == 0, (xi > 0) & (xi <= self._xi_m),
+                                        xi > self._xi_m],
+                                       [lambda xi: np.inf,
+                                        lambda xi: fore(xi),
+                                        lambda xi: aft(xi)])
 
     def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -570,58 +602,36 @@ class Naca4DigitModifiedThicknessBase:
         def aft(xi: np_type.NDArray) -> np_type.NDArray:
             return 2*self.d[2] + 6*(1-xi)*self.d[3]
 
-        return self.thickness*np.piecewise(xi, [xi <= self.xi_m,
-                                                xi > self.xi_m],
-                                           [lambda xi: fore(xi),
-                                            lambda xi: aft(xi)])
+        return self._tmax*np.piecewise(xi,
+                                       [xi == 0, (0 < xi) & (xi <= self._xi_m),
+                                        xi > self._xi_m],
+                                       [lambda xi: -np.inf,
+                                        lambda xi: fore(xi),
+                                        lambda xi: aft(xi)])
 
-    def _reset(self, le_radius: float, xi_m: float, eta: float) -> None:
-        tau = self._tau(xi_m)
-        k_m = self._k_m(eta=eta, tau=tau, xi_m=xi_m)
-        self._xi_m = xi_m
-        self._d = self._calc_d_terms(eta=eta, tau=tau, xi_m=xi_m)
-        self._a = self._calc_a_terms(Iterm=le_radius, k_m=k_m, xi_m=xi_m)
+    def joints(self) -> List[float]:
+        """
+        Return the locations of any joints/discontinuities in the thickness.
 
-    @staticmethod
-    def _tau(xi_m: float) -> float:
-        p = [1.0310900853, -2.7171508529, 4.8594083156]
-        q = [1.0, -1.8252487562, 1.1771499645]
-        return ((p[0] + p[1]*xi_m + p[2]*xi_m**2)
-                / (q[0] + q[1]*xi_m + q[2]*xi_m**2))
+        Returns
+        -------
+        List[float]
+            Xi-coordinates of any discontinuities.
+        """
+        return [0.0, self._xi_m, 1.0]
 
-    @staticmethod
-    def _Q(Iterm: float) -> float:
-        a_tilda2 = 0.08814961
-        if Iterm < 9:
-            return 25*a_tilda2/72
-        else:
-            return 25*a_tilda2/54
+    def max_thickness(self) -> Tuple[float, float]:
+        """
+        Return chord location of maximum thickness and the maximum thickness.
 
-    @staticmethod
-    def _calc_d_terms(eta: float, tau: float, xi_m: float) -> np_type.NDArray:
-        d = np.zeros(4)
-        d[0] = 0.5*eta
-        d[1] = tau
-        d[2] = (2*tau*(xi_m-1)-1.5*(eta-1))/(xi_m-1)**2
-        d[3] = (tau*(xi_m-1)-(eta-1))/(xi_m-1)**3
-        return d
-
-    @staticmethod
-    def _k_m(eta: float, tau: float, xi_m: float) -> float:
-        return (3*(eta-1)-2*tau*(xi_m-1))/(xi_m-1)**2
-
-    @staticmethod
-    def _calc_a_terms(Iterm: float, k_m: float,
-                      xi_m: float) -> np_type.NDArray:
-        Q = Naca4DigitModifiedThicknessBase._Q(Iterm)
-        a = np.zeros(4)
-        sqrt_term = np.sqrt(2*Q)
-        sqrt_term2 = np.sqrt(2*Q*xi_m)
-        a[0] = Iterm*sqrt_term
-        a[1] = 0.5*xi_m*(k_m + (3-3.75*Iterm*sqrt_term2)/xi_m**2)
-        a[2] = -(k_m + (1.5-1.25*Iterm*sqrt_term2)/xi_m**2)
-        a[3] = 0.5/xi_m*(k_m + (1-0.75*Iterm*sqrt_term2)/xi_m**2)
-        return a
+        Returns
+        -------
+        float
+            Chord location of maximum thickness.
+        float
+            Maximum thickness.
+        """
+        return self._xi_m, self.y(self._xi_m)
 
     def le_k(self) -> float:
         """
@@ -632,56 +642,48 @@ class Naca4DigitModifiedThicknessBase:
         float
             Leading edge curvature.
         """
-        return -2/(self.thickness*self.a[0])**2
+        return -2/(self._tmax*self.a[0])**2
+
+    def _calculate_coefficients(self):
+        # Pade approximation that goes through all Stack and von Doenhoff
+        # (1935) values. Improves upon Riegels (1961) fit.
+        p = [1.0310900853, -2.7171508529, 4.8594083156]
+        q = [1.0, -1.8252487562, 1.1771499645]
+        tau = ((p[0] + p[1]*self._xi_m + p[2]*self._xi_m**2)
+               / (q[0] + q[1]*self._xi_m + q[2]*self._xi_m**2))
+
+        # calculate the d coefficients
+        if self._closed_te:
+            eta = 0.0
+        else:
+            eta = 0.02
+
+        self._d[0] = 0.5*eta
+        self._d[1] = tau
+        self._d[2] = (2*tau*(self._xi_m-1)-1.5*(eta-1))/(self._xi_m-1)**2
+        self._d[3] = (tau*(self._xi_m-1)-(eta-1))/(self._xi_m-1)**3
+
+        # calculate the a coefficients
+        Q = 25*0.08814961
+        if self._lei < 9:
+            Q /= 72
+        else:
+            Q /= 54
+
+        k_m = (3*(eta-1)-2*tau*(self._xi_m-1))/(self._xi_m-1)**2
+        sqrt_term = np.sqrt(2*Q)
+        sqrt_term2 = np.sqrt(2*Q*self._xi_m)
+        self._a[0] = self._lei*sqrt_term
+        self._a[1] = (0.5*self._xi_m
+                      * (k_m + (3-3.75*self._lei*sqrt_term2)/self._xi_m**2))
+        self._a[2] = -(k_m + (1.5-1.25*self._lei*sqrt_term2)/self._xi_m**2)
+        self._a[3] = (0.5/self._xi_m
+                      * (k_m + (1-0.75*self._lei*sqrt_term2)/self._xi_m**2))
 
 
-class Naca4DigitModifiedThicknessClassic(Naca4DigitModifiedThicknessBase):
+class Naca45DigitModifiedThicknessEnhanced(Naca45DigitModifiedThickness):
     """
-    Classic NACA modified 4-digit airfoil thickness.
-
-    Attributes
-    ----------
-    max_thickness_loc : int
-        Location of maximum thickness in tenth of chord.
-    le_radius : int
-        Index to specify the radius of the leading edge.
-    """
-
-    def __init__(self, thickness: float, le_radius: int,
-                 max_t_loc: int) -> None:
-        super().__init__(thickness=thickness, xi_m=0.4, a=np.zeros(4),
-                         d=np.zeros(4))
-        self.reset(le_radius, max_t_loc)
-
-    @property
-    def max_thickness_loc(self) -> int:
-        """Parameter specifying the location of maximum thickness."""
-        return self._max_t_loc
-
-    @property
-    def le_radius(self) -> int:
-        """Parameter specifying the leading edge radius."""
-        return self._le_radius
-
-    def reset(self, le_radius: int, max_t_loc: int) -> None:
-        """
-        Reset the thickness parameters to new values.
-
-        Parameters
-        ----------
-        le_radius : int
-            Indicator of leading edge radius.
-        max_t_loc : int
-            Indicator of location of maximum thickness.
-        """
-        self._le_radius = le_radius
-        self._max_t_loc = max_t_loc
-        self._reset(le_radius=le_radius, xi_m=max_t_loc/10.0, eta=0.02)
-
-
-class Naca4DigitModifiedThicknessEnhanced(Naca4DigitModifiedThicknessBase):
-    """
-    Enhanced NACA modified 4-digit airfoil thickness relation.
+    Enhanced NACA modified 4-digit and 5-digit airfoil thickness relation.
 
     This class extends the standard modified thickness distribution relations
     by
@@ -693,27 +695,12 @@ class Naca4DigitModifiedThicknessEnhanced(Naca4DigitModifiedThicknessBase):
     ----------
     closed_te : bool
         True if the thickness should be zero at the trailing edge
-    max_thickness_loc : float
-        Location of maximum thickness per chord.
-    le_radius : float
-        Parameter to specify the radius of the leading edge.
     """
 
-    def __init__(self, thickness: float,  le_radius: float, max_t_loc: float,
+    def __init__(self, tmax: float,  lei: float, xi_m: float,
                  closed_te: bool) -> None:
-        super().__init__(thickness=thickness, xi_m=0.4, a=np.zeros(4),
-                         d=np.zeros(4))
-        self.reset(le_radius, max_t_loc, closed_te)
-
-    @property
-    def max_thickness_loc(self) -> float:
-        """Location of maximum thickness per chord."""
-        return self._xi_m
-
-    @property
-    def le_radius(self) -> float:
-        """Parameter specifying the leading edge radius."""
-        return self._le_radius
+        super().__init__(tmax=tmax, xi_m=xi_m, lei=lei)
+        self.closed_te = closed_te
 
     @property
     def closed_te(self) -> bool:
@@ -722,25 +709,6 @@ class Naca4DigitModifiedThicknessEnhanced(Naca4DigitModifiedThicknessBase):
 
     @closed_te.setter
     def closed_te(self, closed_te: bool) -> None:
-        self.reset(le_radius=self.le_radius, max_t_loc=self.max_thickness_loc,
-                   closed_te=closed_te)
-
-    def reset(self, le_radius: float, max_t_loc: float,
-              closed_te: bool) -> None:
-        """
-        Reset the thickness parameters to new values.
-
-        Parameters
-        ----------
-        le_radius : int
-            Indicator of leading edge radius.
-        max_t_loc : int
-            Indicator of location of maximum thickness.
-        """
-        self._le_radius = le_radius
-        self._closed_te = closed_te
-        if closed_te:
-            eta = 0
-        else:
-            eta = 0.02
-        self._reset(le_radius=le_radius, xi_m=max_t_loc, eta=eta)
+        if self._closed_te != closed_te:
+            self._closed_te = closed_te
+            self._calculate_coefficients()
