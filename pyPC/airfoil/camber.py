@@ -344,51 +344,49 @@ class Naca4DigitCamber(Camber):
 
 class Naca5DigitCamber(Camber):
     """
-    Base class for the NACA 5-digit airfoil camber.
+    Class for the classic NACA 5-digit airfoil camber.
 
     Attributes
     ----------
-    ci : float
+    lift_coefficient_index : float
         Ideal lift coefficient times 20/3.
-    p : float
+    max_camber_index : float
         Relative chord location of maximum camber times 20.
     m : float
         Camber transition relative chord location.
     k1 : float
         Scale factor for camber.
+
+    Notes
+    -----
+    The only valid values for the relative chord location of maximum camber
+    term are 1, 2, 3, 4, and 5. The only valid value for the ideal lift
+    coefficient term is 2.
     """
 
-    def __init__(self, ci: float, p: float) -> None:
+    def __init__(self, lci: float, mci: float) -> None:
         self._m = 0.2
         self._k1 = 0.0
-        self._p_setter(p)
-        self._ci_setter(ci)
+        self._p_setter(mci)
+        self._lci_setter(lci)
 
     @property
-    def p(self) -> float:
+    def lift_coefficient_index(self) -> float:
+        """Ideal lift coefficient term."""
+        return (20.0/3.0)*self._lci
+
+    @lift_coefficient_index.setter
+    def lift_coefficient_index(self, lci: float) -> None:
+        self._lci_setter(lci)
+
+    @property
+    def max_camber_index(self) -> float:
         """Location of maximum camber."""
         return 20.0*self._p
 
-    @p.setter
-    def p(self, p: float) -> None:
-        self._p_setter(p)
-
-    @abstractmethod
-    def _p_setter(self, p: float) -> None:
-        pass
-
-    @property
-    def ci(self) -> float:
-        """Ideal lift coefficient term."""
-        return (20.0/3.0)*self._ci
-
-    @ci.setter
-    def ci(self, ci: float) -> None:
-        self._ci_setter(ci)
-
-    @abstractmethod
-    def _ci_setter(self, ci: float) -> None:
-        pass
+    @max_camber_index.setter
+    def max_camber_index(self, mci: float) -> None:
+        self._p_setter(mci)
 
     @property
     def m(self) -> float:
@@ -535,46 +533,33 @@ class Naca5DigitCamber(Camber):
         """
         return self._p, self.y(xi=self._p)
 
-
-class Naca5DigitCamberClassic(Naca5DigitCamber):
-    """
-    Camber for the classic NACA 5-digit airfoils.
-
-    The only valid values for the relative chord location of maximum camber
-    term are 1, 2, 3, 4, and 5. The only valid value for the ideal lift
-    coefficient term is 2.
-    """
-
-    def __init__(self, p: int) -> None:
-        super().__init__(ci=2, p=p)
-
-    def _p_setter(self, p: int) -> None:
-        if p == 1:
+    def _p_setter(self, mci: int) -> None:
+        if mci == 1:
             self._m = 0.0580
             self._k1 = 361.4
-        elif p == 2:
+        elif mci == 2:
             self._m = 0.1260
             self._k1 = 51.64
-        elif p == 3:
+        elif mci == 3:
             self._m = 0.2025
             self._k1 = 15.957
-        elif p == 4:
+        elif mci == 4:
             self._m = 0.2900
             self._k1 = 6.643
-        elif p == 5:
+        elif mci == 5:
             self._m = 0.3910
             self._k1 = 3.230
         else:
             raise ValueError("Invalid NACA 5-Digit max. camber location:"
-                             f" {p}.")
+                             f" {mci}.")
 
-        self._p = p/20.0
+        self._p = mci/20.0
 
-    def _ci_setter(self, ci: int) -> None:
-        if ci != 2:
-            raise ValueError("Invalid NACA 5-Digit ideal lift coefficient: "
-                             f"{ci}.")
-        self._ci = (3.0/20.0)*ci
+    def _lci_setter(self, lci: int) -> None:
+        if lci != 2:
+            raise ValueError("Invalid NACA 5-Digit ideal lift coefficient "
+                             f"parameter: {lci}.")
+        self._lci = (3.0/20.0)*lci
 
 
 class Naca5DigitCamberEnhanced(Naca5DigitCamber):
@@ -585,17 +570,17 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamber):
     [1, 6). The valid range for the ideal lift coefficient term is [1, 4).
     """
 
-    def __init__(self, ci: float, p: float) -> None:
+    def __init__(self, lci: float, mci: float) -> None:
         # Need to bootstrap initialization
-        self._ci = (3.0/20.0)*ci
-        super().__init__(ci=ci, p=p)
+        self._lci = (3.0/20.0)*lci
+        super().__init__(lci=lci, mci=mci)
 
-    def _p_setter(self, p: float) -> None:
-        if p < 1 or p >= 6:
-            raise ValueError("Invalid NACA 5-Digit max. camber location: "
-                             f"{p}.")
+    def _p_setter(self, mci: float) -> None:
+        if mci < 1 or mci >= 6:
+            raise ValueError("Invalid NACA 5-Digit max. camber location "
+                             f"parameter: {mci}.")
 
-        self._p = p/20.0
+        self._p = mci/20.0
 
         def camber_slope(m: float) -> float:
             return 3*self._p**2 - 6*m*self._p + m**2*(3-m)
@@ -605,29 +590,29 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamber):
         self._m = root.root
         self._determine_k1()
 
-    def _ci_setter(self, ci: int) -> None:
-        if ci < 1 or ci >= 4:
-            raise ValueError("Invalid NACA 5-Digit ideal lift coefficient: "
-                             f"{ci}.")
+    def _lci_setter(self, lci: float) -> None:
+        if lci < 1 or lci >= 4:
+            raise ValueError("Invalid NACA 5-Digit ideal lift coefficient "
+                             f"paremeter: {lci}.")
 
-        self._ci = (3.0/20.0)*ci
+        self._lci = (3.0/20.0)*lci
         self._determine_k1()
 
     def _determine_k1(self) -> None:
-        self._k1 = 6*self._ci/(-3/2*(1-2*self._m)*np.arccos(1-2*self._m)
-                               + (4*self._m**2-4*self._m
-                                  + 3)*np.sqrt(self._m*(1-self._m)))
+        self._k1 = 6*self._lci/(-3/2*(1-2*self._m)*np.arccos(1-2*self._m)
+                                + (4*self._m**2-4*self._m
+                                   + 3)*np.sqrt(self._m*(1-self._m)))
 
 
 class Naca5DigitCamberReflexed:
     """
-    Base class for the NACA 5-digit reflexed camber airfoil.
+    Class for the classic NACA 5-digit reflexed camber airfoil.
 
     Attributes
     ----------
-    ci : float
+    lift_coefficient_index : float
         Ideal lift coefficient times 20/3.
-    p : float
+    max_camber_index : float
         Relative chord location of maximum camber times 20.
     m : float
         Camber transition relative chord location.
@@ -635,40 +620,38 @@ class Naca5DigitCamberReflexed:
         First scale factor for camber.
     k2 : float
         Second scale factor for camber.
+
+    Notes
+    -----
+    The only valid values for the relative chord location of maximum camber
+    term are 1, 2, 3, 4, and 5. The only valid value for the ideal lift
+    coefficient term is 2.
     """
 
-    def __init__(self, ci: float, p: float,) -> None:
+    def __init__(self, lci: float, mci: float,) -> None:
         self._m = 0.2
         self._k1 = 0.0
         self._k2 = 0.0
-        self._p_setter(p)
-        self._ci_setter(ci)
+        self._p_setter(mci)
+        self._lci_setter(lci)
 
     @property
-    def p(self) -> float:
+    def lift_coefficient_index(self) -> float:
+        """Ideal lift coefficient term."""
+        return (20.0/3.0)*self._lci
+
+    @lift_coefficient_index.setter
+    def lift_coefficient_index(self, lci: float) -> None:
+        self._lci_setter(lci)
+
+    @property
+    def max_camber_index(self) -> float:
         """Location of maximum camber."""
         return 20.0*self._p
 
-    @p.setter
-    def p(self, p: float) -> None:
-        self._p_setter(p)
-
-    @abstractmethod
-    def _p_setter(self, p: float) -> None:
-        pass
-
-    @property
-    def ci(self) -> float:
-        """Ideal lift coefficient term."""
-        return (20.0/3.0)*self._ci
-
-    @ci.setter
-    def ci(self, ci: float) -> None:
-        self._ci_setter(ci)
-
-    @abstractmethod
-    def _ci_setter(self, ci: float) -> None:
-        pass
+    @max_camber_index.setter
+    def max_camber_index(self, mci: float) -> None:
+        self._p_setter(mci)
 
     @property
     def m(self) -> float:
@@ -825,47 +808,34 @@ class Naca5DigitCamberReflexed:
         """
         return self._p, self.y(self._p)
 
-
-class Naca5DigitCamberReflexedClassic(Naca5DigitCamberReflexed):
-    """
-    Camber for the classic NACA 5-digit reflexed airfoils.
-
-    The only valid values for the relative chord location of maximum camber
-    term are 1, 2, 3, 4, and 5. The only valid value for the ideal lift
-    coefficient term is 2.
-    """
-
-    def __init__(self, p: int) -> None:
-        super().__init__(ci=2, p=p)
-
-    def _p_setter(self, p: int) -> None:
-        if p == 2:
+    def _p_setter(self, mci: int) -> None:
+        if mci == 2:
             self._m = 0.1300
             self._k1 = 51.99
             self._k2 = 0.03972036
-        elif p == 3:
+        elif mci == 3:
             self._m = 0.2170
             self._k1 = 15.793
             self._k2 = 0.10691861
-        elif p == 4:
+        elif mci == 4:
             self._m = 0.3180
             self._k1 = 6.520
             self._k2 = 0.197556
-        elif p == 5:
+        elif mci == 5:
             self._m = 0.4410
             self._k1 = 3.191
             self._k2 = 0.4323805
         else:
             raise ValueError("Invalid NACA 5-Digit reflexed max. camber "
-                             f"location: {p}.")
+                             f"location: {mci}.")
 
-        self._p = p/20.0
+        self._p = mci/20.0
 
-    def _ci_setter(self, ci: int) -> None:
-        if ci != 2:
+    def _lci_setter(self, lci: int) -> None:
+        if lci != 2:
             raise ValueError("Invalid NACA 5-Digit reflexed ideal lift "
-                             f"coefficient: {ci}.")
-        self._ci = (3.0/20.0)*ci
+                             f"coefficient parameter: {lci}.")
+        self._lci = (3.0/20.0)*lci
 
 
 class Naca5DigitCamberReflexedEnhanced(Naca5DigitCamberReflexed):
@@ -876,17 +846,17 @@ class Naca5DigitCamberReflexedEnhanced(Naca5DigitCamberReflexed):
     [1, 6). The valid range for the ideal lift coefficient term is [1, 4).
     """
 
-    def __init__(self, ci: float, p: float) -> None:
+    def __init__(self, lci: float, mci: float) -> None:
         # Need to bootstrap initialization
-        self._ci = (3.0/20.0)*ci
-        super().__init__(ci=ci, p=p)
+        self._lci = (3.0/20.0)*lci
+        super().__init__(lci=lci, mci=mci)
 
-    def _p_setter(self, p) -> float:
-        if p < 1 or p >= 6:
+    def _p_setter(self, mci) -> float:
+        if mci < 1 or mci >= 6:
             raise ValueError("Invalid NACA 5-Digit reflexed max. camber "
-                             f"location: {p}")
+                             f"location: {mci}")
 
-        self._p = p/20.0
+        self._p = mci/20.0
 
         def m_fun(m: float) -> float:
             k1 = 1.0
@@ -901,17 +871,17 @@ class Naca5DigitCamberReflexedEnhanced(Naca5DigitCamberReflexed):
         self._m = root.root
         self._determine_k1k2()
 
-    def _ci_setter(self, ci: float) -> float:
-        if ci < 1 or ci >= 4:
+    def _lci_setter(self, lci: float) -> float:
+        if lci < 1 or lci >= 4:
             raise ValueError("Invalid NACA 5-Digit reflexed ideal lift "
-                             f"coefficient: {ci}.")
+                             f"coefficient parameter: {lci}.")
 
-        self._ci = (3.0/20.0)*ci
+        self._lci = (3.0/20.0)*lci
         self._determine_k1k2()
 
     def _determine_k1k2(self) -> None:
         k2ok1 = self._k2ok1(self.m, self._p)
-        self._k1 = self._ci/self._Cl_id(self.m, 1, k2ok1)
+        self._k1 = self._lci/self._Cl_id(self.m, 1, k2ok1)
         self._k2 = k2ok1*self._k1
 
     @staticmethod

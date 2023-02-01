@@ -13,7 +13,6 @@ import numpy.typing as np_type
 import numpy.testing as npt
 
 from pyPC.airfoil.camber import (Naca5DigitCamberReflexed,
-                                 Naca5DigitCamberReflexedClassic,
                                  Naca5DigitCamberReflexedEnhanced)
 
 
@@ -22,15 +21,15 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testSetters(self) -> None:
         """Test the setting of the max. camber location and ideal lift coef."""
-        af = Naca5DigitCamberReflexedClassic(p=3)
+        af = Naca5DigitCamberReflexed(lci=2, mci=3)
 
-        self.assertEqual(af.p, 3)
-        self.assertEqual(af.ci, 2)
+        self.assertEqual(af.max_camber_index, 3)
+        self.assertEqual(af.lift_coefficient_index, 2)
 
-        af = Naca5DigitCamberReflexedEnhanced(ci=2.3, p=3.2)
+        af = Naca5DigitCamberReflexedEnhanced(lci=2.3, mci=3.2)
 
-        self.assertEqual(af.p, 3.2)
-        self.assertEqual(af.ci, 2.3)
+        self.assertEqual(af.max_camber_index, 3.2)
+        self.assertEqual(af.lift_coefficient_index, 2.3)
 
         # Note: while published data from Jacobs and Pinkerton (1936) has
         #       values, they are noticable off from actual values. These
@@ -59,17 +58,17 @@ class TestNaca5DigitReflexed(unittest.TestCase):
             self.assertIsNone(npt.assert_allclose(k2ok1, k2ok1_ref))
 
         # test the initialization of camber
-        af.ci = ci
+        af.lift_coefficient_index = ci
         for pit, mit, k1it, k2it in np.nditer([p, m_ref, k1_ref, k2_ref]):
-            af.p = pit
+            af.max_camber_index = pit
             self.assertIsNone(npt.assert_allclose(af.m, mit))
             self.assertIsNone(npt.assert_allclose(af.k1, k1it))
             self.assertIsNone(npt.assert_allclose(af.k2, k2it))
 
     def testCamber(self) -> None:
         """Test the camber relations."""
-        af_classic = Naca5DigitCamberReflexedClassic(p=2)
-        af_enhanced = Naca5DigitCamberReflexedEnhanced(ci=3.7, p=2.4)
+        af_classic = Naca5DigitCamberReflexed(lci=2, mci=2)
+        af_enhanced = Naca5DigitCamberReflexedEnhanced(lci=3.7, mci=2.4)
 
         def compare_values(xi: np_type.NDArray,
                            af: Naca5DigitCamberReflexed) -> None:
@@ -133,7 +132,7 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testEndpoints(self) -> None:
         """Test accessing the end points of camber with integers."""
-        af = Naca5DigitCamberReflexedClassic(p=3)
+        af = Naca5DigitCamberReflexed(lci=2, mci=3)
 
         # reference values
         coef = [af.k1/6, af.k1/6]
@@ -178,13 +177,13 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testJoints(self) -> None:
         """Test correct joints are being reported."""
-        af = Naca5DigitCamberReflexedClassic(p=3)
+        af = Naca5DigitCamberReflexed(lci=2, mci=3)
 
         self.assertListEqual([0.0, 0.2170, 1.0], af.joints())
 
     def testMaxCamber(self) -> None:
         """Test maximum camber."""
-        af = Naca5DigitCamberReflexedClassic(p=3)
+        af = Naca5DigitCamberReflexed(lci=2, mci=3)
 
         self.assertTupleEqual((0.15, af.y(0.15)), af.max_camber())
 

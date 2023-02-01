@@ -14,9 +14,7 @@ import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
 
-from pyPC.airfoil.camber import (Naca5DigitCamber,
-                                 Naca5DigitCamberClassic,
-                                 Naca5DigitCamberEnhanced)
+from pyPC.airfoil.camber import Naca5DigitCamber, Naca5DigitCamberEnhanced
 
 from theory_of_wing_sections import camber_data
 
@@ -24,83 +22,23 @@ from theory_of_wing_sections import camber_data
 class TestNaca5DigitCamber(unittest.TestCase):
     """Class to test the NACA 5-digit camber geometry."""
 
-    def testCamberClassic(self) -> None:
-        """Test the camber coordinates and slope against published data."""
-        directory = dirname(abspath(__file__))
-        tows = camber_data(filename=None)
-
-        # NACA 210xx
-        af = Naca5DigitCamberClassic(p=1)
-        filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA2{int(af.p):1d}0.dat")
-        tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=3e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
-                                              atol=2e-5))
-
-        # NACA 220xx
-        af = Naca5DigitCamberClassic(p=2)
-        filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA2{int(af.p):1d}0.dat")
-        tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=2e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
-                                              atol=1e-5))
-
-        # NACA 230xx
-        af = Naca5DigitCamberClassic(p=3)
-        filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA2{int(af.p):1d}0.dat")
-        tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
-                                              atol=1e-5))
-
-        # NACA 240xx
-        af = Naca5DigitCamberClassic(p=4)
-        filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA2{int(af.p):1d}0.dat")
-        tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
-                                              atol=1e-5))
-
-        # NACA 250xx
-        af = Naca5DigitCamberClassic(p=5)
-        filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA2{int(af.p):1d}0.dat")
-        tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
-                                              atol=2e-5))
-
     def testSetters(self) -> None:
         """Test the setting of the max. camber location and ideal lift coef."""
-        af = Naca5DigitCamberClassic(p=4)
+        af = Naca5DigitCamber(lci=2, mci=4)
 
-        self.assertEqual(af.p, 4)
-        self.assertEqual(af.ci, 2)
+        self.assertEqual(af.max_camber_index, 4)
+        self.assertEqual(af.lift_coefficient_index, 2)
 
-        af = Naca5DigitCamberEnhanced(ci=2.4, p=1.2)
+        af = Naca5DigitCamberEnhanced(lci=2.4, mci=1.2)
 
-        self.assertEqual(af.p, 1.2)
-        self.assertEqual(af.ci, 2.4)
+        self.assertEqual(af.max_camber_index, 1.2)
+        self.assertEqual(af.lift_coefficient_index, 2.4)
 
         # Note: The published data from Jacobs and Pinkerton (1936) are
         #       noticably off from actual values. These reference values come
         #       from previous Matlab implementation.
         p = 20*np.array([0.05, 0.10, 0.15, 0.20, 0.25])
-        ci = (20/3.0)*0.3
+        lci = (20/3.0)*0.3
         # m from ref.    [0.0580,       0.1260,       0.2025,
         #                 0.2900,       0.3910]
         m_ref = np.array([0.0580815972, 0.1257435084, 0.2026819782,
@@ -111,16 +49,76 @@ class TestNaca5DigitCamber(unittest.TestCase):
                            6.6240446646, 3.2227606900])
 
         # test the initialization of camber
-        af.ci = ci
+        af.lift_coefficient_index = lci
         for pit, mit, k1it in np.nditer([p, m_ref, k1_ref]):
-            af.p = pit
+            af.max_camber_index = pit
             self.assertIsNone(npt.assert_allclose(af._m, mit))
             self.assertIsNone(npt.assert_allclose(af._k1, k1it))
 
+    def testClassicCamber(self) -> None:
+        """Test the camber coordinates and slope against published data."""
+        directory = dirname(abspath(__file__))
+        tows = camber_data(filename=None)
+
+        # NACA 210xx
+        af = Naca5DigitCamber(lci=2, mci=1)
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA2{int(af.max_camber_index):1d}0.dat")
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=3e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=2e-5))
+
+        # NACA 220xx
+        af = Naca5DigitCamber(lci=2, mci=2)
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA2{int(af.max_camber_index):1d}0.dat")
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=2e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=1e-5))
+
+        # NACA 230xx
+        af = Naca5DigitCamber(lci=2, mci=3)
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA2{int(af.max_camber_index):1d}0.dat")
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=1e-5))
+
+        # NACA 240xx
+        af = Naca5DigitCamber(lci=2, mci=4)
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA2{int(af.max_camber_index):1d}0.dat")
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=1e-5))
+
+        # NACA 250xx
+        af = Naca5DigitCamber(lci=2, mci=5)
+        filename = (directory + "/data/Theory of Wing Sections/Camber/"
+                    + f"NACA2{int(af.max_camber_index):1d}0.dat")
+        tows.change_case_data(filename=filename)
+        y = af.y(tows.x)
+        yp = af.y_p(tows.x)
+        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+                                              atol=2e-5))
+
     def testCamber(self) -> None:
         """Test the camber relations."""
-        af_classic = Naca5DigitCamberClassic(p=2)
-        af_enhanced = Naca5DigitCamberEnhanced(ci=3.7, p=2.4)
+        af_classic = Naca5DigitCamber(lci=2, mci=2)
+        af_enhanced = Naca5DigitCamberEnhanced(lci=3.7, mci=2.4)
 
         def compare_values(xi: np_type.NDArray, af: Naca5DigitCamber) -> None:
             eps = 1e-7
@@ -180,7 +178,7 @@ class TestNaca5DigitCamber(unittest.TestCase):
 
     def testEndpoints(self) -> None:
         """Test accessing the end points of camber with integers."""
-        af = Naca5DigitCamberClassic(p=3)
+        af = Naca5DigitCamber(lci=2, mci=3)
 
         # reference values
         coef = [af.k1/6, af.k1*af.m**3/6]
@@ -224,13 +222,13 @@ class TestNaca5DigitCamber(unittest.TestCase):
 
     def testJoints(self) -> None:
         """Test correct joints are being reported."""
-        af = Naca5DigitCamberClassic(p=3)
+        af = Naca5DigitCamber(lci=2, mci=3)
 
         self.assertListEqual([0.0, 0.2025, 1.0], af.joints())
 
     def testMaxCamber(self) -> None:
         """Test maximum camber."""
-        af = Naca5DigitCamberClassic(p=3)
+        af = Naca5DigitCamber(lci=2, mci=3)
 
         self.assertTupleEqual((0.15, af.y(0.15)), af.max_camber())
 
