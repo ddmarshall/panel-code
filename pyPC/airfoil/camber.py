@@ -257,33 +257,57 @@ class Naca4DigitCamber(Camber):
 
     Attributes
     ----------
-    m : float
+    max_camber_index : float
         Maximum amount of camber per chord length times 100.
-    p : float
+    loc_max_camber_index : float
         Relative chord location of maximum camber times 10.
     """
 
-    def __init__(self, m: float, p: float) -> None:
-        self._m = m/100.0
-        self._p = p/10.0
+    def __init__(self, mci: float, lci: float) -> None:
+        # bootstrap values
+        self._m = 2
+        self._p = 2
+        self.max_camber_index = mci
+        self.loc_max_camber_index = lci
 
     @property
-    def m(self) -> float:
+    def max_camber_index(self) -> float:
         """Maximum amount of camber."""
         return 100.0*self._m
 
-    @m.setter
-    def m(self, m: float) -> None:
-        self._m = m/100.0
+    @max_camber_index.setter
+    def max_camber_index(self, mci: float) -> None:
+        if mci == 0:
+            self._m = 0.0
+            self._p = 0.0
+        elif (mci < 0) or (mci > 9):
+            raise ValueError("Invalid NACA 4-Digit max. camber: {mci}.")
+        else:
+            # check to see if currently no camber and force valid value
+            if self._p == 0:
+                self._p = 0.2
+
+            self._m = mci/100.0
 
     @property
-    def p(self) -> float:
+    def loc_max_camber_index(self) -> float:
         """Location of maximum camber."""
         return 10.0*self._p
 
-    @p.setter
-    def p(self, p: float) -> None:
-        self._p = p/10.0
+    @loc_max_camber_index.setter
+    def loc_max_camber_index(self, lci: float) -> None:
+        if lci == 0:
+            self._m = 0.0
+            self._p = 0.0
+        elif (lci < 0) or (lci > 9):
+            raise ValueError("Invalid NACA 4-Digit max. camber location: "
+                             f"{lci}.")
+        else:
+            # check to see if currently no camber and force valid value
+            if self._m == 0:
+                self._m = 0.2
+
+            self._p = lci/10.0
 
     def y(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
@@ -299,6 +323,9 @@ class Naca4DigitCamber(Camber):
         numpy.ndarray
             Camber at specified point.
         """
+        if (self._m == 0) or (self._p == 0):
+            return np.zeros_like(xi)
+
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -333,6 +360,9 @@ class Naca4DigitCamber(Camber):
         numpy.ndarray
             First derivative of camber at specified point.
         """
+        if (self._m == 0) or (self._p == 0):
+            return np.zeros_like(xi)
+
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -366,6 +396,9 @@ class Naca4DigitCamber(Camber):
         numpy.ndarray
             Second derivative of camber at specified point.
         """
+        if (self._m == 0) or (self._p == 0):
+            return np.zeros_like(xi)
+
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -399,6 +432,9 @@ class Naca4DigitCamber(Camber):
         numpy.ndarray
             Third derivative of camber at specified point.
         """
+        if (self._m == 0) or (self._p == 0):
+            return np.zeros_like(xi)
+
         xi = np.asarray(xi)
         if issubclass(xi.dtype.type, np.integer):
             xi = xi.astype(np.float64)
@@ -421,6 +457,9 @@ class Naca4DigitCamber(Camber):
         List[float]
             Xi-coordinates of any discontinuities.
         """
+        if (self._m == 0) or (self._p == 0):
+            return [0.0, 1.0]
+
         return [0.0, self._p, 1.0]
 
     def max_camber(self) -> Tuple[float, float]:
