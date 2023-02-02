@@ -156,6 +156,101 @@ class Camber(Curve):
         """
 
 
+class NoCamber(Camber):
+    """Representation of the case where there is no camber."""
+
+    def __init__(self) -> None:
+        pass
+
+    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the camber location at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Camber at specified point.
+        """
+        return np.zeros_like(xi)
+
+    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of camber at specified point.
+        """
+        return np.zeros_like(xi)
+
+    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of camber at specified point.
+        """
+        return np.zeros_like(xi)
+
+    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return third derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Third derivative of camber at specified point.
+        """
+        return np.zeros_like(xi)
+
+    def joints(self) -> List[float]:
+        """
+        Return the locations of any joints/discontinuities in the camber line.
+
+        Returns
+        -------
+        List[float]
+            Xi-coordinates of any discontinuities.
+        """
+        return [0.0, 1.0]
+
+    def max_camber(self) -> Tuple[float, float]:
+        """
+        Return chord location of maximum camber and the maximum camber.
+
+        Returns
+        -------
+        float
+            Chord location of maximum camber.
+        float
+            Maximum camber.
+        """
+        return 0.0, 0.0
+
+
 class Naca4DigitCamber(Camber):
     """
     Camber for the NACA 4-digit airfoils.

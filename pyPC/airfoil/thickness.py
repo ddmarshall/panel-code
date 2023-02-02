@@ -180,6 +180,96 @@ class Thickness(Curve):
         """
 
 
+class NoThickness(Thickness):
+    """Reprentation of the case where there is no thickness."""
+
+    def __init__(self) -> None:
+        pass
+
+    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the thickness at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Thickness at specified point.
+        """
+        return np.zeros_like(xi)
+
+    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of thickness at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of thickness at specified point.
+        """
+        return np.zeros_like(xi)
+
+    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of thickness at specified chord location.
+
+        Parameters
+        ----------
+        xi : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of thickness at specified point.
+        """
+        return np.zeros_like(xi)
+
+    def joints(self) -> List[float]:
+        """
+        Return the locations of any joints/discontinuities in the thickness.
+
+        Returns
+        -------
+        List[float]
+            Xi-coordinates of any discontinuities.
+        """
+        return [0.0, 1.0]
+
+    def max_thickness(self) -> Tuple[float, float]:
+        """
+        Return chord location of maximum thickness and the maximum thickness.
+
+        Returns
+        -------
+        float
+            Chord location of maximum thickness.
+        float
+            Maximum thickness.
+        """
+        return 0.0, 0.0
+
+    def le_k(self) -> float:
+        """
+        Return the curvature of the leading edge.
+
+        Returns
+        -------
+        float
+            Leading edge curvature.
+        """
+        return 0.0
+
+
 class Naca45DigitThickness(Thickness):
     """
     Class for the classic NACA 4-digit and 5-digit airfoil thickness.
