@@ -276,7 +276,7 @@ class Naca45DigitThickness(Thickness):
 
     Attributes
     ----------
-    tmax : float
+    max_thickness_index : float
         Maximum thickness per chord length times 100.
     a : numpy.ndarray
         Coefficients for equation.
@@ -289,21 +289,21 @@ class Naca45DigitThickness(Thickness):
     be specified.
     """
 
-    def __init__(self, tmax: float) -> None:
+    def __init__(self, mti: float) -> None:
         self._a = np.array([0.29690, -0.12600, -0.35160, 0.28430, -0.10150])
-        self.tmax = tmax
+        self.max_thickness_index = mti
 
     @property
-    def tmax(self) -> float:
+    def max_thickness_index(self) -> float:
         """Maximum thickness."""
         return 100*self._tmax
 
-    @tmax.setter
-    def tmax(self, tmax: float) -> None:
-        if tmax < 0 or tmax >= 100:
-            raise ValueError(f"Invalid NACA 4/5-digit max. thicknes: {tmax}")
+    @max_thickness_index.setter
+    def max_thickness_index(self, mti: float) -> None:
+        if mti < 0 or mti >= 100:
+            raise ValueError(f"Invalid NACA 4/5-digit max. thickness: {mti}")
 
-        self._tmax = tmax/100.0
+        self._tmax = mti/100.0
 
     @property
     def a(self) -> float:
@@ -450,8 +450,8 @@ class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
     from Jacobs, Ward, and Pinkerton (1933).
     """
 
-    def __init__(self, tmax: float, closed_te: bool, use_radius: bool) -> None:
-        super().__init__(tmax=tmax)
+    def __init__(self, mti: float, closed_te: bool, use_radius: bool) -> None:
+        super().__init__(mti=mti)
         self._closed_te = closed_te
         self._use_radius = use_radius
         self._calculate_a()
@@ -529,11 +529,11 @@ class Naca45DigitModifiedThickness(Thickness):
 
     Attributes
     ----------
-    tmax : float
+    max_thickness_index : float
         Maximum thickness per chord length times 100.
     leading_edge_index: float
         Parameter to specify the radius of the leading edge.
-    max_thickness_index : float
+    loc_max_thickness_index : float
         Location of end of fore section and start of aft section times 10.
     a : numpy.ndarray
         Coefficients for fore equation.
@@ -541,7 +541,7 @@ class Naca45DigitModifiedThickness(Thickness):
         Coefficients for aft equation.
     """
 
-    def __init__(self, tmax: float, lei: float, xi_m: float) -> None:
+    def __init__(self, mti: float, lei: float, lmti: float) -> None:
         # start with valid defaults for setters to work
         self._closed_te = False
         self._lei = 4
@@ -550,21 +550,21 @@ class Naca45DigitModifiedThickness(Thickness):
         self._d = np.zeros(4)
 
         # use settters to ensure valid data
-        self.tmax = tmax
-        self.max_thickness_index = xi_m
+        self.max_thickness_index = mti
+        self.loc_max_thickness_index = lmti
         self.leading_edge_index = lei
 
     @property
-    def tmax(self) -> float:
+    def max_thickness_index(self) -> float:
         """Maximum thickness."""
         return 100*self._tmax
 
-    @tmax.setter
-    def tmax(self, tmax: float) -> None:
-        if tmax < 0 or tmax >= 100:
+    @max_thickness_index.setter
+    def max_thickness_index(self, mti: float) -> None:
+        if mti < 0 or mti >= 100:
             raise ValueError("Invalid NACA modified 4/5-digit max. thickness: "
-                             f"{tmax}")
-        self._tmax = tmax/100.0
+                             f"{mti}")
+        self._tmax = mti/100.0
 
     @property
     def leading_edge_index(self) -> float:
@@ -580,16 +580,16 @@ class Naca45DigitModifiedThickness(Thickness):
         self._calculate_coefficients()
 
     @property
-    def max_thickness_index(self) -> float:
+    def loc_max_thickness_index(self) -> float:
         """Location where fore and aft equations meet."""
         return 10*self._xi_m
 
-    @max_thickness_index.setter
-    def max_thickness_index(self, xi_m: float) -> None:
-        if xi_m < 1 or xi_m >= 10:
+    @loc_max_thickness_index.setter
+    def loc_max_thickness_index(self, lmti: float) -> None:
+        if lmti < 1 or lmti >= 10:
             raise ValueError("Invalid NACA modified 4/5-digit max. thickness "
-                             f"location parameter: {xi_m}")
-        self._xi_m = xi_m/10.0
+                             f"location parameter: {lmti}")
+        self._xi_m = lmti/10.0
         self._calculate_coefficients()
 
     @property
@@ -787,9 +787,9 @@ class Naca45DigitModifiedThicknessEnhanced(Naca45DigitModifiedThickness):
         True if the thickness should be zero at the trailing edge
     """
 
-    def __init__(self, tmax: float,  lei: float, xi_m: float,
+    def __init__(self, mti: float,  lei: float, lmti: float,
                  closed_te: bool) -> None:
-        super().__init__(tmax=tmax, xi_m=xi_m, lei=lei)
+        super().__init__(mti=mti, lei=lei, lmti=lmti)
         self.closed_te = closed_te
 
     @property

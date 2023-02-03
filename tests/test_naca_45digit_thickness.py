@@ -25,13 +25,13 @@ class TestNaca45DigitThickness(unittest.TestCase):
 
     def testSetters(self) -> None:
         """Test the setting of thickness parameters."""
-        af = Naca45DigitThickness(tmax=14)
+        af = Naca45DigitThickness(mti=14)
 
-        self.assertAlmostEqual(af.tmax, 14, delta=1e-7)
+        self.assertAlmostEqual(af.max_thickness_index, 14, delta=1e-7)
 
-        af = Naca45DigitThicknessEnhanced(tmax=18.5, closed_te=True,
+        af = Naca45DigitThicknessEnhanced(mti=18.5, closed_te=True,
                                           use_radius=True)
-        self.assertAlmostEqual(af.tmax, 18.5, delta=1e-7)
+        self.assertAlmostEqual(af.max_thickness_index, 18.5, delta=1e-7)
         self.assertTrue(af.closed_trailing_edge)
         self.assertTrue(af.use_leading_edge_radius)
 
@@ -51,9 +51,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         tows = thickness_data(filename=None)
 
         # NACA 0006
-        af = Naca45DigitThickness(tmax=6)
+        af = Naca45DigitThickness(mti=6)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -62,9 +62,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                               rtol=0, atol=5e-5))
 
         # NACA 0008
-        af = Naca45DigitThickness(tmax=8)
+        af = Naca45DigitThickness(mti=8)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -73,9 +73,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                               rtol=0, atol=6e-5))
 
         # NACA 0009
-        af = Naca45DigitThickness(tmax=9)
+        af = Naca45DigitThickness(mti=9)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -84,9 +84,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                               rtol=0, atol=3e-5))
 
         # NACA 0010
-        af = Naca45DigitThickness(tmax=10)
+        af = Naca45DigitThickness(mti=10)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -95,9 +95,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                               rtol=0, atol=2e-5))
 
         # NACA 0012
-        af = Naca45DigitThickness(tmax=12)
+        af = Naca45DigitThickness(mti=12)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -106,9 +106,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                               rtol=0, atol=7e-5))
 
         # NACA 0015
-        af = Naca45DigitThickness(tmax=15)
+        af = Naca45DigitThickness(mti=15)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -117,9 +117,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                               rtol=0, atol=1e-5))
 
         # NACA 0018
-        af = Naca45DigitThickness(tmax=18)
+        af = Naca45DigitThickness(mti=18)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -128,9 +128,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                               rtol=0, atol=1e-5))
 
         # NACA 0021
-        af = Naca45DigitThickness(tmax=21)
+        af = Naca45DigitThickness(mti=21)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -139,9 +139,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                               rtol=0, atol=1e-5))
 
         # NACA 0024
-        af = Naca45DigitThickness(tmax=24)
+        af = Naca45DigitThickness(mti=24)
         filename = (directory + "/data/Theory of Wing Sections/Thickness/"
-                    + f"NACA00{int(af.tmax):02d}.dat")
+                    + f"NACA00{int(af.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
         y = af.y(tows.x)
         le_radius = -1/af.le_k()
@@ -151,7 +151,7 @@ class TestNaca45DigitThickness(unittest.TestCase):
 
     def testEnhancedThickness(self) -> None:
         """Test the enhanced thickness coefficient calculation."""
-        af = Naca45DigitThicknessEnhanced(tmax=20, closed_te=True,
+        af = Naca45DigitThicknessEnhanced(mti=20, closed_te=True,
                                           use_radius=False)
         xi_max = 0.3
         xi_1c = 0.1
@@ -231,8 +231,8 @@ class TestNaca45DigitThickness(unittest.TestCase):
 
     def testThickness(self) -> None:
         """Test the thickness relations."""
-        af_open = Naca45DigitThickness(tmax=30)
-        af_closed = Naca45DigitThicknessEnhanced(tmax=24.2, closed_te=True,
+        af_open = Naca45DigitThickness(mti=30)
+        af_closed = Naca45DigitThicknessEnhanced(mti=24.2, closed_te=True,
                                                  use_radius=False)
 
         def compare_values(xi: np_type.NDArray,
@@ -245,11 +245,10 @@ class TestNaca45DigitThickness(unittest.TestCase):
                                                     ["writeonly"]])
             with it:
                 for xir, yr in it:
-                    yr[...] = (af.tmax/20.0)*(af.a[0]*np.sqrt(xir)
-                                              + af.a[1]*xir
-                                              + af.a[2]*xir**2
-                                              + af.a[3]*xir**3
-                                              + af.a[4]*xir**4)
+                    tmax = af.max_thickness_index/20.0
+                    yr[...] = tmax*(af.a[0]*np.sqrt(xir) + af.a[1]*xir
+                                    + af.a[2]*xir**2 + af.a[3]*xir**3
+                                    + af.a[4]*xir**4)
 
             # compare point values
             y = af.y(xi)
@@ -287,7 +286,7 @@ class TestNaca45DigitThickness(unittest.TestCase):
 
     def testEndPoints(self) -> None:
         """Test accessing the end points of thickness with integers."""
-        af = Naca45DigitThickness(tmax=12)
+        af = Naca45DigitThickness(mti=12)
 
         # reference values
         y_ref = [0, 0.00126]
@@ -330,13 +329,13 @@ class TestNaca45DigitThickness(unittest.TestCase):
 
     def testJoints(self) -> None:
         """Test correct joints are being reported."""
-        af = Naca45DigitThickness(tmax=24)
+        af = Naca45DigitThickness(mti=24)
 
         self.assertListEqual([0.0, 1.0], af.joints())
 
     def testMaxThickness(self) -> None:
         """Test maximum thickness."""
-        af = Naca45DigitThickness(tmax=24)
+        af = Naca45DigitThickness(mti=24)
 
         xi_max, y_max = af.max_thickness()
         self.assertAlmostEqual(0.3, xi_max, delta=1e-7)
