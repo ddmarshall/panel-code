@@ -113,7 +113,7 @@ class Cylinder(Airfoil):
         y_pp = -np.pi**2*self.radius*np.sin(theta)
         return x_pp, y_pp
 
-    def camber(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def camber_value(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of camber at specified chord location.
 
@@ -129,7 +129,7 @@ class Cylinder(Airfoil):
         """
         return np.zeros_like(xi)
 
-    def thickness(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def thickness_value(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of thickness at specified chord location.
 

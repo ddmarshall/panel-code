@@ -10,7 +10,7 @@ import numpy.typing as np_type
 
 from scipy.optimize import root_scalar
 
-from pyPC.airfoil.airfoil import Curve
+from pyPC.airfoil.curve import Curve
 
 
 class Camber(Curve):

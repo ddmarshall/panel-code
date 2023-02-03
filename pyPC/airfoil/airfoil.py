@@ -2,191 +2,16 @@
 # -*- coding: utf-8 -*-
 """Classes associated with airfoils and their analysis."""
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Tuple, List
 
 import numpy as np
 import numpy.typing as np_type
-from scipy.integrate import quadrature
 from scipy.optimize import root_scalar
 
-
-class Curve(ABC):
-    """
-    Base class for 1-d curves.
-
-    Curves can be interrogated based on their natural parameterization, using
-    the parameter, xi.
-    """
-
-    #
-    # Parameteric Interface
-    #
-    @abstractmethod
-    def xy(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
-        """
-        Calculate the coordinates of geometry at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            X-coordinate of point.
-        numpy.ndarray
-            Y-coordinate of point.
-        """
-
-    @abstractmethod
-    def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                 np_type.NDArray]:
-        """
-        Calculate rates of change of the coordinates at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Parametric rate of change of the x-coordinate of point.
-        numpy.ndarray
-            Parametric rate of change of the y-coordinate of point.
-        """
-
-    @abstractmethod
-    def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                  np_type.NDArray]:
-        """
-        Calculate second derivative of the coordinates at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Parametric second derivative of the x-coordinate of point.
-        numpy.ndarray
-            Parametric second derivative of the y-coordinate of point.
-        """
-
-    def normal(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                   np_type.NDArray]:
-        """
-        Calculate the unit normal at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray, numpy.ndarray
-            Unit normal at point.
-        """
-        sx, sy = self.tangent(xi)
-        nx = -sy
-        ny = sx
-        return nx, ny
-
-    def tangent(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                    np_type.NDArray]:
-        """
-        Calculate the unit tangent at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray, numpy.ndarray
-            Unit tangent at point.
-        """
-        sx, sy = self.xy_p(xi)
-        temp = np.sqrt(sx**2 + sy**2)
-        sx = sx/temp
-        sy = sy/temp
-        return sx, sy
-
-    def k(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the curvature at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Curvature of surface at point.
-
-        Raises
-        ------
-        ValueError
-            If there is no surface point at the given x-location.
-        """
-        xp, yp = self.xy_p(xi)
-        xpp, ypp = self.xy_pp(xi)
-        return (xp*ypp-yp*xpp)/(xp**2+yp**2)**(3/2)
-
-    def arc_length(self, xi_s: float,
-                   xi_e: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the arc-length distance between two points on surface.
-
-        Parameters
-        ----------
-        xi_s : float
-            Start point of distance calculation.
-        xi_e : numpy.ndarray
-            End point of distance calculation.
-
-        Returns
-        -------
-        numpy.ndarray
-            Distance from start point to end point.
-        """
-
-        def fun(xi):
-            xp, yp = self.xy_p(xi)
-            return np.sqrt(xp**2+yp**2)
-
-        xi_ea = np.asarray(xi_e)
-        it = np.nditer([xi_ea, None])
-        with it:
-            for xi, alen in it:
-                alen[...], _ = quadrature(fun, xi_s, xi)
-
-            return it.operands[1]
-
-    @abstractmethod
-    def joints(self) -> List[float]:
-        """
-        Return the locations of any joints/discontinuities in the curve.
-
-        The resulting list needs to contain any parameteric locations where
-        some non-standard discontinuity (slope, curvature, etc.) occurs as
-        well as the end points for the curve (if they exist).
-
-        Returns
-        -------
-        List[float]
-            Xi-coordinates of any discontinuities.
-        """
+from pyPC.airfoil.curve import Curve
+from pyPC.airfoil.camber import Camber
+from pyPC.airfoil.thickness import Thickness
 
 
 class Airfoil(Curve):
@@ -500,7 +325,7 @@ class Airfoil(Curve):
         return 0.5*(xl+xu), 0.5*(yl+yu)
 
     @abstractmethod
-    def camber(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def camber_value(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of camber at specified chord location.
 
@@ -516,7 +341,7 @@ class Airfoil(Curve):
         """
 
     @abstractmethod
-    def thickness(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def thickness_value(self, xi: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of thickness at specified chord location.
 
@@ -543,8 +368,19 @@ class Airfoil(Curve):
 class OrthogonalAirfoil(Airfoil):
     """Airfoils that can be decomposed to camber and thickness."""
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, camber: Camber, thickness: Thickness) -> None:
+        self._camber = camber
+        self._thickness = thickness
+
+    @property
+    def camber(self) -> Camber:
+        """Return the camber function for airfoil."""
+        return self._camber
+
+    @property
+    def thickness(self) -> Thickness:
+        """Return the thickness function for airfoil."""
+        return self._thickness
 
     def tangent(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                     np_type.NDArray]:

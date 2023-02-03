@@ -8,7 +8,7 @@ from typing import Tuple, List
 import numpy as np
 import numpy.typing as np_type
 
-from pyPC.airfoil.airfoil import Curve
+from pyPC.airfoil.curve import Curve
 
 
 class Thickness(Curve):
