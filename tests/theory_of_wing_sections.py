@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """Classes to get Theory of wing sections data from files."""
 
-from typing import Tuple
-
 import numpy as np
 import numpy.typing as np_type
 
@@ -204,7 +202,7 @@ class airfoil_data:
     ----------
     le_radius : float
         Leading edge radius
-    le_slope : float
+    le_radius_slope : float
         Slope at leading edge
     x_upper : numpy.ndarray
         Upper surface x-coordinate
@@ -218,7 +216,7 @@ class airfoil_data:
 
     def __init__(self, filename: str):
         self._le_radius = 0.0
-        self._le_slope = 0.0
+        self._le_radius_slope = 0.0
         self._x_upper = np.zeros(1)
         self._y_upper = np.zeros(1)
         self._x_lower = np.zeros(1)
@@ -232,9 +230,9 @@ class airfoil_data:
         return self._le_radius
 
     @property
-    def le_slope(self) -> float:
-        """Leading edge slope."""
-        return self._le_slope
+    def le_radius_slope(self) -> float:
+        """Leading edge radius slope."""
+        return self._le_radius_slope
 
     @property
     def x_upper(self) -> np_type.NDArray:
@@ -272,7 +270,7 @@ class airfoil_data:
 
         # get header info
         self._le_radius = float(lines[0][12:-1])/100.0
-        self._le_slope = float(lines[1][29:-1])
+        self._le_radius_slope = float(lines[1][29:-1])
 
         # get rest of data
         header_offset = 5
@@ -294,50 +292,3 @@ class airfoil_data:
             col = lines[i + header_offset].split(",")
             self._x_lower[i] = float(col[0])/100.0
             self._y_lower[i] = float(col[1])/100.0
-
-
-def read_airfoil_data(filename:str) -> Tuple[np_type.NDArray, np_type.NDArray]:
-    """
-    Read Theory of Wing Sections airfoil data from file.
-
-    Parameters
-    ----------
-    filename : str
-        Name of file to be read.
-
-    Returns
-    -------
-    xu : numpy.ndarray
-        Upper surface x-coordinate.
-    yu : numpy.ndarray
-        Upper surface y-coordinate.
-    xl : numpy.ndarray
-        Lower surface x-coordinate.
-    yl : numpy.ndarray
-        Lower surface y-coordinate.
-    """
-    file = open(filename, "r", encoding="utf8")
-    lines = file.readlines()
-    file.close()
-
-    header_offset = 5
-    n = lines[header_offset:-1].index("\n")
-    xu = np.zeros(n)
-    yu = np.zeros(n)
-
-    for i in range(0,n):
-        col = lines[i + header_offset].split(",")
-        xu[i] = float(col[0])/100.0
-        yu[i] = float(col[1])/100.0
-
-    header_offset = header_offset + n + 3
-    n = len(lines) - header_offset
-    xl = np.zeros(n)
-    yl = np.zeros(n)
-
-    for i in range(0,n):
-        col = lines[i + header_offset].split(",")
-        xl[i] = float(col[0])/100.0
-        yl[i] = float(col[1])/100.0
-
-    return xu, yu, xl, yl
