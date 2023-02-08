@@ -12,9 +12,9 @@ import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
 
-from pyPC.camber import Naca5DigitCamberReflexedBase
-from pyPC.camber import Naca5DigitCamberReflexedClassic
-from pyPC.camber import Naca5DigitCamberReflexedEnhanced
+# from pyPC.camber import Naca5DigitCamberReflexedBase
+# from pyPC.camber import Naca5DigitCamberReflexedClassic
+# from pyPC.camber import Naca5DigitCamberReflexedEnhanced
 
 
 class TestNaca5Digit(unittest.TestCase):
