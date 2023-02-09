@@ -538,9 +538,7 @@ class OrthogonalAirfoil(Airfoil):
             Unit tangent at point.
         """
         eps = 1e-7
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         # np.piecewise does not work when returning tuples so need to manually
         # do the iteration to find the leading edge cases
@@ -578,9 +576,7 @@ class OrthogonalAirfoil(Airfoil):
             If there is no surface point at the given x-location.
         """
         eps = 1e-7
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         return np.piecewise(xi, [np.abs(xi) < eps, np.abs(xi) >= eps],
                             [lambda xi: (self.thickness.k(xi)
@@ -605,9 +601,7 @@ class OrthogonalAirfoil(Airfoil):
     #     numpy.ndarray
     #         Distance from start point to end point.
     #     """
-    #     xi_e = np.asarray(xi_e)
-    #     if issubclass(xi_e.dtype.type, np.integer):
-    #         xi_e = xi_e.astype(np.float64)
+    #     xi_e = np.asarray(xi_e, dtype=np.float64)
 
     #     # NOTE: This prototype works for xi>=0 as a parameterization
     #     #       of xi=t**2. How can this be integrated into existing
@@ -658,9 +652,7 @@ class OrthogonalAirfoil(Airfoil):
             If there is no surface point at the given x-location.
         """
         eps = 1e-7
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fun(xi: float) -> float:
             if self.camber.max_camber()[1] == 0:

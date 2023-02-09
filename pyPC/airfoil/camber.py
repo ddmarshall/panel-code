@@ -326,9 +326,7 @@ class Naca4DigitCamber(Camber):
         if (self._m == 0) or (self._p == 0):
             return np.zeros_like(xi)
 
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
@@ -363,9 +361,7 @@ class Naca4DigitCamber(Camber):
         if (self._m == 0) or (self._p == 0):
             return np.zeros_like(xi)
 
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
@@ -399,9 +395,7 @@ class Naca4DigitCamber(Camber):
         if (self._m == 0) or (self._p == 0):
             return np.zeros_like(xi)
 
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
@@ -435,9 +429,7 @@ class Naca4DigitCamber(Camber):
         if (self._m == 0) or (self._p == 0):
             return np.zeros_like(xi)
 
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             return np.zeros_like(xi)
@@ -546,9 +538,7 @@ class Naca5DigitCamber(Camber):
         numpy.ndarray
             Camber at specified point.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             m = self.m
@@ -574,10 +564,7 @@ class Naca5DigitCamber(Camber):
         numpy.ndarray
             First derivative of camber at specified point.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
+        xi = np.asarray(xi, dtype=np.float64)
         m = self.m
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
@@ -603,9 +590,7 @@ class Naca5DigitCamber(Camber):
         numpy.ndarray
             Second derivative of camber at specified point.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             return (self.k1)*(xi - self.m)
@@ -630,9 +615,7 @@ class Naca5DigitCamber(Camber):
         numpy.ndarray
             Third derivative of camber at specified point.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             return self.k1*np.ones_like(xi)
@@ -816,10 +799,7 @@ class Naca5DigitCamberReflexed:
         numpy.ndarray
             Camber at specified point.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
+        xi = np.asarray(xi, dtype=np.float64)
         m = self.m
         k1 = self.k1
         k2ok1 = self.k2/k1
@@ -847,10 +827,7 @@ class Naca5DigitCamberReflexed:
         numpy.ndarray
             First derivative of camber at specified point.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
+        xi = np.asarray(xi, dtype=np.float64)
         m = self.m
         k1 = self.k1
         k2ok1 = self.k2/k1
@@ -878,9 +855,7 @@ class Naca5DigitCamberReflexed:
         numpy.ndarray
             Second derivative of camber at specified point.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             return (self.k1)*(xi - self.m)
@@ -905,9 +880,7 @@ class Naca5DigitCamberReflexed:
         numpy.ndarray
             Third derivative of camber at specified point.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        xi = np.asarray(xi, dtype=np.float64)
 
         def fore(xi: np_type.NDArray) -> np_type.NDArray:
             return self.k1*np.ones_like(xi)
