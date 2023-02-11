@@ -19,14 +19,14 @@ class Thickness(Curve):
     defined outside of that range.
     """
 
-    def xy(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
+    def xy(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                              np_type.NDArray]:
         """
         Calculate the coordinates of geometry at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -36,16 +36,16 @@ class Thickness(Curve):
         numpy.ndarray
             Y-coordinate of point.
         """
-        return xi, self.y(xi)
+        return t**2, self._y(t)
 
-    def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                 np_type.NDArray]:
+    def xy_p(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                np_type.NDArray]:
         """
         Calculate rates of change of the coordinates at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -55,16 +55,20 @@ class Thickness(Curve):
         numpy.ndarray
             Parametric rate of change of the y-coordinate of point.
         """
-        return np.ones_like(xi), self.y_p(xi)
+        t = np.asarray(t, dtype=np.float64)
+        xp = np.asarray(2*t)
+        yp = self._y_t(t)
+        xp[(xp == 0) & (yp == 0)] = 1e-8
+        return xp, yp
 
-    def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                  np_type.NDArray]:
+    def xy_pp(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                 np_type.NDArray]:
         """
         Calculate second derivative of the coordinates at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -74,85 +78,57 @@ class Thickness(Curve):
         numpy.ndarray
             Parametric second derivative of the y-coordinate of point.
         """
-        return np.zeros_like(xi), self.y_pp(xi)
-
-    def k(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the curvature at parameter location.
-
-        Special treatment is needed for many formulations of the typical
-        rounded leading edge.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Curvature of surface at point.
-
-        Raises
-        ------
-        ValueError
-            If there is no surface point at the given x-location.
-        """
-        eps = 1e-6
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
-        return np.piecewise(xi, [np.abs(xi) < eps, np.abs(xi) >= eps],
-                            [lambda xi: self.le_k(),
-                             lambda xi: super(Thickness, self).k(xi)])
+        return 2*np.ones_like(t), self._y_tt(t)
 
     @abstractmethod
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the camber location at specified chord location.
+        Return the thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            Camber at specified point.
+            Thickness at specified parameter.
         """
 
     @abstractmethod
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return first derivative of camber at specified chord location.
+        Return first derivative of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            First derivative of camber at specified point.
+            First derivative of thickness at specified parameter.
         """
 
     @abstractmethod
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return second derivative of camber at specified chord location.
+        Return second derivative of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            Second derivative of camber at specified point.
+            Second derivative of thickness at specified parameter.
         """
 
     @abstractmethod
@@ -168,17 +144,6 @@ class Thickness(Curve):
             Maximum thickness.
         """
 
-    @abstractmethod
-    def le_k(self) -> float:
-        """
-        Return the curvature of the leading edge.
-
-        Returns
-        -------
-        float
-            Leading edge curvature.
-        """
-
 
 class NoThickness(Thickness):
     """Reprentation of the case where there is no thickness."""
@@ -186,53 +151,56 @@ class NoThickness(Thickness):
     def __init__(self) -> None:
         pass
 
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the thickness at specified chord location.
+        Return the thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            Thickness at specified point.
+            Thickness at specified parameter.
         """
-        return np.zeros_like(xi)
+        return np.zeros_like(t)
 
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return first derivative of thickness at specified chord location.
+        Return first derivative of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            First derivative of thickness at specified point.
+            First derivative of thickness at specified parameter.
         """
-        return np.zeros_like(xi)
+        return np.zeros_like(t)
 
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return second derivative of thickness at specified chord location.
+        Return second derivative of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            Second derivative of thickness at specified point.
+            Second derivative of thickness at specified parameter.
         """
-        return np.zeros_like(xi)
+        return np.zeros_like(t)
 
     def joints(self) -> List[float]:
         """
@@ -258,17 +226,6 @@ class NoThickness(Thickness):
         """
         return 0.0, 0.0
 
-    def le_k(self) -> float:
-        """
-        Return the curvature of the leading edge.
-
-        Returns
-        -------
-        float
-            Leading edge curvature.
-        """
-        return 0.0
-
 
 class Naca45DigitThickness(Thickness):
     """
@@ -290,7 +247,8 @@ class Naca45DigitThickness(Thickness):
     """
 
     def __init__(self, mti: float) -> None:
-        self._a = np.array([0.29690, -0.12600, -0.35160, 0.28430, -0.10150])
+        self._a = np.array([0.29690, -0.12600, -0.35160, 0.28430,
+                            -0.10150])/0.20
         self.max_thickness_index = mti
 
     @property
@@ -310,80 +268,69 @@ class Naca45DigitThickness(Thickness):
         """Equation coefficients."""
         return self._a
 
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the thickness at specified chord location.
+        Return the thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            Thickness at specified point.
+            Thickness at specified parameter.
         """
-        return (self._tmax/0.20)*(self.a[0]*np.sqrt(xi)
-                                  + xi*(self.a[1]
-                                        + xi*(self.a[2]
-                                              + xi*(self.a[3]
-                                                    + xi*self.a[4]))))
+        t2 = t**2
+        return self._tmax*t*(self.a[0] + t*(self.a[1]
+                                            + t2*(self.a[2]
+                                                  + t2*(self.a[3]
+                                                        + t2*self.a[4]))))
 
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return first derivative of thickness at specified chord location.
+        Return first derivative of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            First derivative of thickness at specified point.
+            First derivative of thickness at specified parameter.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        t2 = t**2
+        return self._tmax*(self.a[0]
+                           + 2*t*(self.a[1]
+                                  + t2*(2*self.a[2]
+                                        + t2*(3*self.a[3]
+                                              + 4*t2*self.a[4]))))
 
-        def fun(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self._tmax/0.20)*(0.5*self.a[0]/np.sqrt(xi)
-                                      + (self.a[1]
-                                         + xi*(2*self.a[2]
-                                               + xi*(3*self.a[3]
-                                                     + 4*xi*self.a[4]))))
-
-        return np.piecewise(xi, [xi == 0, xi != 0],
-                            [lambda xi: np.inf, lambda xi: fun(xi)])
-
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return second derivative of thickness at specified chord location.
+        Return second derivative of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            Second derivative of thickness at specified point.
+            Second derivative of thickness at specified parameter.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
-
-        def fun(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self._tmax/0.20)*(-0.25*self.a[0]/(xi*np.sqrt(xi))
-                                      + 2*(self.a[2]
-                                           + 3*xi*(self.a[3]
-                                                   + 2*xi*self.a[4])))
-
-        return np.piecewise(xi, [xi == 0, xi != 0],
-                            [lambda xi: -np.inf, lambda xi: fun(xi)])
+        t2 = t**2
+        return 2*self._tmax*(self.a[1]
+                             + t2*(6*self.a[2]
+                                   + t2*(15*self.a[3]
+                                         + 28*self.a[4]*t2)))
 
     def joints(self) -> List[float]:
         """
@@ -407,18 +354,7 @@ class Naca45DigitThickness(Thickness):
         float
             Maximum thickness.
         """
-        return 0.3, self.y(0.3)
-
-    def le_k(self) -> float:
-        """
-        Return the curvature of the leading edge.
-
-        Returns
-        -------
-        float
-            Leading edge curvature.
-        """
-        return -2/((self._tmax/0.20)*self.a[0])**2
+        return 0.3, self._y(np.sqrt(0.3))
 
 
 class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
@@ -520,7 +456,7 @@ class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
         B[i, :] = [1, 1, 1, 1, 1]
         r[i] = t_te
 
-        self._a = np.linalg.solve(B, r).transpose()[0]
+        self._a = (np.linalg.solve(B, r).transpose()[0])/0.20
 
 
 class Naca45DigitModifiedThickness(Thickness):
@@ -602,102 +538,97 @@ class Naca45DigitModifiedThickness(Thickness):
         """Aft equation coefficients."""
         return self._d
 
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the thickness at specified chord location.
+        Return the thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            Thickness at specified point.
+            Thickness at specified parameter.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        t = np.asarray(t, np.float64)
 
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return self.a[0]*np.sqrt(xi) + xi*(self.a[1]
-                                               + xi*(self.a[2]
-                                                     + (xi*self.a[3])))
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            t2 = t**2
+            return t*(self.a[0]
+                      + t*(self.a[1] + t2*(self.a[2] + t2*self.a[3])))
 
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return self.d[0] + (1-xi)*(self.d[1]
-                                       + (1-xi)*(self.d[2]
-                                                 + ((1-xi)*self.d[3])))
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            t2 = t**2
+            term = 1-t2
+            return self.d[0] + term*(self.d[1]
+                                     + term*(self.d[2] + term*self.d[3]))
 
-        return self._tmax*np.piecewise(xi, [xi <= self._xi_m, xi > self._xi_m],
-                                       [lambda xi: fore(xi),
-                                        lambda xi: aft(xi)])
+        t_m = np.sqrt(self._xi_m)
+        return self._tmax*np.piecewise(t, [t <= t_m, t > t_m],
+                                       [lambda t: fore(t), lambda t: aft(t)])
 
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return first derivative of thickness at specified chord location.
+        Return first derivative of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            First derivative of thickness at specified point.
+            First derivative of thickness at specified parameter.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        t = np.asarray(t, np.float64)
 
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return 0.5*self.a[0]/np.sqrt(xi) + (self.a[1]
-                                                + xi*(2*self.a[2]
-                                                      + (3*xi*self.a[3])))
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            t2 = t**2
+            return self.a[0] + 2*t*(self.a[1] + t2*(2*self.a[2]
+                                                    + 3*self.a[3]*t2))
 
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return -self.d[1] + (1-xi)*(-2*self.d[2] + (-3*(1-xi)*self.d[3]))
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            t2 = t**2
+            return -2*t*(self.d[1] + (1-t2)*(2*self.d[2] + 3*(1-t2)*self.d[3]))
 
-        return self._tmax*np.piecewise(xi,
-                                       [xi == 0, (xi > 0) & (xi <= self._xi_m),
-                                        xi > self._xi_m],
-                                       [lambda xi: np.inf,
-                                        lambda xi: fore(xi),
-                                        lambda xi: aft(xi)])
+        t_m = np.sqrt(self._xi_m)
+        return self._tmax*np.piecewise(t, [t <= t_m, t > t_m],
+                                       [lambda t: fore(t), lambda t: aft(t)])
 
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return second derivative of thickness at specified chord location.
+        Return second derivative of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter location of interest. Equal to the square root of the
+            desired chord location.
 
         Returns
         -------
         numpy.ndarray
-            Second derivative of thickness at specified point.
+            Second derivative of thickness at specified parameter.
         """
-        xi = np.asarray(xi)
-        if issubclass(xi.dtype.type, np.integer):
-            xi = xi.astype(np.float64)
+        t = np.asarray(t, np.float64)
 
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return (-0.25*self.a[0]/(xi*np.sqrt(xi)) + 2*self.a[2]
-                    + 6*xi*self.a[3])
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            t2 = t**2
+            return 2*(self.a[1] + 3*t2*(2*self.a[2] + 5*t2*self.a[3]))
 
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return 2*self.d[2] + 6*(1-xi)*self.d[3]
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            t2 = t**2
+            return -2*(self.d[1] + 2*(1-3*t2)*self.d[2]
+                       + 3*(1-t2)*(1-5*t2)*self.d[3])
 
-        return self._tmax*np.piecewise(xi,
-                                       [xi == 0, (0 < xi) & (xi <= self._xi_m),
-                                        xi > self._xi_m],
-                                       [lambda xi: -np.inf,
-                                        lambda xi: fore(xi),
-                                        lambda xi: aft(xi)])
+        t_m = np.sqrt(self._xi_m)
+        return self._tmax*np.piecewise(t, [t <= t_m, t > t_m],
+                                       [lambda t: fore(t), lambda t: aft(t)])
 
     def joints(self) -> List[float]:
         """
@@ -708,7 +639,7 @@ class Naca45DigitModifiedThickness(Thickness):
         List[float]
             Xi-coordinates of any discontinuities.
         """
-        return [0.0, self._xi_m, 1.0]
+        return [0.0, np.sqrt(self._xi_m), 1.0]
 
     def max_thickness(self) -> Tuple[float, float]:
         """
@@ -721,18 +652,7 @@ class Naca45DigitModifiedThickness(Thickness):
         float
             Maximum thickness.
         """
-        return self._xi_m, self.y(self._xi_m)
-
-    def le_k(self) -> float:
-        """
-        Return the curvature of the leading edge.
-
-        Returns
-        -------
-        float
-            Leading edge curvature.
-        """
-        return -2/(self._tmax*self.a[0])**2
+        return self._xi_m, self._y(np.sqrt(self._xi_m))
 
     def _calculate_coefficients(self):
         # Pade approximation that goes through all Stack and von Doenhoff

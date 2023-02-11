@@ -903,7 +903,7 @@
     <packagedElement xmi:type="uml:Model" xmi:id="Entity_Relationship_Model" name="Entity Relationship Model"/>
   </uml:Model>
   <xmi:Extension extender="umbrello">
-    <docsettings viewid="u7D6eVku3VePh" documentation="" uniqueid="u9VbHJUNxmv8i"/>
+    <docsettings viewid="uiMY9NweHGuPp" documentation="" uniqueid="u9VbHJUNxmv8i"/>
     <listview>
       <listitem id="Views" type="800" open="1">
         <listitem id="Component_View" type="821" open="1"/>

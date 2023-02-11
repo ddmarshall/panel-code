@@ -76,8 +76,10 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                     f"-{int(af.leading_edge_index)}"
                     f"{int(af.loc_max_thickness_index)}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        le_radius = -1/af.le_k()
+        t = np.sqrt(tows.x)
+        x, y = af.xy(t)
+        le_radius = -1/af.k(0)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
                                               rtol=0, atol=3e-5))
@@ -89,8 +91,10 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                     f"-{int(af.leading_edge_index)}"
                     f"{int(af.loc_max_thickness_index)}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        le_radius = -1/af.le_k()
+        t = np.sqrt(tows.x)
+        x, y = af.xy(t)
+        le_radius = -1/af.k(0)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
                                               rtol=0, atol=4e-5))
@@ -102,8 +106,10 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                     f"-{int(af.leading_edge_index)}"
                     f"{int(af.loc_max_thickness_index)}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        le_radius = -1/af.le_k()
+        t = np.sqrt(tows.x)
+        x, y = af.xy(t)
+        le_radius = -1/af.k(0)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=6e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
                                               rtol=0, atol=4e-5))
@@ -115,8 +121,10 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                     f"-{int(af.leading_edge_index)}"
                     f"{int(af.loc_max_thickness_index)}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        le_radius = -1/af.le_k()
+        t = np.sqrt(tows.x)
+        x, y = af.xy(t)
+        le_radius = -1/af.k(0)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=6e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
                                               rtol=0, atol=2e-5))
@@ -128,8 +136,10 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                     f"-{int(af.leading_edge_index)}"
                     f"{int(af.loc_max_thickness_index)}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        le_radius = -1/af.le_k()
+        t = np.sqrt(tows.x)
+        x, y = af.xy(t)
+        le_radius = -1/af.k(0)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
                                               rtol=0, atol=2e-5))
@@ -141,8 +151,10 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                     f"-{int(af.leading_edge_index)}"
                     f"{int(af.loc_max_thickness_index)}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        le_radius = -1/af.le_k()
+        t = np.sqrt(tows.x)
+        x, y = af.xy(t)
+        le_radius = -1/af.k(0)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=6e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
                                               rtol=0, atol=2e-5))
@@ -154,8 +166,10 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                     f"-{int(af.leading_edge_index)}"
                     f"{int(af.loc_max_thickness_index)}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        le_radius = -1/af.le_k()
+        t = np.sqrt(tows.x)
+        x, y = af.xy(t)
+        le_radius = -1/af.k(0)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=6e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
                                               rtol=0, atol=1e-5))
@@ -167,8 +181,10 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                     f"-{int(af.leading_edge_index)}"
                     f"{int(af.loc_max_thickness_index)}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        le_radius = -1/af.le_k()
+        t = np.sqrt(tows.x)
+        x, y = af.xy(t)
+        le_radius = -1/af.k(0)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=8e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
                                               rtol=0, atol=1e-5))
@@ -180,24 +196,31 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
 
         # test the settings with open trailing edge
         xi_m = af.loc_max_thickness_index/10.0
+        t_m = np.sqrt(xi_m)
         xi_te = 1.0
-        y_m = af.y(xi_m)
-        yp_m = af.y_p(xi_m)
-        y_te = af.y(xi_te)
-        self.assertIsNone(npt.assert_allclose(y_m,
-                                              0.005*af.max_thickness_index))
+        t_te = 1.0
+        y_m_ref = 0.005*af.max_thickness_index
+        x_m, y_m = af.xy(t_m)
+        xp_m, yp_m = af.xy_p(t_m)
+        x_te, y_te = af.xy(t_te)
+        self.assertIsNone(npt.assert_allclose(x_m, xi_m))
+        self.assertIsNone(npt.assert_allclose(y_m, y_m_ref))
+        self.assertIsNone(npt.assert_allclose(xp_m, 2*t_m))
         self.assertIsNone(npt.assert_allclose(yp_m, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(x_te, xi_te))
         self.assertIsNone(npt.assert_allclose(y_te, 0.02*0.10))
 
         # test the settings with close trailing edge
         af.closed_te = True
-        y_m = af.y(xi_m)
-        yp_m = af.y_p(xi_m)
-        y_te = af.y(xi_te)
-        self.assertIsNone(npt.assert_allclose(y_m,
-                                              0.005*af.max_thickness_index))
+        x_m, y_m = af.xy(t_m)
+        xp_m, yp_m = af.xy_p(t_m)
+        x_te, y_te = af.xy(t_te)
+        self.assertIsNone(npt.assert_allclose(x_m, xi_m))
+        self.assertIsNone(npt.assert_allclose(y_m, y_m_ref))
+        self.assertIsNone(npt.assert_allclose(xp_m, 2*t_m))
         self.assertIsNone(npt.assert_allclose(yp_m, 0, atol=1e-7))
-        self.assertIsNone(npt.assert_allclose(y_te, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(x_te, xi_te))
+        self.assertIsNone(npt.assert_allclose(y_te, 0))
 
     def testThickness(self) -> None:
         """Test the thickness relations."""
@@ -210,37 +233,41 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
                            af: Naca45DigitModifiedThickness) -> None:
             eps = 1e-7
 
-            xi_a = np.asarray(xi)
-            y_ref = np.zeros_like(xi_a)
-            it = np.nditer([xi_a, y_ref], op_flags=[["readonly"],
-                                                    ["writeonly"]])
+            t = np.sqrt(np.asarray(xi))
+            y_ref = np.zeros_like(t)
+            it = np.nditer([t, y_ref], op_flags=[["readonly"], ["writeonly"]])
             with it:
-                for xir, yr in it:
+                for tr, yr in it:
                     tmax = af.max_thickness_index/100.0
-                    if xir <= af.loc_max_thickness_index/10.0:
-                        yr[...] = tmax*(af.a[0]*np.sqrt(xir) + af.a[1]*xir
-                                        + af.a[2]*xir**2 + af.a[3]*xir**3)
+                    if tr**2 <= af.loc_max_thickness_index/10.0:
+                        yr[...] = tmax*(af.a[0]*tr + af.a[1]*tr**2
+                                        + af.a[2]*tr**4 + af.a[3]*tr**6)
                     else:
-                        yr[...] = tmax*(af.d[0] + af.d[1]*(1-xir)
-                                        + af.d[2]*(1-xir)**2
-                                        + af.d[3]*(1-xir)**3)
+                        yr[...] = tmax*(af.d[0] + af.d[1]*(1-tr**2)
+                                        + af.d[2]*(1-tr**2)**2
+                                        + af.d[3]*(1-tr**2)**3)
 
             # compare point values
-            y = af.y(xi)
+            x, y = af.xy(np.sqrt(xi))
+            self.assertIsNone(npt.assert_allclose(x, xi, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(y, y_ref, atol=1e-7))
 
             # compare first derivatives
-            ypl = af.y(xi+eps)
-            ymi = af.y(xi-eps)
+            xpl, ypl = af.xy(t+eps)
+            xmi, ymi = af.xy(t-eps)
+            xp_ref = 0.5*(xpl-xmi)/eps
             yp_ref = 0.5*(ypl-ymi)/eps
-            yp = af.y_p(xi)
+            xp, yp = af.xy_p(t)
+            self.assertIsNone(npt.assert_allclose(xp, xp_ref, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(yp, yp_ref, atol=1e-7))
 
             # compare second derivatives
-            ypl = af.y_p(xi+eps)
-            ymi = af.y_p(xi-eps)
+            xpl, ypl = af.xy_p(xi+eps)
+            xmi, ymi = af.xy_p(xi-eps)
+            xpp_ref = 0.5*(xpl-xmi)/eps
             ypp_ref = 0.5*(ypl-ymi)/eps
-            ypp = af.y_pp(xi)
+            xpp, ypp = af.xy_pp(xi)
+            self.assertIsNone(npt.assert_allclose(xpp, xpp_ref, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(ypp, ypp_ref, atol=1e-7))
 
         # test point on front
@@ -253,9 +280,8 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         compare_values(xi, af_closed)
         compare_values(xi, af_open)
 
-        # test points on lower and upper surface (avoid leading edge because
-        # the derivatives are infinite)
-        xi = np.linspace(0.001, 1, 12)
+        # test points on fore and aft
+        xi = np.linspace(0, 1, 12)
         compare_values(xi, af_closed)
         compare_values(xi, af_open)
 
@@ -264,41 +290,53 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         af = Naca45DigitModifiedThickness(mti=12, lei=4, lmti=6)
 
         # reference values
+        x_ref = [0, 1]
         y_ref = [0, 0.0012]
-        yp_ref = [np.inf, -0.4200]
-        ypp_ref = [-np.inf, -1.995]
-        k_ref = [af.le_k(), -1.5635449681]
+        xp_ref = [0, 2]
+        yp_ref = [0.11876, -0.8400]
+        xpp_ref = [2, 2]
+        ypp_ref = [-0.0379443778, -8.82]
+        k_ref = [-141.804371, -1.5635449681]
 
         # test leading edge
-        xi = 0
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        k = af.k(xi)
+        t = 0
+        x, y = af.xy(t)
+        xp, yp = af.xy_p(t)
+        xpp, ypp = af.xy_pp(t)
+        k = af.k(t)
+        self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xp, xp_ref[0]))
         self.assertIsNone(npt.assert_allclose(yp, yp_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[0]))
         self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[0]))
         self.assertIsNone(npt.assert_allclose(k, k_ref[0]))
 
         # test trailing edge
-        xi = 1
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        k = af.k(xi)
+        t = 1
+        x, y = af.xy(t)
+        xp, yp = af.xy_p(t)
+        xpp, ypp = af.xy_pp(t)
+        k = af.k(t)
+        self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xp, xp_ref[1]))
         self.assertIsNone(npt.assert_allclose(yp, yp_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[1]))
         self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[1]))
         self.assertIsNone(npt.assert_allclose(k, k_ref[1]))
 
         # test both
-        xi = np.array([0, 1])
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        k = af.k(xi)
+        t = np.array([0, 1])
+        x, y = af.xy(t)
+        xp, yp = af.xy_p(t)
+        xpp, ypp = af.xy_pp(t)
+        k = af.k(t)
+        self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
+        self.assertIsNone(npt.assert_allclose(xp, xp_ref))
         self.assertIsNone(npt.assert_allclose(yp, yp_ref))
+        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref))
         self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
         self.assertIsNone(npt.assert_allclose(k, k_ref))
 
@@ -306,7 +344,7 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         """Test correct joints are being reported."""
         af = Naca45DigitModifiedThickness(mti=24, lei=3, lmti=5)
 
-        self.assertListEqual([0.0, 0.5, 1.0], af.joints())
+        self.assertListEqual([0.0, np.sqrt(0.5), 1.0], af.joints())
 
     def testMaxThickness(self) -> None:
         """Test maximum thickness."""
