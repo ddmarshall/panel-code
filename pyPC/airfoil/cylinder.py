@@ -21,6 +21,7 @@ class Cylinder(Airfoil):
     """
 
     def __init__(self, radius) -> None:
+        super().__init__()
         self._r = radius
 
     @property
@@ -32,8 +33,8 @@ class Cylinder(Airfoil):
     def radius(self, radius) -> float:
         self._r = radius
 
-    def xy(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
+    def xy(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                              np_type.NDArray]:
         """
         Calculate the coordinates of geometry at parameter location.
 
@@ -44,7 +45,7 @@ class Cylinder(Airfoil):
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -54,13 +55,13 @@ class Cylinder(Airfoil):
         numpy.ndarray
             Y-coordinate of point.
         """
-        theta = np.pi*(1-xi)
+        theta = self._convert_theta(t)
         x = self.radius*(1+np.cos(theta))
         y = self.radius*np.sin(theta)
         return x, y
 
-    def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                 np_type.NDArray]:
+    def xy_t(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                np_type.NDArray]:
         """
         Calculate rates of change of the coordinates at parameter location.
 
@@ -71,7 +72,7 @@ class Cylinder(Airfoil):
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -81,13 +82,13 @@ class Cylinder(Airfoil):
         numpy.ndarray
             Parametric rate of change of the y-coordinate of point.
         """
-        theta = np.pi*(1-xi)
-        x_p = np.pi*self.radius*np.sin(theta)
-        y_p = -np.pi*self.radius*np.cos(theta)
-        return x_p, y_p
+        theta = self._convert_theta(t)
+        x_t = np.pi*self.radius*np.sin(theta)
+        y_t = -np.pi*self.radius*np.cos(theta)
+        return x_t, y_t
 
-    def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                  np_type.NDArray]:
+    def xy_tt(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                 np_type.NDArray]:
         """
         Return second derivative of the coordinates at parameter location.
 
@@ -98,7 +99,7 @@ class Cylinder(Airfoil):
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -108,18 +109,18 @@ class Cylinder(Airfoil):
         numpy.ndarray
             Parametric second derivative of the y-coordinate of point.
         """
-        theta = np.pi*(1-xi)
-        x_pp = -np.pi**2*self.radius*np.cos(theta)
-        y_pp = -np.pi**2*self.radius*np.sin(theta)
-        return x_pp, y_pp
+        theta = self._convert_theta(t)
+        x_tt = -np.pi**2*self.radius*np.cos(theta)
+        y_tt = -np.pi**2*self.radius*np.sin(theta)
+        return x_tt, y_tt
 
-    def camber_value(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def camber_value(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of camber at specified chord location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Chord location of interest.
 
         Returns
@@ -127,15 +128,15 @@ class Cylinder(Airfoil):
         numpy.ndarray
             Camber at specified point.
         """
-        return np.zeros_like(xi)
+        return np.zeros_like(t)
 
-    def thickness_value(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def thickness_value(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of thickness at specified chord location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Chord location of interest.
 
         Returns
@@ -143,8 +144,7 @@ class Cylinder(Airfoil):
         numpy.ndarray
             Thickness at specified point.
         """
-        _, th = self.xy(xi)
-        return th
+        return self.xy(t)[1]
 
     def joints(self) -> List[float]:
         """
@@ -153,6 +153,10 @@ class Cylinder(Airfoil):
         Returns
         -------
         List[float]
-            Xi-coordinates of any discontinuities.
+            Parametric coordinates of any discontinuities.
         """
         return [-1.0, 1.0]
+
+    @staticmethod
+    def _convert_theta(t: np_type.NDArray) -> np_type.NDArray:
+        return np.pi*(1-t)

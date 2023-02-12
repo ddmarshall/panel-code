@@ -56,7 +56,7 @@ class Airfoil(Curve):
 
         return self._s_max
 
-    def xi_from_x(self, x:np_type.NDArray, upper: bool) -> np_type.NDArray:
+    def t_from_x(self, x:np_type.NDArray, upper: bool) -> np_type.NDArray:
         """
         Calculate the parametric value for x-location provided.
 
@@ -77,48 +77,82 @@ class Airfoil(Curve):
         ValueError
             If there is no surface point at the given x-location.
         """
-        x_a = np.asarray(x)
+        x = np.asarray(x)
         # TODO: the actual minimum for cambered airfoil is NOT at leading edge
         # TODO: this should be part of a bounding box method perhaps
         xmin, _ = self.leading_edge()
         xmin += -0.01
         xmax = max(self.xy(-1)[0], self.xy(1)[0])
-        if ((x_a < xmin).any() or (x_a > xmax).any()):
+        if ((x < xmin).any() or (x > xmax).any()):
             raise ValueError("Invalid x-coordinate provided.")
 
-        def fun(xi: float, x: float) -> float:
-            xr, _ = self.xy(xi)
-            return xr - x
+        def fun(ti: float, x: float) -> float:
+            return self.xy(ti)[0] - x
 
-        it = np.nditer([x_a, None])
+        it = np.nditer([x, None])
         if upper:
             bracket = [0, 1]
         else:
             bracket = [-1, 0]
         with it:
             # pylint: disable=cell-var-from-loop
-            for xx, xi in it:
+            for xx, ti in it:
                 if xx < 0:
-                    root = root_scalar(lambda xi: fun(xi, xx),
+                    root = root_scalar(lambda t: fun(t, xx),
                                        x0=0, x1=abs(xx))
-                    xi[...] = root.root
+                    ti[...] = root.root
                 elif np.abs(fun(bracket[0], xx)) < 1e-8:
-                    xi[...] = bracket[0]
+                    ti[...] = bracket[0]
                 elif np.abs(fun(bracket[1], xx)) < 1e-8:
-                    xi[...] = bracket[1]
+                    ti[...] = bracket[1]
                 else:
-                    root = root_scalar(lambda xi: fun(xi, xx), bracket=bracket)
-                    xi[...] = root.root
+                    root = root_scalar(lambda t: fun(t, xx), bracket=bracket)
+                    ti[...] = root.root
 
             return it.operands[1]
 
-    def dydx(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def t_from_s(self, s: np_type.NDArray) -> np_type.NDArray:
+        """
+        Calculate the parametric value for arc-length provided.
+
+        Parameters
+        ----------
+        s : numpy.ndarray
+            Arc-length location of point.
+
+        Raises
+        ------
+        ValueError
+            When arc-length provided is larger than airfoil surface length.
+
+        Returns
+        -------
+        numpy.ndarray
+            Parametric value for location provided.
+        """
+        s_a = np.asarray(s)
+        if (s_a > self.surface_length).any() or (s_a < 0).any():
+            raise ValueError("Invalid arc length provided.")
+
+        def fun(t: float, s: float) -> float:
+            return self.arc_length(-1, t) - s
+
+        # pylint: disable=cell-var-from-loop
+        it = np.nditer([s_a, None])
+        with it:
+            for ss, ti in it:
+                root = root_scalar(lambda t: fun(t, ss), bracket=[-1, 1])
+                ti[...] = root.root
+
+            return it.operands[1]
+
+    def dydx(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Calculate the slope at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -131,16 +165,16 @@ class Airfoil(Curve):
         ValueError
             If there is no surface point at the given x-location.
         """
-        xp, yp = self.xy_p(xi)
-        return yp/xp
+        xt, yt = self.xy_t(t)
+        return yt/xt
 
-    def d2ydx2(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def d2ydx2(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Calculate the second derivative at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -153,9 +187,9 @@ class Airfoil(Curve):
         ValueError
             If there is no surface point at the given x-location.
         """
-        xp, yp = self.xy_p(xi)
-        xpp, ypp = self.xy_pp(xi)
-        return (xp*ypp-yp*xpp)/xp**3
+        xt, yt = self.xy_t(t)
+        xtt, ytt = self.xy_tt(t)
+        return (xt*ytt-yt*xtt)/xt**3
 
     #
     # Arc-length Interface
@@ -176,8 +210,8 @@ class Airfoil(Curve):
         numpy.ndarray
             Y-coordinate of point.
         """
-        xi = self._xi_from_s(s)
-        return self.xy(xi)
+        t = self.t_from_s(s)
+        return self.xy(t)
 
     def xy_s(self, s: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                 np_type.NDArray]:
@@ -196,8 +230,8 @@ class Airfoil(Curve):
         numpy.ndarray
             Arc-length rate of change of the y-coordinate of point.
         """
-        xi = self._xi_from_s(s)
-        return self.tangent(xi)
+        t = self.t_from_s(s)
+        return self.tangent(t)
 
     def xy_ss(self, s: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                  np_type.NDArray]:
@@ -216,47 +250,10 @@ class Airfoil(Curve):
         numpy.ndarray
             Arc-length second derivative of the y-coordinate of point.
         """
-        xi = self._xi_from_s(s)
-        nx, ny = self.normal(xi)
-        k = self.k(xi)
+        t = self.t_from_s(s)
+        nx, ny = self.normal(t)
+        k = self.k(t)
         return k*nx, k*ny
-
-    def _xi_from_s(self, s: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the parametric value for arc-length provided.
-
-        Parameters
-        ----------
-        s : numpy.ndarray
-            Arc-length location of point.
-
-        Raises
-        ------
-        ValueError
-            When arc-length provided is larger than airfoil surface length.
-
-        Returns
-        -------
-        numpy.ndarray
-            Parametric value for location provided.
-        """
-        s_max = self.surface_length()
-
-        s_a = np.asarray(s)
-        if (s_a > s_max).any() or (s_a < 0).any():
-            raise ValueError("Invalid arc length provided.")
-
-        def fun(xi: float, s: float) -> float:
-            return self.arc_length(-1, xi) - s
-
-        # pylint: disable=cell-var-from-loop
-        it = np.nditer([s_a, None])
-        with it:
-            for ss, xi in it:
-                root = root_scalar(lambda xi: fun(xi, ss), bracket=[-1, 1])
-                xi[...] = root.root
-
-            return it.operands[1]
 
     def chord(self) -> float:
         """
@@ -318,13 +315,13 @@ class Airfoil(Curve):
         self._s_max = None
 
     @abstractmethod
-    def camber_value(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def camber_value(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of camber at specified chord location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Chord location of interest.
 
         Returns
@@ -334,13 +331,13 @@ class Airfoil(Curve):
         """
 
     @abstractmethod
-    def thickness_value(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def thickness_value(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the amount of thickness at specified chord location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Chord location of interest.
 
         Notes

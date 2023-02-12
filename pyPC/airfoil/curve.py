@@ -15,21 +15,21 @@ class Curve(ABC):
     Base class for 1-d curves.
 
     Curves can be interrogated based on their natural parameterization, using
-    the parameter, xi.
+    the parameter, t.
     """
 
     #
     # Parameteric Interface
     #
     @abstractmethod
-    def xy(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
+    def xy(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                              np_type.NDArray]:
         """
         Calculate the coordinates of geometry at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -41,14 +41,14 @@ class Curve(ABC):
         """
 
     @abstractmethod
-    def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                 np_type.NDArray]:
+    def xy_t(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                np_type.NDArray]:
         """
         Calculate rates of change of the coordinates at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -60,14 +60,14 @@ class Curve(ABC):
         """
 
     @abstractmethod
-    def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                  np_type.NDArray]:
+    def xy_tt(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                 np_type.NDArray]:
         """
         Calculate second derivative of the coordinates at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -78,14 +78,14 @@ class Curve(ABC):
             Parametric second derivative of the y-coordinate of point.
         """
 
-    def normal(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                   np_type.NDArray]:
+    def normal(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                  np_type.NDArray]:
         """
         Calculate the unit normal at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -93,19 +93,19 @@ class Curve(ABC):
         numpy.ndarray, numpy.ndarray
             Unit normal at point.
         """
-        sx, sy = self.tangent(xi)
+        sx, sy = self.tangent(t)
         nx = -sy
         ny = sx
         return nx, ny
 
-    def tangent(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                    np_type.NDArray]:
+    def tangent(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                   np_type.NDArray]:
         """
         Calculate the unit tangent at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -113,19 +113,19 @@ class Curve(ABC):
         numpy.ndarray, numpy.ndarray
             Unit tangent at point.
         """
-        sx, sy = self.xy_p(xi)
+        sx, sy = self.xy_t(t)
         temp = np.sqrt(sx**2 + sy**2)
         sx = sx/temp
         sy = sy/temp
         return sx, sy
 
-    def k(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def k(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Calculate the curvature at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -138,20 +138,20 @@ class Curve(ABC):
         ValueError
             If there is no surface point at the given x-location.
         """
-        xp, yp = self.xy_p(xi)
-        xpp, ypp = self.xy_pp(xi)
-        return (xp*ypp-yp*xpp)/(xp**2+yp**2)**(3/2)
+        xt, yt = self.xy_t(t)
+        xtt, ytt = self.xy_tt(t)
+        return (xt*ytt-yt*xtt)/(xt**2+yt**2)**(3/2)
 
-    def arc_length(self, xi_s: float,
-                   xi_e: np_type.NDArray) -> np_type.NDArray:
+    def arc_length(self, t_s: float,
+                   t_e: np_type.NDArray) -> np_type.NDArray:
         """
         Calculate the arc-length distance between two points on surface.
 
         Parameters
         ----------
-        xi_s : float
+        t_s : float
             Start point of distance calculation.
-        xi_e : numpy.ndarray
+        t_e : numpy.ndarray
             End point of distance calculation.
 
         Returns
@@ -160,15 +160,15 @@ class Curve(ABC):
             Distance from start point to end point.
         """
 
-        def fun(xi):
-            xp, yp = self.xy_p(xi)
-            return np.sqrt(xp**2+yp**2)
+        def fun(t):
+            xt, yt = self.xy_t(t)
+            return np.sqrt(xt**2+yt**2)
 
-        xi_ea = np.asarray(xi_e)
-        it = np.nditer([xi_ea, None])
+        t_e = np.asarray(t_e)
+        it = np.nditer([t_e, None])
         with it:
-            for xi, alen in it:
-                alen[...], _ = quadrature(fun, xi_s, xi)
+            for ti, alen in it:
+                alen[...], _ = quadrature(fun, t_s, ti)
 
             return it.operands[1]
 
@@ -184,5 +184,5 @@ class Curve(ABC):
         Returns
         -------
         List[float]
-            Xi-coordinates of any discontinuities.
+            Parametric coordinates of any discontinuities.
         """
