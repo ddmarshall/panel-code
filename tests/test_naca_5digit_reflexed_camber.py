@@ -74,46 +74,53 @@ class TestNaca5DigitReflexed(unittest.TestCase):
                            af: Naca5DigitCamberReflexed) -> None:
             eps = 1e-7
 
-            xi_a = np.asarray(xi)
-            y_ref = np.zeros_like(xi_a)
-            it = np.nditer([xi_a, y_ref], op_flags=[["readonly"],
-                                                    ["writeonly"]])
+            m = af.m
+            k1 = af.k1
+            k2ok1 = af.k2/k1
+            xi = np.asarray(xi)
+            it = np.nditer([xi, None])
             with it:
-                for xir, yr in it:
-                    m = af.m
-                    k1 = af.k1
-                    k2ok1 = af.k2/k1
-                    if xir <= m:
-                        yr[...] = (k1/6)*((xir-m)**3 - k2ok1*(1-m)**3*xir
-                                          - m**3*xir + m**3)
+                for xit, yit in it:
+                    if xit <= m:
+                        yit[...] = (k1/6)*((xit-m)**3 - k2ok1*(1-m)**3*xit
+                                           - m**3*xit + m**3)
                     else:
-                        yr[...] = (k1/6)*(k2ok1*(xir-m)**3 - k2ok1*(1-m)**3*xir
-                                          - m**3*xir + m**3)
+                        yit[...] = (k1/6)*(k2ok1*(xit-m)**3
+                                           - k2ok1*(1-m)**3*xit
+                                           - m**3*xit + m**3)
+                y_ref = it.operands[1]
 
             # compare point values
-            y = af.y(xi)
-            self.assertIsNone(npt.assert_allclose(y, y_ref, atol=1e-7))
+            x, y = af.xy(xi)
+            self.assertIsNone(npt.assert_allclose(x, xi))
+            self.assertIsNone(npt.assert_allclose(y, y_ref))
 
             # compare first derivatives
-            ypl = af.y(xi+eps)
-            ymi = af.y(xi-eps)
-            yp_ref = 0.5*(ypl-ymi)/eps
-            yp = af.y_p(xi)
-            self.assertIsNone(npt.assert_allclose(yp, yp_ref, atol=1e-7))
+            xpl, ypl = af.xy(xi+eps)
+            xmi, ymi = af.xy(xi-eps)
+            xt_ref = 0.5*(xpl-xmi)/eps
+            yt_ref = 0.5*(ypl-ymi)/eps
+            xt, yt = af.xy_t(xi)
+            self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+            self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
-            ypl = af.y_p(xi+eps)
-            ymi = af.y_p(xi-eps)
-            ypp_ref = 0.5*(ypl-ymi)/eps
-            ypp = af.y_pp(xi)
-            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref, atol=1e-7))
+            xpl, ypl = af.xy_t(xi+eps)
+            xmi, ymi = af.xy_t(xi-eps)
+            xtt_ref = 0.5*(xpl-xmi)/eps
+            ytt_ref = 0.5*(ypl-ymi)/eps
+            xtt, ytt = af.xy_tt(xi)
+            self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
             # compare third derivatives
-            ypl = af.y_pp(xi+eps)
-            ymi = af.y_pp(xi-eps)
-            yppp_ref = 0.5*(ypl-ymi)/eps
-            yppp = af.y_ppp(xi)
-            self.assertIsNone(npt.assert_allclose(yppp, yppp_ref, atol=1e-7))
+            xpl, ypl = af.xy_tt(xi+eps)
+            xmi, ymi = af.xy_tt(xi-eps)
+            xttt_ref = 0.5*(xpl-xmi)/eps
+            yttt_ref = 0.5*(ypl-ymi)/eps
+            xttt, yttt = af.xy_ttt(xi)
+            self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
+            self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
         # test point on front
         xi = 0.125
@@ -136,44 +143,60 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
         # reference values
         coef = [af.k1/6, af.k1/6]
+        x_ref = [0, 1]
         y_ref = [0, 0]
-        yp_ref = [coef[0]*(3*af.m**2-(af.k2/af.k1)*(1-af.m)**3-af.m**3),
+        xt_ref = [1, 1]
+        yt_ref = [coef[0]*(3*af.m**2-(af.k2/af.k1)*(1-af.m)**3-af.m**3),
                   coef[1]*((af.k2/af.k1)*(3*(1-af.m)**2-(1-af.m)**3)-af.m**3)]
-        ypp_ref = [-6*coef[0]*af.m, 6*coef[1]*(af.k2/af.k1)*(1-af.m)]
-        yppp_ref = [6*coef[0], 6*coef[1]*(af.k2/af.k1)]
+        xtt_ref = [0, 0]
+        ytt_ref = [-6*coef[0]*af.m, 6*coef[1]*(af.k2/af.k1)*(1-af.m)]
+        xttt_ref = [0, 0]
+        yttt_ref = [6*coef[0], 6*coef[1]*(af.k2/af.k1)]
 
         # test leading edge
         xi = 0
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        yppp = af.y_ppp(xi)
+        x, y = af.xy(xi)
+        xt, yt = af.xy_t(xi)
+        xtt, ytt = af.xy_tt(xi)
+        xttt, yttt = af.xy_ttt(xi)
+        self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(yppp, yppp_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xttt, xttt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(yttt, yttt_ref[0]))
 
         # test trailing edge
         xi = 1
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        yppp = af.y_ppp(xi)
+        x, y = af.xy(xi)
+        xt, yt = af.xy_t(xi)
+        xtt, ytt = af.xy_tt(xi)
+        xttt, yttt = af.xy_ttt(xi)
+        self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yppp, yppp_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xttt, xttt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(yttt, yttt_ref[1]))
 
         # test both
         xi = np.array([0, 1])
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        yppp = af.y_ppp(xi)
+        x, y = af.xy(xi)
+        xt, yt = af.xy_t(xi)
+        xtt, ytt = af.xy_tt(xi)
+        xttt, yttt = af.xy_ttt(xi)
+        self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
-        self.assertIsNone(npt.assert_allclose(yppp, yppp_ref))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
+        self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
+        self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
     def testJoints(self) -> None:
         """Test correct joints are being reported."""
@@ -185,7 +208,7 @@ class TestNaca5DigitReflexed(unittest.TestCase):
         """Test maximum camber."""
         af = Naca5DigitCamberReflexed(lci=2, mci=3)
 
-        self.assertTupleEqual((0.15, af.y(0.15)), af.max_camber())
+        self.assertTupleEqual((0.15, af.xy(0.15)[1]), af.max_camber())
 
 
 if __name__ == "__main__":

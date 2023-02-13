@@ -59,10 +59,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
                     + f"NACA{int(af.max_camber_index):1d}"
                     + f"{int(af.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
+        x, y = af.xy(tows.x)
+        xt, yt = af.xy_t(tows.x)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
                                               atol=1e-5))
 
         # NACA 63xx
@@ -71,10 +72,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
                     + f"NACA{int(af.max_camber_index):1d}"
                     + f"{int(af.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
+        x, y = af.xy(tows.x)
+        xt, yt = af.xy_t(tows.x)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
                                               atol=1e-5))
 
         # NACA 64xx
@@ -83,10 +85,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
                     + f"NACA{int(af.max_camber_index):1d}"
                     + f"{int(af.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
+        x, y = af.xy(tows.x)
+        xt, yt = af.xy_t(tows.x)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
                                               atol=1e-5))
 
         # NACA 65xx
@@ -95,10 +98,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
                     + f"NACA{int(af.max_camber_index):1d}"
                     + f"{int(af.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
+        x, y = af.xy(tows.x)
+        xt, yt = af.xy_t(tows.x)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
                                               atol=1e-5))
 
         # NACA 66xx
@@ -107,10 +111,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
                     + f"NACA{int(af.max_camber_index):1d}"
                     + f"{int(af.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
+        x, y = af.xy(tows.x)
+        xt, yt = af.xy_t(tows.x)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
                                               atol=1e-5))
 
         # NACA 67xx
@@ -119,10 +124,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
                     + f"NACA{int(af.max_camber_index):1d}"
                     + f"{int(af.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        y = af.y(tows.x)
-        yp = af.y_p(tows.x)
+        x, y = af.xy(tows.x)
+        xt, yt = af.xy_t(tows.x)
+        self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yp, tows.dydx, rtol=0,
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
                                               atol=1e-5))
 
     def testCamber(self) -> None:
@@ -134,44 +140,50 @@ class TestNaca4DigitCamber(unittest.TestCase):
             eps = 1e-7
 
             p, m = af.max_camber()
-            xi_a = np.asarray(xi)
-            y_ref = np.zeros_like(xi_a)
-            it = np.nditer([xi_a, y_ref], op_flags=[["readonly"],
-                                                    ["writeonly"]])
+            xi = np.asarray(xi)
+            it = np.nditer([xi, None])
             with it:
-                for xir, yr in it:
+                for xit, yit in it:
                     if p == 0:
-                        yr[...] = np.zeros_like(xir)
+                        yit[...] = np.zeros_like(xit)
                     else:
-                        if xir <= p:
-                            yr[...] = (m/p**2)*(2*p*xir - xir**2)
+                        if xit <= p:
+                            yit[...] = (m/p**2)*(2*p*xit - xit**2)
                         else:
-                            yr[...] = (m/(1-p)**2)*(1-2*p + 2*p*xir - xir**2)
+                            yit[...] = (m/(1-p)**2)*(1-2*p + 2*p*xit - xit**2)
+                y_ref = it.operands[1]
 
             # compare point values
-            y = af.y(xi)
-            self.assertIsNone(npt.assert_allclose(y, y_ref, atol=1e-7))
+            x, y = af.xy(xi)
+            self.assertIsNone(npt.assert_allclose(x, xi))
+            self.assertIsNone(npt.assert_allclose(y, y_ref))
 
             # compare first derivatives
-            ypl = af.y(xi+eps)
-            ymi = af.y(xi-eps)
-            yp_ref = 0.5*(ypl-ymi)/eps
-            yp = af.y_p(xi)
-            self.assertIsNone(npt.assert_allclose(yp, yp_ref, atol=1e-7))
+            xpl, ypl = af.xy(xi+eps)
+            xmi, ymi = af.xy(xi-eps)
+            xt_ref = 0.5*(xpl-xmi)/eps
+            yt_ref = 0.5*(ypl-ymi)/eps
+            xt, yt = af.xy_t(xi)
+            self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+            self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
-            ypl = af.y_p(xi+eps)
-            ymi = af.y_p(xi-eps)
-            ypp_ref = 0.5*(ypl-ymi)/eps
-            ypp = af.y_pp(xi)
-            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref, atol=1e-7))
+            xpl, ypl = af.xy_t(xi+eps)
+            xmi, ymi = af.xy_t(xi-eps)
+            xtt_ref = 0.5*(xpl-xmi)/eps
+            ytt_ref = 0.5*(ypl-ymi)/eps
+            xtt, ytt = af.xy_tt(xi)
+            self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
             # compare third derivatives
-            ypl = af.y_pp(xi+eps)
-            ymi = af.y_pp(xi-eps)
-            yppp_ref = 0.5*(ypl-ymi)/eps
-            yppp = af.y_ppp(xi)
-            self.assertIsNone(npt.assert_allclose(yppp, yppp_ref, atol=1e-7))
+            xpl, ypl = af.xy_tt(xi+eps)
+            xmi, ymi = af.xy_tt(xi-eps)
+            xttt_ref = 0.5*(xpl-xmi)/eps
+            yttt_ref = 0.5*(ypl-ymi)/eps
+            xttt, yttt = af.xy_ttt(xi)
+            self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
+            self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
         # test point on front
         xi = 0.25
@@ -194,43 +206,59 @@ class TestNaca4DigitCamber(unittest.TestCase):
 
         # reference values
         coef = [m/p**2, m/(1-p)**2]
+        x_ref = [0, 1]
         y_ref = [0, 0]
-        yp_ref = [2*coef[0]*p, 2*coef[1]*(p - 1)]
-        ypp_ref = [-2*coef[0], -2*coef[1]]
-        yppp_ref = [0, 0]
+        xt_ref = [1, 1]
+        yt_ref = [2*coef[0]*p, 2*coef[1]*(p - 1)]
+        xtt_ref = [0, 0]
+        ytt_ref = [-2*coef[0], -2*coef[1]]
+        xttt_ref = [0, 0]
+        yttt_ref = [0, 0]
 
         # test leading edge
         xi = 0
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        yppp = af.y_ppp(xi)
+        x, y = af.xy(xi)
+        xt, yt = af.xy_t(xi)
+        xtt, ytt = af.xy_tt(xi)
+        xttt, yttt = af.xy_ttt(xi)
+        self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(yppp, yppp_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xttt, xttt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(yttt, yttt_ref[0]))
 
         # test trailing edge
         xi = 1
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        yppp = af.y_ppp(xi)
+        x, y = af.xy(xi)
+        xt, yt = af.xy_t(xi)
+        xtt, ytt = af.xy_tt(xi)
+        xttt, yttt = af.xy_ttt(xi)
+        self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yppp, yppp_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xttt, xttt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(yttt, yttt_ref[1]))
 
         # test both
         xi = np.array([0, 1])
-        y = af.y(xi)
-        yp = af.y_p(xi)
-        ypp = af.y_pp(xi)
-        yppp = af.y_ppp(xi)
+        x, y = af.xy(xi)
+        xt, yt = af.xy_t(xi)
+        xtt, ytt = af.xy_tt(xi)
+        xttt, yttt = af.xy_ttt(xi)
+        self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
-        self.assertIsNone(npt.assert_allclose(yppp, yppp_ref))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
+        self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
+        self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
     def testJoints(self) -> None:
         af = Naca4DigitCamber(mci=3, lci=4.0)

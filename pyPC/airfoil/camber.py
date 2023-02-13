@@ -21,14 +21,14 @@ class Camber(Curve):
     defined outside of that range.
     """
 
-    def xy(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
+    def xy(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                              np_type.NDArray]:
         """
         Calculate the coordinates of geometry at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -38,16 +38,16 @@ class Camber(Curve):
         numpy.ndarray
             Y-coordinate of point.
         """
-        return xi, self.y(xi)
+        return t, self._y(t)
 
-    def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                 np_type.NDArray]:
+    def xy_t(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                np_type.NDArray]:
         """
         Calculate rates of change of the coordinates at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -57,16 +57,16 @@ class Camber(Curve):
         numpy.ndarray
             Parametric rate of change of the y-coordinate of point.
         """
-        return np.ones_like(xi), self.y_p(xi)
+        return np.ones_like(t), self._y_t(t)
 
-    def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                  np_type.NDArray]:
+    def xy_tt(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                 np_type.NDArray]:
         """
         Calculate second derivative of the coordinates at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -76,71 +76,26 @@ class Camber(Curve):
         numpy.ndarray
             Parametric second derivative of the y-coordinate of point.
         """
-        return np.zeros_like(xi), self.y_pp(xi)
+        return np.zeros_like(t), self._y_tt(t)
 
-    @abstractmethod
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def xy_ttt(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                  np_type.NDArray]:
         """
-        Return the camber location at specified chord location.
+        Calculate third derivative of the coordinates at parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
+        t : numpy.ndarray
+            Parameter for desired locations.
 
         Returns
         -------
         numpy.ndarray
-            Camber at specified point.
-        """
-
-    @abstractmethod
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return first derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
+            Parametric third derivative of the x-coordinate of point.
         numpy.ndarray
-            First derivative of camber at specified point.
+            Parametric third derivative of the y-coordinate of point.
         """
-
-    @abstractmethod
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return second derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Second derivative of camber at specified point.
-        """
-
-    @abstractmethod
-    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return third derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Third derivative of camber at specified point.
-        """
+        return np.zeros_like(t), self._y_ttt(t)
 
     @abstractmethod
     def max_camber(self) -> Tuple[float, float]:
@@ -155,20 +110,14 @@ class Camber(Curve):
             Maximum camber.
         """
 
-
-class NoCamber(Camber):
-    """Representation of the case where there is no camber."""
-
-    def __init__(self) -> None:
-        pass
-
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
+    @abstractmethod
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the camber location at specified chord location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Chord location of interest.
 
         Returns
@@ -176,15 +125,15 @@ class NoCamber(Camber):
         numpy.ndarray
             Camber at specified point.
         """
-        return np.zeros_like(xi)
 
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
+    @abstractmethod
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return first derivative of camber at specified chord location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Chord location of interest.
 
         Returns
@@ -192,15 +141,15 @@ class NoCamber(Camber):
         numpy.ndarray
             First derivative of camber at specified point.
         """
-        return np.zeros_like(xi)
 
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
+    @abstractmethod
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return second derivative of camber at specified chord location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Chord location of interest.
 
         Returns
@@ -208,15 +157,15 @@ class NoCamber(Camber):
         numpy.ndarray
             Second derivative of camber at specified point.
         """
-        return np.zeros_like(xi)
 
-    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
+    @abstractmethod
+    def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return third derivative of camber at specified chord location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Chord location of interest.
 
         Returns
@@ -224,7 +173,13 @@ class NoCamber(Camber):
         numpy.ndarray
             Third derivative of camber at specified point.
         """
-        return np.zeros_like(xi)
+
+
+class NoCamber(Camber):
+    """Representation of the case where there is no camber."""
+
+    def __init__(self) -> None:
+        pass
 
     def joints(self) -> List[float]:
         """
@@ -233,7 +188,7 @@ class NoCamber(Camber):
         Returns
         -------
         List[float]
-            Xi-coordinates of any discontinuities.
+            Parameter coordinates of any discontinuities.
         """
         return [0.0, 1.0]
 
@@ -249,6 +204,70 @@ class NoCamber(Camber):
             Maximum camber.
         """
         return 0.0, 0.0
+
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the camber location at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Camber at specified point.
+        """
+        return np.zeros_like(t)
+
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of camber at specified point.
+        """
+        return np.zeros_like(t)
+
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of camber at specified point.
+        """
+        return np.zeros_like(t)
+
+    def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return third derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Third derivative of camber at specified point.
+        """
+        return np.zeros_like(t)
 
 
 class Naca4DigitCamber(Camber):
@@ -309,137 +328,6 @@ class Naca4DigitCamber(Camber):
 
             self._p = lci/10.0
 
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return the camber location at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Camber at specified point.
-        """
-        if (self._m == 0) or (self._p == 0):
-            return np.zeros_like(xi)
-
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            if self._m == 0:
-                return np.zeros_like(xi)
-            else:
-                return (self._m/self._p**2)*(2*self._p*xi - xi**2)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            if self._m == 0:
-                return np.zeros_like(xi)
-            else:
-                return (self._m/(1-self._p)**2)*(1
-                                                 + 2*self._p*(xi - 1) - xi**2)
-
-        return np.piecewise(xi, [xi <= self._p, xi > self._p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return first derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            First derivative of camber at specified point.
-        """
-        if (self._m == 0) or (self._p == 0):
-            return np.zeros_like(xi)
-
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            if self._m == 0:
-                return np.zeros_like(xi)
-            else:
-                return 2*(self._m/self._p**2)*(self._p - xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            if self._m == 0:
-                return np.zeros_like(xi)
-            else:
-                return 2*(self._m/(1-self._p)**2)*(self._p - xi)
-
-        return np.piecewise(xi, [xi <= self._p, xi > self._p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return second derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Second derivative of camber at specified point.
-        """
-        if (self._m == 0) or (self._p == 0):
-            return np.zeros_like(xi)
-
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            if self._m == 0:
-                return np.zeros_like(xi)
-            else:
-                return -2*(self._m/self._p**2)*np.ones_like(xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            if self._m == 0:
-                return np.zeros_like(xi)
-            else:
-                return -2*(self._m/(1-self._p)**2)*np.ones_like(xi)
-
-        return np.piecewise(xi, [xi <= self._p, xi > self._p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return third derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Third derivative of camber at specified point.
-        """
-        if (self._m == 0) or (self._p == 0):
-            return np.zeros_like(xi)
-
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return np.zeros_like(xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return np.zeros_like(xi)
-
-        return np.piecewise(xi, [xi <= self._p, xi > self._p],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
     def joints(self) -> List[float]:
         """
         Return the locations of any joints/discontinuities in the camber line.
@@ -466,6 +354,136 @@ class Naca4DigitCamber(Camber):
             Maximum camber.
         """
         return self._p, self._m
+
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the camber location at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Camber at specified point.
+        """
+        if (self._m == 0) or (self._p == 0):
+            return np.zeros_like(t)
+
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            if self._m == 0:
+                return np.zeros_like(t)
+            else:
+                return (self._m/self._p**2)*(2*self._p*t - t**2)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            if self._m == 0:
+                return np.zeros_like(t)
+            else:
+                return (self._m/(1-self._p)**2)*(1 + 2*self._p*(t - 1) - t**2)
+
+        return np.piecewise(t, [t <= self._p, t > self._p],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of camber at specified point.
+        """
+        if (self._m == 0) or (self._p == 0):
+            return np.zeros_like(t)
+
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            if self._m == 0:
+                return np.zeros_like(t)
+            else:
+                return 2*(self._m/self._p**2)*(self._p - t)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            if self._m == 0:
+                return np.zeros_like(t)
+            else:
+                return 2*(self._m/(1-self._p)**2)*(self._p - t)
+
+        return np.piecewise(t, [t <= self._p, t > self._p],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of camber at specified point.
+        """
+        if (self._m == 0) or (self._p == 0):
+            return np.zeros_like(t)
+
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            if self._m == 0:
+                return np.zeros_like(t)
+            else:
+                return -2*(self._m/self._p**2)*np.ones_like(t)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            if self._m == 0:
+                return np.zeros_like(t)
+            else:
+                return -2*(self._m/(1-self._p)**2)*np.ones_like(t)
+
+        return np.piecewise(t, [t <= self._p, t > self._p],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return third derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Third derivative of camber at specified point.
+        """
+        if (self._m == 0) or (self._p == 0):
+            return np.zeros_like(t)
+
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            return np.zeros_like(t)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return np.zeros_like(t)
+
+        return np.piecewise(t, [t <= self._p, t > self._p],
+                            [lambda t: fore(t), lambda t: aft(t)])
 
 
 class Naca5DigitCamber(Camber):
@@ -524,108 +542,6 @@ class Naca5DigitCamber(Camber):
         """Scale factor for camber."""
         return self._k1
 
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return the camber location at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Camber at specified point.
-        """
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            m = self.m
-            return (self.k1/6)*(xi**3 - 3*m*xi**2 + m**2*(3-m)*xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.k1*self.m**3/6)*(1 - xi)
-
-        return np.piecewise(xi, [xi <= self.m, xi > self.m],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return first derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            First derivative of camber at specified point.
-        """
-        xi = np.asarray(xi, dtype=np.float64)
-        m = self.m
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.k1/6)*(3*xi**2 - 6*m*xi + m**2*(3-m))
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return -(self.k1*m**3/6)*np.ones_like(xi)
-
-        return np.piecewise(xi, [xi <= m, xi > m],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return second derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Second derivative of camber at specified point.
-        """
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.k1)*(xi - self.m)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return np.zeros_like(xi)
-
-        return np.piecewise(xi, [xi <= self.m, xi > self.m],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return third derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Third derivative of camber at specified point.
-        """
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return self.k1*np.ones_like(xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return np.zeros_like(xi)
-
-        return np.piecewise(xi, [xi <= self.m, xi > self.m],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
     def joints(self) -> List[float]:
         """
         Return the locations of any joints/discontinuities in the camber line.
@@ -648,7 +564,109 @@ class Naca5DigitCamber(Camber):
         float
             Maximum camber.
         """
-        return self._p, self.y(xi=self._p)
+        return self._p, self._y(self._p)
+
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the camber location at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Camber at specified point.
+        """
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            m = self.m
+            return (self.k1/6)*(t**3 - 3*m*t**2 + m**2*(3-m)*t)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return (self.k1*self.m**3/6)*(1 - t)
+
+        return np.piecewise(t, [t <= self.m, t > self.m],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of camber at specified point.
+        """
+        t = np.asarray(t, dtype=np.float64)
+        m = self.m
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            return (self.k1/6)*(3*t**2 - 6*m*t + m**2*(3-m))
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return -(self.k1*m**3/6)*np.ones_like(t)
+
+        return np.piecewise(t, [t <= m, t > m],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of camber at specified point.
+        """
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            return (self.k1)*(t - self.m)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return np.zeros_like(t)
+
+        return np.piecewise(t, [t <= self.m, t > self.m],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return third derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Third derivative of camber at specified point.
+        """
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            return self.k1*np.ones_like(t)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return np.zeros_like(t)
+
+        return np.piecewise(t, [t <= self.m, t > self.m],
+                            [lambda t: fore(t), lambda t: aft(t)])
 
     def _p_setter(self, mci: int) -> None:
         if mci == 1:
@@ -721,7 +739,7 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamber):
                                    + 3)*np.sqrt(self._m*(1-self._m)))
 
 
-class Naca5DigitCamberReflexed:
+class Naca5DigitCamberReflexed(Camber):
     """
     Class for the classic NACA 5-digit reflexed camber airfoil.
 
@@ -785,112 +803,6 @@ class Naca5DigitCamberReflexed:
         """Second scale factor for camber."""
         return self._k2
 
-    def y(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return the camber location at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Camber at specified point.
-        """
-        xi = np.asarray(xi, dtype=np.float64)
-        m = self.m
-        k1 = self.k1
-        k2ok1 = self.k2/k1
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return (k1/6)*((xi-m)**3 - k2ok1*(1-m)**3*xi + m**3*(1-xi))
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return (k1/6)*(k2ok1*(xi-m)**3 - k2ok1*(1-m)**3*xi + m**3*(1-xi))
-
-        return np.piecewise(xi, [xi <= m, xi > m],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_p(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return first derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            First derivative of camber at specified point.
-        """
-        xi = np.asarray(xi, dtype=np.float64)
-        m = self.m
-        k1 = self.k1
-        k2ok1 = self.k2/k1
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return (k1/6)*(3*(xi-m)**2 - k2ok1*(1-m)**3 - m**3)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return (k1/6)*(3*k2ok1*(xi-m)**2 - k2ok1*(1-m)**3 - m**3)
-
-        return np.piecewise(xi, [xi <= m, xi > m],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_pp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return second derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Second derivative of camber at specified point.
-        """
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.k1)*(xi - self.m)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return (self.k2)*(xi - self.m)
-
-        return np.piecewise(xi, [xi <= self.m, xi > self.m],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
-    def y_ppp(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return third derivative of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
-        numpy.ndarray
-            Third derivative of camber at specified point.
-        """
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fore(xi: np_type.NDArray) -> np_type.NDArray:
-            return self.k1*np.ones_like(xi)
-
-        def aft(xi: np_type.NDArray) -> np_type.NDArray:
-            return self.k2*np.ones_like(xi)
-
-        return np.piecewise(xi, [xi <= self.m, xi > self.m],
-                            [lambda xi: fore(xi), lambda xi: aft(xi)])
-
     def joints(self) -> List[float]:
         """
         Return the locations of any joints/discontinuities in the camber line.
@@ -913,7 +825,113 @@ class Naca5DigitCamberReflexed:
         float
             Maximum camber.
         """
-        return self._p, self.y(self._p)
+        return self._p, self._y(self._p)
+
+    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return the camber location at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Camber at specified point.
+        """
+        t = np.asarray(t, dtype=np.float64)
+        m = self.m
+        k1 = self.k1
+        k2ok1 = self.k2/k1
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            return (k1/6)*((t-m)**3 - k2ok1*(1-m)**3*t + m**3*(1-t))
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return (k1/6)*(k2ok1*(t-m)**3 - k2ok1*(1-m)**3*t + m**3*(1-t))
+
+        return np.piecewise(t, [t <= m, t > m],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return first derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            First derivative of camber at specified point.
+        """
+        t = np.asarray(t, dtype=np.float64)
+        m = self.m
+        k1 = self.k1
+        k2ok1 = self.k2/k1
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            return (k1/6)*(3*(t-m)**2 - k2ok1*(1-m)**3 - m**3)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return (k1/6)*(3*k2ok1*(t-m)**2 - k2ok1*(1-m)**3 - m**3)
+
+        return np.piecewise(t, [t <= m, t > m],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return second derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Second derivative of camber at specified point.
+        """
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            return (self.k1)*(t - self.m)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return (self.k2)*(t - self.m)
+
+        return np.piecewise(t, [t <= self.m, t > self.m],
+                            [lambda t: fore(t), lambda t: aft(t)])
+
+    def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Return third derivative of camber at specified chord location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Chord location of interest.
+
+        Returns
+        -------
+        numpy.ndarray
+            Third derivative of camber at specified point.
+        """
+        t = np.asarray(t, dtype=np.float64)
+
+        def fore(t: np_type.NDArray) -> np_type.NDArray:
+            return self.k1*np.ones_like(t)
+
+        def aft(t: np_type.NDArray) -> np_type.NDArray:
+            return self.k2*np.ones_like(t)
+
+        return np.piecewise(t, [t <= self.m, t > self.m],
+                            [lambda t: fore(t), lambda t: aft(t)])
 
     def _p_setter(self, mci: int) -> None:
         if mci == 2:
