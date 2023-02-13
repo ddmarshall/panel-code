@@ -101,10 +101,10 @@ class TestLineVortexConstant2D(unittest.TestCase):
         phi_app = vortex_app.potential(x, y, True)
         psi_app = vortex_app.stream_function(x, y, True)
 
-        self.assertIsNone(npt.assert_allclose(phi, phi_app, rtol=0, atol=2e-4))
-        self.assertIsNone(npt.assert_allclose(psi, psi_app, rtol=0, atol=2e-4))
-        self.assertIsNone(npt.assert_allclose(u, u_app, rtol=0, atol=1e-3))
-        self.assertIsNone(npt.assert_allclose(v, v_app, rtol=0, atol=5e-4))
+        self.assertIsNone(npt.assert_allclose(phi, phi_app, atol=2e-4))
+        self.assertIsNone(npt.assert_allclose(psi, psi_app, atol=2e-4))
+        self.assertIsNone(npt.assert_allclose(u, u_app, atol=1e-3))
+        self.assertIsNone(npt.assert_allclose(v, v_app, atol=5e-4))
 
 
 if __name__ == "__main__":

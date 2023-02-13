@@ -61,9 +61,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=5e-5))
+                                              atol=5e-5))
 
         # NACA 0008
         af = Naca45DigitThickness(mti=8)
@@ -74,9 +74,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=6e-5))
+                                              atol=6e-5))
 
         # NACA 0009
         af = Naca45DigitThickness(mti=9)
@@ -87,9 +87,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=3e-5))
+                                              atol=3e-5))
 
         # NACA 0010
         af = Naca45DigitThickness(mti=10)
@@ -100,9 +100,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1.2e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1.2e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=2e-5))
+                                              atol=2e-5))
 
         # NACA 0012
         af = Naca45DigitThickness(mti=12)
@@ -113,9 +113,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=7e-5))
+                                              atol=7e-5))
 
         # NACA 0015
         af = Naca45DigitThickness(mti=15)
@@ -126,9 +126,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=1e-5))
+                                              atol=1e-5))
 
         # NACA 0018
         af = Naca45DigitThickness(mti=18)
@@ -139,9 +139,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=1e-5))
+                                              atol=1e-5))
 
         # NACA 0021
         af = Naca45DigitThickness(mti=21)
@@ -152,9 +152,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=1e-5))
+                                              atol=1e-5))
 
         # NACA 0024
         af = Naca45DigitThickness(mti=24)
@@ -165,9 +165,9 @@ class TestNaca45DigitThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=4e-5))
+                                              atol=4e-5))
 
     def testEnhancedThickness(self) -> None:
         """Test the enhanced thickness coefficient calculation."""
@@ -291,7 +291,7 @@ class TestNaca45DigitThickness(unittest.TestCase):
 
             # compare point values
             x, y = af.xy(np.sqrt(xi))
-            self.assertIsNone(npt.assert_allclose(x, xi, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(x, xi))
             self.assertIsNone(npt.assert_allclose(y, y_ref, atol=1e-7))
 
             # compare first derivatives
@@ -300,8 +300,8 @@ class TestNaca45DigitThickness(unittest.TestCase):
             xp_ref = 0.5*(xpl-xmi)/eps
             yp_ref = 0.5*(ypl-ymi)/eps
             xp, yp = af.xy_p(t)
-            self.assertIsNone(npt.assert_allclose(xp, xp_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(yp, yp_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(xp, xp_ref))
+            self.assertIsNone(npt.assert_allclose(yp, yp_ref))
 
             # compare second derivatives
             xpl, ypl = af.xy_p(xi+eps)
@@ -309,8 +309,8 @@ class TestNaca45DigitThickness(unittest.TestCase):
             xpp_ref = 0.5*(xpl-xmi)/eps
             ypp_ref = 0.5*(ypl-ymi)/eps
             xpp, ypp = af.xy_pp(xi)
-            self.assertIsNone(npt.assert_allclose(xpp, xpp_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(xpp, xpp_ref))
+            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
 
         # test point on front
         xi = 0.25

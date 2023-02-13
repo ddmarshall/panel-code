@@ -80,9 +80,9 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=3e-5))
+                                              atol=3e-5))
 
         # NACA 0010-34
         af = Naca45DigitModifiedThickness(mti=10, lei=3, lmti=4)
@@ -95,9 +95,9 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=4e-5))
+                                              atol=4e-5))
 
         # NACA 0010-35
         af = Naca45DigitModifiedThickness(mti=10, lei=3, lmti=5)
@@ -110,9 +110,9 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=6e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=6e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=4e-5))
+                                              atol=4e-5))
 
         # NACA 0010-64
         af = Naca45DigitModifiedThickness(mti=10, lei=6, lmti=4)
@@ -125,9 +125,9 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=6e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=6e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=2e-5))
+                                              atol=2e-5))
 
         # NACA 0010-65
         af = Naca45DigitModifiedThickness(mti=10, lei=6, lmti=5)
@@ -140,9 +140,9 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=5e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=2e-5))
+                                              atol=2e-5))
 
         # NACA 0010-66
         af = Naca45DigitModifiedThickness(mti=10, lei=6, lmti=6)
@@ -155,9 +155,9 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=6e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=6e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=2e-5))
+                                              atol=2e-5))
 
         # NACA 0012-34
         af = Naca45DigitModifiedThickness(mti=12, lei=3, lmti=4)
@@ -170,9 +170,9 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=6e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=6e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=1e-5))
+                                              atol=1e-5))
 
         # NACA 0012-64
         af = Naca45DigitModifiedThickness(mti=12, lei=6, lmti=4)
@@ -185,9 +185,9 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         x, y = af.xy(t)
         le_radius = -1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=8e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=8e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=1e-5))
+                                              atol=1e-5))
 
     def testEnhancedThickness(self) -> None:
         """Test the enhanced thickness coefficient calculation."""
@@ -249,8 +249,8 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
 
             # compare point values
             x, y = af.xy(np.sqrt(xi))
-            self.assertIsNone(npt.assert_allclose(x, xi, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(y, y_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(x, xi))
+            self.assertIsNone(npt.assert_allclose(y, y_ref))
 
             # compare first derivatives
             xpl, ypl = af.xy(t+eps)
@@ -258,8 +258,8 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
             xp_ref = 0.5*(xpl-xmi)/eps
             yp_ref = 0.5*(ypl-ymi)/eps
             xp, yp = af.xy_p(t)
-            self.assertIsNone(npt.assert_allclose(xp, xp_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(yp, yp_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(xp, xp_ref))
+            self.assertIsNone(npt.assert_allclose(yp, yp_ref))
 
             # compare second derivatives
             xpl, ypl = af.xy_p(xi+eps)

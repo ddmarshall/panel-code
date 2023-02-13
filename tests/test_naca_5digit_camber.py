@@ -68,9 +68,8 @@ class TestNaca5DigitCamber(unittest.TestCase):
         x, y = af.xy(tows.x)
         xt, yt = af.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=3e-5))
-        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
-                                              atol=2e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=3e-5))
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=2e-5))
 
         # NACA 220xx
         af = Naca5DigitCamber(lci=2, mci=2)
@@ -80,9 +79,8 @@ class TestNaca5DigitCamber(unittest.TestCase):
         x, y = af.xy(tows.x)
         xt, yt = af.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=2e-5))
-        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
-                                              atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=2e-5))
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
         # NACA 230xx
         af = Naca5DigitCamber(lci=2, mci=3)
@@ -92,9 +90,8 @@ class TestNaca5DigitCamber(unittest.TestCase):
         x, y = af.xy(tows.x)
         xt, yt = af.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
-                                              atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
         # NACA 240xx
         af = Naca5DigitCamber(lci=2, mci=4)
@@ -104,9 +101,8 @@ class TestNaca5DigitCamber(unittest.TestCase):
         x, y = af.xy(tows.x)
         xt, yt = af.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
-                                              atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
         # NACA 250xx
         af = Naca5DigitCamber(lci=2, mci=5)
@@ -116,9 +112,8 @@ class TestNaca5DigitCamber(unittest.TestCase):
         x, y = af.xy(tows.x)
         xt, yt = af.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
-        self.assertIsNone(npt.assert_allclose(y, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, rtol=0,
-                                              atol=2e-5))
+        self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=2e-5))
 
     def testCamber(self) -> None:
         """Test the camber relations."""
