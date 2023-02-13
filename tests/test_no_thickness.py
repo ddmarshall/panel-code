@@ -14,7 +14,6 @@ import numpy.testing as npt
 
 from pyPC.airfoil.thickness import NoThickness
 
-
 class TestNoThickness(unittest.TestCase):
     """Class to test the zero thickness geometry."""
 
@@ -22,107 +21,84 @@ class TestNoThickness(unittest.TestCase):
         """Test the thickness relations."""
         af = NoThickness()
 
-        def compare_values(xi: np_type.NDArray, af: NoThickness) -> None:
-            xi_a = np.asarray(xi)
-            y_ref = np.zeros_like(xi_a)
+        def compare_values(t: np_type.NDArray, th: NoThickness) -> None:
+            t = np.asarray(t)
+            delta_ref = np.zeros_like(t)
 
             # compare point values
-            t = np.sqrt(xi)
-            x, y = af.xy(t)
-            self.assertIsNone(npt.assert_allclose(x, xi))
-            self.assertIsNone(npt.assert_allclose(y, y_ref, atol=1e-7))
+            delta = th.delta(t)
+            self.assertIsNone(npt.assert_allclose(delta, delta_ref))
 
             # compare first derivatives
-            yt_ref = y_ref
-            xt, yt = af.xy_t(t)
-            self.assertIsNone(npt.assert_allclose(xt, 2*t))
-            self.assertIsNone(npt.assert_allclose(yt, yt_ref, atol=1e-7))
+            deltat_ref = np.zeros_like(t)
+            deltat = th.delta_t(t)
+            self.assertIsNone(npt.assert_allclose(deltat, deltat_ref))
 
             # compare second derivatives
-            ytt_ref = y_ref
-            xtt, ytt = af.xy_tt(t)
-            self.assertIsNone(npt.assert_allclose(xtt, 2))
-            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref, atol=1e-7))
+            deltatt_ref = np.zeros_like(t)
+            deltatt = th.delta_tt(t)
+            self.assertIsNone(npt.assert_allclose(deltatt, deltatt_ref))
 
         # test point on front
-        xi = 0.25
-        compare_values(xi, af)
+        t = 0.25
+        compare_values(t, af)
 
         # test point on back
-        xi = 0.6
-        compare_values(xi, af)
+        t = 0.6
+        compare_values(t, af)
 
         # test points on lower and upper surface (avoid leading edge because
         # the derivatives are infinite)
-        xi = np.linspace(0.001, 1, 12)
-        compare_values(xi, af)
+        t = np.linspace(0.001, 1, 12)
+        compare_values(t, af)
 
     def testEndPoints(self) -> None:
         """Test accessing the end points of thickness with integers."""
-        af = NoThickness()
+        th = NoThickness()
 
         # reference values
-        x_ref = [0, 1]
-        y_ref = [0, 0]
-        xt_ref = [0, 2]
-        yt_ref = [0, 0]
-        xtt_ref = [2, 2]
-        ytt_ref = [0, 0]
-        k_ref = [0, 0]
+        delta_ref = [0, 0]
+        deltat_ref = [0, 0]
+        deltatt_ref = [0, 0]
 
         # test leading edge
         t = 0
-        x, y = af.xy(t)
-        xt, yt = af.xy_t(t)
-        xtt, ytt = af.xy_tt(t)
-        k = af.k(t)
-        self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
-        self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xt, xt_ref[0], atol=2e-8))
-        self.assertIsNone(npt.assert_allclose(yt, yt_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[0]))
-        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[0]))
-        self.assertIsNone(npt.assert_allclose(k, k_ref[0]))
+        delta = th.delta(t)
+        deltat = th.delta_t(t)
+        deltatt = th.delta_tt(t)
+        self.assertIsNone(npt.assert_allclose(delta, delta_ref[0]))
+        self.assertIsNone(npt.assert_allclose(deltat, deltat_ref[0]))
+        self.assertIsNone(npt.assert_allclose(deltatt, deltatt_ref[0]))
 
         # test trailing edge
         t = 1
-        x, y = af.xy(t)
-        xt, yt = af.xy_t(t)
-        xtt, ytt = af.xy_tt(t)
-        k = af.k(t)
-        self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
-        self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yt, yt_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[1]))
-        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[1]))
-        self.assertIsNone(npt.assert_allclose(k, k_ref[1]))
+        delta = th.delta(t)
+        deltat = th.delta_t(t)
+        deltatt = th.delta_tt(t)
+        self.assertIsNone(npt.assert_allclose(delta, delta_ref[1]))
+        self.assertIsNone(npt.assert_allclose(deltat, deltat_ref[1]))
+        self.assertIsNone(npt.assert_allclose(deltatt, deltatt_ref[1]))
 
         # test both
         t = np.array([0, 1])
-        x, y = af.xy(t)
-        xt, yt = af.xy_t(t)
-        xtt, ytt = af.xy_tt(t)
-        k = af.k(t)
-        self.assertIsNone(npt.assert_allclose(x, x_ref))
-        self.assertIsNone(npt.assert_allclose(y, y_ref))
-        self.assertIsNone(npt.assert_allclose(xt, xt_ref, atol=2e-8))
-        self.assertIsNone(npt.assert_allclose(yt, yt_ref))
-        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
-        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
-        self.assertIsNone(npt.assert_allclose(k, k_ref))
+        delta = th.delta(t)
+        deltat = th.delta_t(t)
+        deltatt = th.delta_tt(t)
+        self.assertIsNone(npt.assert_allclose(delta, delta_ref))
+        self.assertIsNone(npt.assert_allclose(deltat, deltat_ref))
+        self.assertIsNone(npt.assert_allclose(deltatt, deltatt_ref))
 
-    def testJoints(self) -> None:
+    def testDiscontinuities(self) -> None:
         """Test correct joints are being reported."""
-        af = NoThickness()
+        th = NoThickness()
 
-        self.assertListEqual([0.0, 1.0], af.joints())
+        self.assertListEqual([], th.discontinuities())
 
     def testMaxThickness(self) -> None:
         """Test maximum thickness."""
-        af = NoThickness()
+        th = NoThickness()
 
-        self.assertTupleEqual((0.0, 0.0), af.max_thickness())
+        self.assertTupleEqual((0.0, 0.0), th.max_thickness())
 
 
 if __name__ == "__main__":

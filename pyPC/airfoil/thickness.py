@@ -2,107 +2,55 @@
 # -*- coding: utf-8 -*-
 """Classes associated with airfoil thickness distributions."""
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Tuple, List
 
 import numpy as np
 import numpy.typing as np_type
 
-from pyPC.airfoil.curve import Curve
 
-
-class Thickness(Curve):
+class Thickness(ABC):
     """
     Base class for thickness distribution.
 
     The thickness will have a parameterization from 0 to 1 and is not
-    defined outside of that range.
+    defined outside of that range. This parameterization should be chosen so
+    that all derivatives are finite over the entire parameterization range.
     """
 
-    def xy(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                              np_type.NDArray]:
+    @abstractmethod
+    def discontinuities(self) -> List[float]:
         """
-        Calculate the coordinates of geometry at parameter location.
-
-        Parameters
-        ----------
-        t : numpy.ndarray
-            Parameter for desired locations.
+        Return the locations of any discontinuities in the thickness.
 
         Returns
         -------
-        numpy.ndarray
-            X-coordinate of point.
-        numpy.ndarray
-            Y-coordinate of point.
+        List[float]
+            Parametrics coordinates of any discontinuities.
         """
-        return t**2, self._y(t)
-
-    def xy_t(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                np_type.NDArray]:
-        """
-        Calculate rates of change of the coordinates at parameter location.
-
-        Parameters
-        ----------
-        t : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Parametric rate of change of the x-coordinate of point.
-        numpy.ndarray
-            Parametric rate of change of the y-coordinate of point.
-        """
-        t = np.asarray(t, dtype=np.float64)
-        xt = np.asarray(2*t)
-        yt = self._y_t(t)
-        xt[(xt == 0) & (yt == 0)] = 1e-8
-        return xt, yt
-
-    def xy_tt(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                 np_type.NDArray]:
-        """
-        Calculate second derivative of the coordinates at parameter location.
-
-        Parameters
-        ----------
-        t : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Parametric second derivative of the x-coordinate of point.
-        numpy.ndarray
-            Parametric second derivative of the y-coordinate of point.
-        """
-        return 2*np.ones_like(t), self._y_tt(t)
 
     @abstractmethod
     def max_thickness(self) -> Tuple[float, float]:
         """
-        Return chord location of maximum thickness and the maximum thickness.
+        Return parameter location and value of maximum thickness.
 
         Returns
         -------
         float
-            Chord location of maximum thickness.
+            Parameter location of maximum thickness.
         float
             Maximum thickness.
         """
 
     @abstractmethod
-    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the thickness at specified parameter location.
 
         Parameters
         ----------
         t : numpy.ndarray
-            Parameter location of interest. Equal to the square root of the
-            desired chord location.
+            Parameter location of interest.
 
         Returns
         -------
@@ -111,15 +59,14 @@ class Thickness(Curve):
         """
 
     @abstractmethod
-    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return first derivative of thickness at specified parameter location.
 
         Parameters
         ----------
         t : numpy.ndarray
-            Parameter location of interest. Equal to the square root of the
-            desired chord location.
+            Parameter location of interest.
 
         Returns
         -------
@@ -128,15 +75,14 @@ class Thickness(Curve):
         """
 
     @abstractmethod
-    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return second derivative of thickness at specified parameter location.
 
         Parameters
         ----------
         t : numpy.ndarray
-            Parameter location of interest. Equal to the square root of the
-            desired chord location.
+            Parameter location of interest.
 
         Returns
         -------
@@ -151,31 +97,31 @@ class NoThickness(Thickness):
     def __init__(self) -> None:
         pass
 
-    def joints(self) -> List[float]:
+    def discontinuities(self) -> List[float]:
         """
-        Return the locations of any joints/discontinuities in the thickness.
+        Return the locations of any discontinuities in the thickness.
 
         Returns
         -------
         List[float]
-            Xi-coordinates of any discontinuities.
+            Parametric coordinates of any discontinuities.
         """
-        return [0.0, 1.0]
+        return []
 
     def max_thickness(self) -> Tuple[float, float]:
         """
-        Return chord location of maximum thickness and the maximum thickness.
+        Return parameter location and value of maximum thickness.
 
         Returns
         -------
         float
-            Chord location of maximum thickness.
+            Parameter location of maximum thickness.
         float
             Maximum thickness.
         """
         return 0.0, 0.0
 
-    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the thickness at specified parameter location.
 
@@ -192,7 +138,7 @@ class NoThickness(Thickness):
         """
         return np.zeros_like(t)
 
-    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return first derivative of thickness at specified parameter location.
 
@@ -209,7 +155,7 @@ class NoThickness(Thickness):
         """
         return np.zeros_like(t)
 
-    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return second derivative of thickness at specified parameter location.
 
@@ -230,6 +176,10 @@ class NoThickness(Thickness):
 class Naca45DigitThickness(Thickness):
     """
     Class for the classic NACA 4-digit and 5-digit airfoil thickness.
+
+    The thickness is parameterized on the square root of the chord location
+    where the thickness is desired. This is to remove singularities that
+    occur at the leading edge for the typical chord length parameterization.
 
     Attributes
     ----------
@@ -268,31 +218,31 @@ class Naca45DigitThickness(Thickness):
         """Equation coefficients."""
         return self._a
 
-    def joints(self) -> List[float]:
+    def discontinuities(self) -> List[float]:
         """
-        Return the locations of any joints/discontinuities in the thickness.
+        Return the locations of any discontinuities in the thickness.
 
         Returns
         -------
         List[float]
-            Xi-coordinates of any discontinuities.
+            Parametric coordinates of any discontinuities.
         """
-        return [0.0, 1.0]
+        return []
 
     def max_thickness(self) -> Tuple[float, float]:
         """
-        Return chord location of maximum thickness and the maximum thickness.
+        Return parameter location and value of maximum thickness.
 
         Returns
         -------
         float
-            Chord location of maximum thickness.
+            Parameter location of maximum thickness.
         float
             Maximum thickness.
         """
-        return 0.3, self._y(np.sqrt(0.3))
+        return 0.3, self.delta(np.sqrt(0.3))
 
-    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the thickness at specified parameter location.
 
@@ -313,7 +263,7 @@ class Naca45DigitThickness(Thickness):
                                                   + t2*(self.a[3]
                                                         + t2*self.a[4]))))
 
-    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return first derivative of thickness at specified parameter location.
 
@@ -335,7 +285,7 @@ class Naca45DigitThickness(Thickness):
                                         + t2*(3*self.a[3]
                                               + 4*t2*self.a[4]))))
 
-    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return second derivative of thickness at specified parameter location.
 
@@ -360,6 +310,10 @@ class Naca45DigitThickness(Thickness):
 class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
     """
     Enhanced NACA 4-digit and 5-digit airfoil thickness.
+
+    The thickness is parameterized on the square root of the chord location
+    where the thickness is desired. This is to remove singularities that
+    occur at the leading edge for the typical chord length parameterization.
 
     This class extends the standard thickness distribution relations by
     - Solving for the coefficients based on the original constraints used to
@@ -414,7 +368,8 @@ class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
 
     def _calculate_a(self) -> None:
         """Reset the flags for the leading edge and trailing edge shape."""
-        # solve for new values of the coefficients
+        # solve for new values of the coefficients using chord based
+        # parameterization
         B = np.zeros([5,5])
         r = np.zeros([5,1])
 
@@ -463,6 +418,10 @@ class Naca45DigitModifiedThickness(Thickness):
     """
     Base class for the NACA modified 4-digit and 5-digit airfoil thickness.
 
+    The thickness is parameterized on the square root of the chord location
+    where the thickness is desired. This is to remove singularities that
+    occur at the leading edge for the typical chord length parameterization.
+
     Attributes
     ----------
     max_thickness_index : float
@@ -481,7 +440,7 @@ class Naca45DigitModifiedThickness(Thickness):
         # start with valid defaults for setters to work
         self._closed_te = False
         self._lei = 4
-        self._xi_m = 4
+        self._t_m = 4
         self._a = np.zeros(4)
         self._d = np.zeros(4)
 
@@ -518,14 +477,14 @@ class Naca45DigitModifiedThickness(Thickness):
     @property
     def loc_max_thickness_index(self) -> float:
         """Location where fore and aft equations meet."""
-        return 10*self._xi_m
+        return 10*self._t_m**2
 
     @loc_max_thickness_index.setter
     def loc_max_thickness_index(self, lmti: float) -> None:
         if lmti < 1 or lmti >= 10:
             raise ValueError("Invalid NACA modified 4/5-digit max. thickness "
                              f"location parameter: {lmti}")
-        self._xi_m = lmti/10.0
+        self._t_m = np.sqrt(lmti/10.0)
         self._calculate_coefficients()
 
     @property
@@ -538,31 +497,31 @@ class Naca45DigitModifiedThickness(Thickness):
         """Aft equation coefficients."""
         return self._d
 
-    def joints(self) -> List[float]:
+    def discontinuities(self) -> List[float]:
         """
-        Return the locations of any joints/discontinuities in the thickness.
+        Return the locations of any discontinuities in the thickness.
 
         Returns
         -------
         List[float]
-            Xi-coordinates of any discontinuities.
+            Parametric coordinates of any discontinuities.
         """
-        return [0.0, np.sqrt(self._xi_m), 1.0]
+        return [self._t_m]
 
     def max_thickness(self) -> Tuple[float, float]:
         """
-        Return chord location of maximum thickness and the maximum thickness.
+        Return parameter location and value of maximum thickness.
 
         Returns
         -------
         float
-            Chord location of maximum thickness.
+            Parameter location of maximum thickness.
         float
             Maximum thickness.
         """
-        return self._xi_m, self._y(np.sqrt(self._xi_m))
+        return self._t_m, self.delta(self._t_m)
 
-    def _y(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return the thickness at specified parameter location.
 
@@ -590,11 +549,10 @@ class Naca45DigitModifiedThickness(Thickness):
             return self.d[0] + term*(self.d[1]
                                      + term*(self.d[2] + term*self.d[3]))
 
-        t_m = np.sqrt(self._xi_m)
-        return self._tmax*np.piecewise(t, [t <= t_m, t > t_m],
+        return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
                                        [lambda t: fore(t), lambda t: aft(t)])
 
-    def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return first derivative of thickness at specified parameter location.
 
@@ -620,11 +578,10 @@ class Naca45DigitModifiedThickness(Thickness):
             t2 = t**2
             return -2*t*(self.d[1] + (1-t2)*(2*self.d[2] + 3*(1-t2)*self.d[3]))
 
-        t_m = np.sqrt(self._xi_m)
-        return self._tmax*np.piecewise(t, [t <= t_m, t > t_m],
+        return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
                                        [lambda t: fore(t), lambda t: aft(t)])
 
-    def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
+    def delta_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
         Return second derivative of thickness at specified parameter location.
 
@@ -650,8 +607,7 @@ class Naca45DigitModifiedThickness(Thickness):
             return -2*(self.d[1] + 2*(1-3*t2)*self.d[2]
                        + 3*(1-t2)*(1-5*t2)*self.d[3])
 
-        t_m = np.sqrt(self._xi_m)
-        return self._tmax*np.piecewise(t, [t <= t_m, t > t_m],
+        return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
                                        [lambda t: fore(t), lambda t: aft(t)])
 
     def _calculate_coefficients(self):
@@ -659,8 +615,9 @@ class Naca45DigitModifiedThickness(Thickness):
         # (1935) values. Improves upon Riegels (1961) fit.
         p = [1.0310900853, -2.7171508529, 4.8594083156]
         q = [1.0, -1.8252487562, 1.1771499645]
-        tau = ((p[0] + p[1]*self._xi_m + p[2]*self._xi_m**2)
-               / (q[0] + q[1]*self._xi_m + q[2]*self._xi_m**2))
+        xi_m = self._t_m**2
+        tau = ((p[0] + p[1]*xi_m + p[2]*xi_m**2)
+               / (q[0] + q[1]*xi_m + q[2]*xi_m**2))
 
         # calculate the d coefficients
         if self._closed_te:
@@ -670,8 +627,8 @@ class Naca45DigitModifiedThickness(Thickness):
 
         self._d[0] = 0.5*eta
         self._d[1] = tau
-        self._d[2] = (2*tau*(self._xi_m-1)-1.5*(eta-1))/(self._xi_m-1)**2
-        self._d[3] = (tau*(self._xi_m-1)-(eta-1))/(self._xi_m-1)**3
+        self._d[2] = (2*tau*(xi_m-1)-1.5*(eta-1))/(xi_m-1)**2
+        self._d[3] = (tau*(xi_m-1)-(eta-1))/(xi_m-1)**3
 
         # calculate the a coefficients
         Q = 25*0.08814961
@@ -680,20 +637,22 @@ class Naca45DigitModifiedThickness(Thickness):
         else:
             Q /= 54
 
-        k_m = (3*(eta-1)-2*tau*(self._xi_m-1))/(self._xi_m-1)**2
+        k_m = (3*(eta-1)-2*tau*(xi_m-1))/(xi_m-1)**2
         sqrt_term = np.sqrt(2*Q)
-        sqrt_term2 = np.sqrt(2*Q*self._xi_m)
+        sqrt_term2 = np.sqrt(2*Q*xi_m)
         self._a[0] = self._lei*sqrt_term
-        self._a[1] = (0.5*self._xi_m
-                      * (k_m + (3-3.75*self._lei*sqrt_term2)/self._xi_m**2))
-        self._a[2] = -(k_m + (1.5-1.25*self._lei*sqrt_term2)/self._xi_m**2)
-        self._a[3] = (0.5/self._xi_m
-                      * (k_m + (1-0.75*self._lei*sqrt_term2)/self._xi_m**2))
+        self._a[1] = (0.5*xi_m*(k_m + (3-3.75*self._lei*sqrt_term2)/xi_m**2))
+        self._a[2] = -(k_m + (1.5-1.25*self._lei*sqrt_term2)/xi_m**2)
+        self._a[3] = (0.5/xi_m*(k_m + (1-0.75*self._lei*sqrt_term2)/xi_m**2))
 
 
 class Naca45DigitModifiedThicknessEnhanced(Naca45DigitModifiedThickness):
     """
     Enhanced NACA modified 4-digit and 5-digit airfoil thickness relation.
+
+    The thickness is parameterized on the square root of the chord location
+    where the thickness is desired. This is to remove singularities that
+    occur at the leading edge for the typical chord length parameterization.
 
     This class extends the standard modified thickness distribution relations
     by
