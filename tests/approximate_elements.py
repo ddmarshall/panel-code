@@ -249,6 +249,6 @@ class ApproxLineDoubletConstant2D(ApproxLineElementConstant2D):
         # doublet is orientied in the xi-direction, so need to rotate angle
         doublet = PointDoublet2D(xo=self._xo[0], yo=self._yo[0],
                                  strength=strength,
-                                 angle=0.5*np.pi+self._panel_angle())
+                                 angle=0.5*np.pi+self.get_panel_angle())
 
         return doublet
