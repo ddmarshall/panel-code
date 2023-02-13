@@ -201,24 +201,24 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         t_te = 1.0
         y_m_ref = 0.005*af.max_thickness_index
         x_m, y_m = af.xy(t_m)
-        xp_m, yp_m = af.xy_p(t_m)
+        xt_m, yt_m = af.xy_t(t_m)
         x_te, y_te = af.xy(t_te)
         self.assertIsNone(npt.assert_allclose(x_m, xi_m))
         self.assertIsNone(npt.assert_allclose(y_m, y_m_ref))
-        self.assertIsNone(npt.assert_allclose(xp_m, 2*t_m))
-        self.assertIsNone(npt.assert_allclose(yp_m, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(xt_m, 2*t_m))
+        self.assertIsNone(npt.assert_allclose(yt_m, 0, atol=1e-7))
         self.assertIsNone(npt.assert_allclose(x_te, xi_te))
         self.assertIsNone(npt.assert_allclose(y_te, 0.02*0.10))
 
         # test the settings with close trailing edge
         af.closed_te = True
         x_m, y_m = af.xy(t_m)
-        xp_m, yp_m = af.xy_p(t_m)
+        xt_m, yt_m = af.xy_t(t_m)
         x_te, y_te = af.xy(t_te)
         self.assertIsNone(npt.assert_allclose(x_m, xi_m))
         self.assertIsNone(npt.assert_allclose(y_m, y_m_ref))
-        self.assertIsNone(npt.assert_allclose(xp_m, 2*t_m))
-        self.assertIsNone(npt.assert_allclose(yp_m, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(xt_m, 2*t_m))
+        self.assertIsNone(npt.assert_allclose(yt_m, 0, atol=1e-7))
         self.assertIsNone(npt.assert_allclose(x_te, xi_te))
         self.assertIsNone(npt.assert_allclose(y_te, 0))
 
@@ -255,20 +255,20 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
             # compare first derivatives
             xpl, ypl = af.xy(t+eps)
             xmi, ymi = af.xy(t-eps)
-            xp_ref = 0.5*(xpl-xmi)/eps
-            yp_ref = 0.5*(ypl-ymi)/eps
-            xp, yp = af.xy_p(t)
-            self.assertIsNone(npt.assert_allclose(xp, xp_ref))
-            self.assertIsNone(npt.assert_allclose(yp, yp_ref))
+            xt_ref = 0.5*(xpl-xmi)/eps
+            yt_ref = 0.5*(ypl-ymi)/eps
+            xt, yt = af.xy_t(t)
+            self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+            self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
-            xpl, ypl = af.xy_p(xi+eps)
-            xmi, ymi = af.xy_p(xi-eps)
-            xpp_ref = 0.5*(xpl-xmi)/eps
-            ypp_ref = 0.5*(ypl-ymi)/eps
-            xpp, ypp = af.xy_pp(xi)
-            self.assertIsNone(npt.assert_allclose(xpp, xpp_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref, atol=1e-7))
+            xpl, ypl = af.xy_t(xi+eps)
+            xmi, ymi = af.xy_t(xi-eps)
+            xtt_ref = 0.5*(xpl-xmi)/eps
+            ytt_ref = 0.5*(ypl-ymi)/eps
+            xtt, ytt = af.xy_tt(xi)
+            self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
         # test point on front
         xi = 0.25
@@ -292,52 +292,52 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
         # reference values
         x_ref = [0, 1]
         y_ref = [0, 0.0012]
-        xp_ref = [0, 2]
-        yp_ref = [0.11876, -0.8400]
-        xpp_ref = [2, 2]
-        ypp_ref = [-0.0379443778, -8.82]
+        xt_ref = [0, 2]
+        yt_ref = [0.11876, -0.8400]
+        xtt_ref = [2, 2]
+        ytt_ref = [-0.0379443778, -8.82]
         k_ref = [-141.804371, -1.5635449681]
 
         # test leading edge
         t = 0
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[0]))
         self.assertIsNone(npt.assert_allclose(k, k_ref[0]))
 
         # test trailing edge
         t = 1
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[1]))
         self.assertIsNone(npt.assert_allclose(k, k_ref[1]))
 
         # test both
         t = np.array([0, 1])
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
         self.assertIsNone(npt.assert_allclose(k, k_ref))
 
     def testJoints(self) -> None:

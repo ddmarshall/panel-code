@@ -33,16 +33,16 @@ class TestNoThickness(unittest.TestCase):
             self.assertIsNone(npt.assert_allclose(y, y_ref, atol=1e-7))
 
             # compare first derivatives
-            yp_ref = y_ref
-            xp, yp = af.xy_p(t)
-            self.assertIsNone(npt.assert_allclose(xp, 2*t))
-            self.assertIsNone(npt.assert_allclose(yp, yp_ref, atol=1e-7))
+            yt_ref = y_ref
+            xt, yt = af.xy_t(t)
+            self.assertIsNone(npt.assert_allclose(xt, 2*t))
+            self.assertIsNone(npt.assert_allclose(yt, yt_ref, atol=1e-7))
 
             # compare second derivatives
-            ypp_ref = y_ref
-            xpp, ypp = af.xy_pp(t)
-            self.assertIsNone(npt.assert_allclose(xpp, 2))
-            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref, atol=1e-7))
+            ytt_ref = y_ref
+            xtt, ytt = af.xy_tt(t)
+            self.assertIsNone(npt.assert_allclose(xtt, 2))
+            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref, atol=1e-7))
 
         # test point on front
         xi = 0.25
@@ -64,52 +64,52 @@ class TestNoThickness(unittest.TestCase):
         # reference values
         x_ref = [0, 1]
         y_ref = [0, 0]
-        xp_ref = [0, 2]
-        yp_ref = [0, 0]
-        xpp_ref = [2, 2]
-        ypp_ref = [0, 0]
+        xt_ref = [0, 2]
+        yt_ref = [0, 0]
+        xtt_ref = [2, 2]
+        ytt_ref = [0, 0]
         k_ref = [0, 0]
 
         # test leading edge
         t = 0
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref[0], atol=1e-7))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[0], atol=2e-8))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[0]))
         self.assertIsNone(npt.assert_allclose(k, k_ref[0]))
 
         # test trailing edge
         t = 1
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[1]))
         self.assertIsNone(npt.assert_allclose(k, k_ref[1]))
 
         # test both
         t = np.array([0, 1])
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref, atol=1e-7))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref, atol=2e-8))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
         self.assertIsNone(npt.assert_allclose(k, k_ref))
 
     def testJoints(self) -> None:

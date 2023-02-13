@@ -188,15 +188,15 @@ class TestNaca45DigitThickness(unittest.TestCase):
         dydx_te_ref = -0.234
         y_1c_ref = 0.078
         x_max, y_max = af.xy(t_max)
-        x_pmax, y_pmax = af.xy_p(t_max)
+        xt_max, yt_max = af.xy_t(t_max)
         x_te, y_te = af.xy(t_te)
-        x_pte, y_pte = af.xy_p(t_te)
-        dydx_te = y_pte/x_pte
+        xt_te, yt_te = af.xy_t(t_te)
+        dydx_te = yt_te/xt_te
         x_1c, y_1c = af.xy(t_1c)
         self.assertIsNone(npt.assert_allclose(x_max, xi_max))
         self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
-        self.assertIsNone(npt.assert_allclose(x_pmax, 2*t_max))
-        self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(xt_max, 2*t_max))
+        self.assertIsNone(npt.assert_allclose(yt_max, 0, atol=1e-7))
         self.assertIsNone(npt.assert_allclose(x_te, xi_te))
         self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
         self.assertIsNone(npt.assert_allclose(dydx_te, dydx_te_ref))
@@ -211,15 +211,15 @@ class TestNaca45DigitThickness(unittest.TestCase):
         dydx_te_ref = -0.234
         r_le_ref = -0.5*0.29690**2
         x_max, y_max = af.xy(t_max)
-        x_pmax, y_pmax = af.xy_p(t_max)
+        xt_max, yt_max = af.xy_t(t_max)
         x_te, y_te = af.xy(t_te)
-        x_pte, y_pte = af.xy_p(t_te)
-        dydx_te = y_pte/x_pte
+        xt_te, yt_te = af.xy_t(t_te)
+        dydx_te = yt_te/xt_te
         r_le = 1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x_max, xi_max))
         self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
-        self.assertIsNone(npt.assert_allclose(x_pmax, 2*t_max))
-        self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(xt_max, 2*t_max))
+        self.assertIsNone(npt.assert_allclose(yt_max, 0, atol=1e-7))
         self.assertIsNone(npt.assert_allclose(x_te, xi_te))
         self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
         self.assertIsNone(npt.assert_allclose(dydx_te, dydx_te_ref))
@@ -233,15 +233,15 @@ class TestNaca45DigitThickness(unittest.TestCase):
         dydx_te_ref = -0.234
         y_1c_ref = 0.078
         x_max, y_max = af.xy(t_max)
-        x_pmax, y_pmax = af.xy_p(t_max)
+        xt_max, yt_max = af.xy_t(t_max)
         x_te, y_te = af.xy(t_te)
-        x_pte, y_pte = af.xy_p(t_te)
-        dydx_te = y_pte/x_pte
+        xt_te, yt_te = af.xy_t(t_te)
+        dydx_te = yt_te/xt_te
         x_1c, y_1c = af.xy(t_1c)
         self.assertIsNone(npt.assert_allclose(x_max, xi_max))
         self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
-        self.assertIsNone(npt.assert_allclose(x_pmax, 2*t_max))
-        self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(xt_max, 2*t_max))
+        self.assertIsNone(npt.assert_allclose(yt_max, 0, atol=1e-7))
         self.assertIsNone(npt.assert_allclose(x_te, xi_te))
         self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
         self.assertIsNone(npt.assert_allclose(dydx_te, dydx_te_ref))
@@ -256,15 +256,15 @@ class TestNaca45DigitThickness(unittest.TestCase):
         dydx_te_ref = -0.234
         r_le_ref = -0.5*0.29690**2
         x_max, y_max = af.xy(t_max)
-        x_pmax, y_pmax = af.xy_p(t_max)
+        xt_max, yt_max = af.xy_t(t_max)
         x_te, y_te = af.xy(t_te)
-        x_pte, y_pte = af.xy_p(t_te)
-        dydx_te = y_pte/x_pte
+        xt_te, yt_te = af.xy_t(t_te)
+        dydx_te = yt_te/xt_te
         r_le = 1/af.k(0)
         self.assertIsNone(npt.assert_allclose(x_max, xi_max))
         self.assertIsNone(npt.assert_allclose(y_max, y_max_ref))
-        self.assertIsNone(npt.assert_allclose(x_pmax, 2*t_max))
-        self.assertIsNone(npt.assert_allclose(y_pmax, 0, atol=1e-7))
+        self.assertIsNone(npt.assert_allclose(xt_max, 2*t_max))
+        self.assertIsNone(npt.assert_allclose(yt_max, 0, atol=1e-7))
         self.assertIsNone(npt.assert_allclose(x_te, xi_te))
         self.assertIsNone(npt.assert_allclose(y_te, y_te_ref))
         self.assertIsNone(npt.assert_allclose(dydx_te, dydx_te_ref))
@@ -297,20 +297,20 @@ class TestNaca45DigitThickness(unittest.TestCase):
             # compare first derivatives
             xpl, ypl = af.xy(t+eps)
             xmi, ymi = af.xy(t-eps)
-            xp_ref = 0.5*(xpl-xmi)/eps
-            yp_ref = 0.5*(ypl-ymi)/eps
-            xp, yp = af.xy_p(t)
-            self.assertIsNone(npt.assert_allclose(xp, xp_ref))
-            self.assertIsNone(npt.assert_allclose(yp, yp_ref))
+            xt_ref = 0.5*(xpl-xmi)/eps
+            yt_ref = 0.5*(ypl-ymi)/eps
+            xt, yt = af.xy_t(t)
+            self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+            self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
-            xpl, ypl = af.xy_p(xi+eps)
-            xmi, ymi = af.xy_p(xi-eps)
-            xpp_ref = 0.5*(xpl-xmi)/eps
-            ypp_ref = 0.5*(ypl-ymi)/eps
-            xpp, ypp = af.xy_pp(xi)
-            self.assertIsNone(npt.assert_allclose(xpp, xpp_ref))
-            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
+            xpl, ypl = af.xy_t(xi+eps)
+            xmi, ymi = af.xy_t(xi-eps)
+            xtt_ref = 0.5*(xpl-xmi)/eps
+            ytt_ref = 0.5*(ypl-ymi)/eps
+            xtt, ytt = af.xy_tt(xi)
+            self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
         # test point on front
         xi = 0.25
@@ -334,52 +334,52 @@ class TestNaca45DigitThickness(unittest.TestCase):
         # reference values
         x_ref = [0, 1]
         y_ref = [0, 0.00126]
-        xp_ref = [0, 2]
-        yp_ref = [0.17814, -0.28062]
-        xpp_ref = [2, 2]
-        ypp_ref = [-0.1512, -0.97572]
+        xt_ref = [0, 2]
+        yt_ref = [0.17814, -0.28062]
+        xtt_ref = [2, 2]
+        ytt_ref = [-0.1512, -0.97572]
         k_ref = [-63.02416489, -0.1687668093]
 
         # test leading edge
         t = 0
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[0]))
         self.assertIsNone(npt.assert_allclose(k, k_ref[0]))
 
         # test trailing edge
         t = 1
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[1]))
         self.assertIsNone(npt.assert_allclose(k, k_ref[1]))
 
         # test both
         t = np.array([0, 1])
         x, y = af.xy(t)
-        xp, yp = af.xy_p(t)
-        xpp, ypp = af.xy_pp(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         k = af.k(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
         self.assertIsNone(npt.assert_allclose(k, k_ref))
 
     def testJoints(self) -> None:
