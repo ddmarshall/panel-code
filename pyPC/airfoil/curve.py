@@ -132,11 +132,6 @@ class Curve(ABC):
         -------
         numpy.ndarray
             Curvature of surface at point.
-
-        Raises
-        ------
-        ValueError
-            If there is no surface point at the given x-location.
         """
         xt, yt = self.xy_t(t)
         xtt, ytt = self.xy_tt(t)

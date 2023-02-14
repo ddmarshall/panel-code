@@ -23,9 +23,9 @@ class TestNoThickness(unittest.TestCase):
 
         def compare_values(t: np_type.NDArray, th: NoThickness) -> None:
             t = np.asarray(t)
-            delta_ref = np.zeros_like(t)
 
             # compare point values
+            delta_ref = np.zeros_like(t)
             delta = th.delta(t)
             self.assertIsNone(npt.assert_allclose(delta, delta_ref))
 
