@@ -114,30 +114,33 @@ class Cylinder(Airfoil):
         y_tt = -np.pi**2*self.radius*np.sin(theta)
         return x_tt, y_tt
 
-    def camber_value(self, t: np_type.NDArray) -> np_type.NDArray:
+    def camber_location(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                           np_type.NDArray]:
         """
-        Return the amount of camber at specified chord location.
+        Return the amount of camber at specified parameter location.
 
         Parameters
         ----------
         t : numpy.ndarray
-            Chord location of interest.
+            Parameter location of interest.
 
         Returns
         -------
         numpy.ndarray
-            Camber at specified point.
+            X-coordinate of camber at specified point.
+        numpy.ndarray
+            Y-coordinate of camber at specified point.
         """
-        return np.zeros_like(t)
+        return t, np.zeros_like(t)
 
     def thickness_value(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the amount of thickness at specified chord location.
+        Return the amount of thickness at specified parameter location.
 
         Parameters
         ----------
         t : numpy.ndarray
-            Chord location of interest.
+            Parameter location of interest.
 
         Returns
         -------

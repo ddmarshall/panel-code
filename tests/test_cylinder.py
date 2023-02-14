@@ -43,7 +43,9 @@ class TestCylinder(unittest.TestCase):
                                      surf: Cylinder) -> None:
             # compare thickness and camber
             thick_ref = surf.radius*np.sin(np.pi*(1-t))
-            self.assertIsNone(npt.assert_allclose(surf.camber_value(t), 0))
+            xc, yc = surf.camber_location(t)
+            self.assertIsNone(npt.assert_allclose(xc, t))
+            self.assertIsNone(npt.assert_allclose(yc, 0))
             self.assertIsNone(npt.assert_allclose(surf.thickness_value(t),
                                                   thick_ref))
 

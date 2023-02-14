@@ -20,7 +20,7 @@ class Airfoil(Curve):
     """
     Base class for airfoil specific geometries.
 
-    There are a few different ways that the airfoil coordinates (and their
+    There are two different ways that the airfoil coordinates (and their
     derivatives) can be queried.
         - The standard parameterization uses a range from -1 to 0 for the lower
           surface (trailing edge to leading edge) and from 0 to 1 for the
@@ -33,15 +33,6 @@ class Airfoil(Curve):
           surface trailing edge. This method is typically computationally
           expensive because the arc-length is not a typical parameter that is
           easy to calculate for airfoil shapes.
-        - Providing the x-coordinate and whether the upper or lower surface
-          is desired. This method allows for the querying of actual points
-          on the airfoil, but it might result in a ValueError exception raised
-          if there is no surface point at the provided x-coordinate. This
-          method is typically more computationally intensive since few airfoils
-          are defined explicitly as a function of x-coordinate.
-
-    The first two methods are exposed by the base class, while the last method
-    is specific to airfoils.
     """
 
     def __init__(self) -> None:
@@ -315,30 +306,33 @@ class Airfoil(Curve):
         self._s_max = None
 
     @abstractmethod
-    def camber_value(self, t: np_type.NDArray) -> np_type.NDArray:
+    def camber_location(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                           np_type.NDArray]:
         """
-        Return the amount of camber at specified chord location.
+        Return the location of camber at specified parameter location.
 
         Parameters
         ----------
         t : numpy.ndarray
-            Chord location of interest.
+            Parameter location of interest.
 
         Returns
         -------
         numpy.ndarray
-            Camber at specified point.
+            X-coordinate of camber at specified point.
+        numpy.ndarray
+            Y-coordinate of camber at specified point.
         """
 
     @abstractmethod
     def thickness_value(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the amount of thickness at specified chord location.
+        Return the amount of thickness at specified parameter location.
 
         Parameters
         ----------
         t : numpy.ndarray
-            Chord location of interest.
+            Parameter location of interest.
 
         Notes
         -----
