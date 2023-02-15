@@ -53,6 +53,11 @@ class TestNoCamber(unittest.TestCase):
             self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
             self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
+            # compare curvature derivatives derivatives
+            kt_ref = np.zeros_like(t)
+            kt = ca.k_t(t)
+            self.assertIsNone(npt.assert_allclose(kt, kt_ref, atol=1e-7))
+
         # test point on front
         t = 0.25
         compare_values(t, ca)

@@ -168,6 +168,13 @@ class TestNaca5DigitCamber(unittest.TestCase):
             self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
             self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
+            # compare curvature derivatives
+            kpl = ca.k(t+eps)
+            kmi = ca.k(t-eps)
+            kt_ref = 0.5*(kpl-kmi)/eps
+            kt = ca.k_t(t)
+            self.assertIsNone(npt.assert_allclose(kt, kt_ref))
+
         # test point on front
         t = 0.125
         compare_values(t, ca_classic)

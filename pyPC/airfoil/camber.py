@@ -97,6 +97,32 @@ class Camber(Curve):
         """
         return np.zeros_like(t), self._y_ttt(t)
 
+    def k_t(self, t: np_type.NDArray) -> np_type.NDArray:
+        """
+        Calculate the rate of change of curvature at parameter location.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Parameter for desired locations.
+
+        Returns
+        -------
+        numpy.ndarray
+            Rate of change of curvature of surface at point.
+        """
+        xt, yt = self.xy_t(t)
+        xtt, ytt = self.xy_tt(t)
+        xttt, yttt = self.xy_ttt(t)
+        k = self.k(t)
+        term1 = xt**2 + yt**2
+        p = xt/np.sqrt(term1)
+        q = yt/np.sqrt(term1)
+
+        # return ((yttt*p - yttt*q)/term1
+        #         - k*(xtt*xt + ytt*yt)/term1**2)*(k*term1 - 2*(xtt*q - ytt*p))
+        return (yttt*p - xttt*q)/term1 - 3*k*(xtt*xt + ytt*yt)/term1
+
     @abstractmethod
     def max_camber_parameter(self) -> float:
         """
