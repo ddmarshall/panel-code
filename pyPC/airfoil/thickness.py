@@ -3,7 +3,7 @@
 """Classes associated with airfoil thickness distributions."""
 
 from abc import ABC, abstractmethod
-from typing import Tuple, List
+from typing import List
 
 import numpy as np
 import numpy.typing as np_type
@@ -30,16 +30,14 @@ class Thickness(ABC):
         """
 
     @abstractmethod
-    def max_thickness(self) -> Tuple[float, float]:
+    def max_thickness_parameter(self) -> float:
         """
-        Return parameter location and value of maximum thickness.
+        Return parameter coordinate of maximum thickness.
 
         Returns
         -------
         float
-            Parameter location of maximum thickness.
-        float
-            Maximum thickness.
+            Parameter coordinate of maximum thickness.
         """
 
     @abstractmethod
@@ -108,18 +106,16 @@ class NoThickness(Thickness):
         """
         return []
 
-    def max_thickness(self) -> Tuple[float, float]:
+    def max_thickness_parameter(self) -> float:
         """
-        Return parameter location and value of maximum thickness.
+        Return parameter coordinate of maximum thickness.
 
         Returns
         -------
         float
-            Parameter location of maximum thickness.
-        float
-            Maximum thickness.
+            Parameter coordinate of maximum thickness.
         """
-        return 0.0, 0.0
+        return 0.0
 
     def delta(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -229,18 +225,16 @@ class Naca45DigitThickness(Thickness):
         """
         return []
 
-    def max_thickness(self) -> Tuple[float, float]:
+    def max_thickness_parameter(self) -> float:
         """
-        Return parameter location and value of maximum thickness.
+        Return parameter coordinate of maximum thickness.
 
         Returns
         -------
         float
-            Parameter location of maximum thickness.
-        float
-            Maximum thickness.
+            Parameter coordinate of maximum thickness.
         """
-        return 0.3, self.delta(np.sqrt(0.3))
+        return np.sqrt(0.3)
 
     def delta(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -508,18 +502,16 @@ class Naca45DigitModifiedThickness(Thickness):
         """
         return [self._t_m]
 
-    def max_thickness(self) -> Tuple[float, float]:
+    def max_thickness_parameter(self) -> float:
         """
-        Return parameter location and value of maximum thickness.
+        Return parameter coordinate of maximum thickness.
 
         Returns
         -------
         float
-            Parameter location of maximum thickness.
-        float
-            Maximum thickness.
+            Parameter coordinate of maximum thickness.
         """
-        return self._t_m, self.delta(self._t_m)
+        return self._t_m
 
     def delta(self, t: np_type.NDArray) -> np_type.NDArray:
         """

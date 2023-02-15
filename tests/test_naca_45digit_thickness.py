@@ -342,9 +342,7 @@ class TestNaca45DigitThickness(unittest.TestCase):
         """Test maximum thickness."""
         th = Naca45DigitThickness(mti=24)
 
-        xi_max, y_max = th.max_thickness()
-        self.assertAlmostEqual(0.3, xi_max)
-        self.assertAlmostEqual(0.12, y_max, delta=4e-5)
+        self.assertAlmostEqual(np.sqrt(0.3), th.max_thickness_parameter())
 
 
 if __name__ == "__main__":

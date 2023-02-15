@@ -98,7 +98,7 @@ class TestNoThickness(unittest.TestCase):
         """Test maximum thickness."""
         th = NoThickness()
 
-        self.assertTupleEqual((0.0, 0.0), th.max_thickness())
+        self.assertEqual(0.0, th.max_thickness_parameter())
 
 
 if __name__ == "__main__":
