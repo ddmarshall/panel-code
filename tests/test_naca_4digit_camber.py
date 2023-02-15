@@ -24,29 +24,29 @@ class TestNaca4DigitCamber(unittest.TestCase):
 
     def testSetters(self) -> None:
         """Test the setting of the max. camber and its location."""
-        af = Naca4DigitCamber(mci=6, lci=2)
+        ca = Naca4DigitCamber(mci=6, lci=2)
 
-        self.assertEqual(af.max_camber_index, 6)
-        self.assertEqual(af.loc_max_camber_index, 2)
+        self.assertEqual(ca.max_camber_index, 6)
+        self.assertEqual(ca.loc_max_camber_index, 2)
 
         # test setting non-zero to zero camber
-        af.max_camber_index = 0
+        ca.max_camber_index = 0
 
-        self.assertEqual(af.max_camber_index, 0)
-        self.assertEqual(af.loc_max_camber_index, 0)
+        self.assertEqual(ca.max_camber_index, 0)
+        self.assertEqual(ca.loc_max_camber_index, 0)
 
         # test setting zero to non-zero camber
-        af.max_camber_index = 3
-        af.loc_max_camber_index = 4
+        ca.max_camber_index = 3
+        ca.loc_max_camber_index = 4
 
-        self.assertEqual(af.max_camber_index, 3)
-        self.assertEqual(af.loc_max_camber_index, 4)
+        self.assertEqual(ca.max_camber_index, 3)
+        self.assertEqual(ca.loc_max_camber_index, 4)
 
         # test setting non-zero to zero camber
-        af.loc_max_camber_index = 0
+        ca.loc_max_camber_index = 0
 
-        self.assertEqual(af.max_camber_index, 0)
-        self.assertEqual(af.loc_max_camber_index, 0)
+        self.assertEqual(ca.max_camber_index, 0)
+        self.assertEqual(ca.loc_max_camber_index, 0)
 
     def testClassic(self) -> None:
         """Test the camber coordinates and slope against published data."""
@@ -54,81 +54,81 @@ class TestNaca4DigitCamber(unittest.TestCase):
         tows = camber_data(filename=None)
 
         # NACA 62xx
-        af = Naca4DigitCamber(mci=6, lci=2)
+        ca = Naca4DigitCamber(mci=6, lci=2)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA{int(af.max_camber_index):1d}"
-                    + f"{int(af.loc_max_camber_index):1d}.dat")
+                    + f"NACA{int(ca.max_camber_index):1d}"
+                    + f"{int(ca.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        x, y = af.xy(tows.x)
-        xt, yt = af.xy_t(tows.x)
+        x, y = ca.xy(tows.x)
+        xt, yt = ca.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
         # NACA 63xx
-        af = Naca4DigitCamber(mci=6, lci=3)
+        ca = Naca4DigitCamber(mci=6, lci=3)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA{int(af.max_camber_index):1d}"
-                    + f"{int(af.loc_max_camber_index):1d}.dat")
+                    + f"NACA{int(ca.max_camber_index):1d}"
+                    + f"{int(ca.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        x, y = af.xy(tows.x)
-        xt, yt = af.xy_t(tows.x)
+        x, y = ca.xy(tows.x)
+        xt, yt = ca.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
         # NACA 64xx
-        af = Naca4DigitCamber(mci=6, lci=4)
+        ca = Naca4DigitCamber(mci=6, lci=4)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA{int(af.max_camber_index):1d}"
-                    + f"{int(af.loc_max_camber_index):1d}.dat")
+                    + f"NACA{int(ca.max_camber_index):1d}"
+                    + f"{int(ca.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        x, y = af.xy(tows.x)
-        xt, yt = af.xy_t(tows.x)
+        x, y = ca.xy(tows.x)
+        xt, yt = ca.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
         # NACA 65xx
-        af = Naca4DigitCamber(mci=6, lci=5)
+        ca = Naca4DigitCamber(mci=6, lci=5)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA{int(af.max_camber_index):1d}"
-                    + f"{int(af.loc_max_camber_index):1d}.dat")
+                    + f"NACA{int(ca.max_camber_index):1d}"
+                    + f"{int(ca.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        x, y = af.xy(tows.x)
-        xt, yt = af.xy_t(tows.x)
+        x, y = ca.xy(tows.x)
+        xt, yt = ca.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
         # NACA 66xx
-        af = Naca4DigitCamber(mci=6, lci=6)
+        ca = Naca4DigitCamber(mci=6, lci=6)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA{int(af.max_camber_index):1d}"
-                    + f"{int(af.loc_max_camber_index):1d}.dat")
+                    + f"NACA{int(ca.max_camber_index):1d}"
+                    + f"{int(ca.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        x, y = af.xy(tows.x)
-        xt, yt = af.xy_t(tows.x)
+        x, y = ca.xy(tows.x)
+        xt, yt = ca.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
         # NACA 67xx
-        af = Naca4DigitCamber(mci=6, lci=7)
+        ca = Naca4DigitCamber(mci=6, lci=7)
         filename = (directory + "/data/Theory of Wing Sections/Camber/"
-                    + f"NACA{int(af.max_camber_index):1d}"
-                    + f"{int(af.loc_max_camber_index):1d}.dat")
+                    + f"NACA{int(ca.max_camber_index):1d}"
+                    + f"{int(ca.loc_max_camber_index):1d}.dat")
         tows.change_case_data(filename=filename)
-        x, y = af.xy(tows.x)
-        xt, yt = af.xy_t(tows.x)
+        x, y = ca.xy(tows.x)
+        xt, yt = ca.xy_t(tows.x)
         self.assertIsNone(npt.assert_allclose(x, tows.x))
         self.assertIsNone(npt.assert_allclose(y, tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(yt/xt, tows.dydx, atol=1e-5))
 
     def testCamber(self) -> None:
         """Test the camber relations."""
-        af = Naca4DigitCamber(mci=3, lci=4)
-        af_flat = Naca4DigitCamber(mci=0, lci=0)
+        ca = Naca4DigitCamber(mci=3, lci=4)
+        ca_flat = Naca4DigitCamber(mci=0, lci=0)
 
         def compare_values(xi: np_type.NDArray, af: Naca4DigitCamber) -> None:
             eps = 1e-7
@@ -180,19 +180,19 @@ class TestNaca4DigitCamber(unittest.TestCase):
             self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
         # test point on front
-        xi = 0.25
-        compare_values(xi, af)
-        compare_values(xi, af_flat)
+        t = 0.25
+        compare_values(t, ca)
+        compare_values(t, ca_flat)
 
         # test point on back
-        xi = 0.6
-        compare_values(xi, af)
-        compare_values(xi, af_flat)
+        t = 0.6
+        compare_values(t, ca)
+        compare_values(t, ca_flat)
 
         # test points on lower and upper surface
-        xi = np.linspace(0, 1, 12)
-        compare_values(xi, af)
-        compare_values(xi, af_flat)
+        t = np.linspace(0, 1, 12)
+        compare_values(t, ca)
+        compare_values(t, ca_flat)
 
     def testEndpoints(self) -> None:
         af = Naca4DigitCamber(mci=4, lci=2)
@@ -255,18 +255,18 @@ class TestNaca4DigitCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
     def testJoints(self) -> None:
-        af = Naca4DigitCamber(mci=3, lci=4.0)
-        af_flat = Naca4DigitCamber(mci=0, lci=0)
+        ca = Naca4DigitCamber(mci=3, lci=4.0)
+        ca_flat = Naca4DigitCamber(mci=0, lci=0)
 
-        self.assertListEqual([0.0, 0.4, 1.0], af.joints())
-        self.assertListEqual([0.0, 1.0], af_flat.joints())
+        self.assertListEqual([0.0, 0.4, 1.0], ca.joints())
+        self.assertListEqual([0.0, 1.0], ca_flat.joints())
 
     def testMaxCamber(self) -> None:
-        af = Naca4DigitCamber(mci=6.1, lci=3.0)
-        af_flat = Naca4DigitCamber(mci=0, lci=0)
+        ca = Naca4DigitCamber(mci=6.1, lci=3.0)
+        ca_flat = Naca4DigitCamber(mci=0, lci=0)
 
-        self.assertTupleEqual((0.3, 0.061), af.max_camber())
-        self.assertTupleEqual((0, 0), af_flat.max_camber())
+        self.assertTupleEqual((0.3, 0.061), ca.max_camber())
+        self.assertTupleEqual((0, ca_flat.max_camber())
 
 
 if __name__ == "__main__":

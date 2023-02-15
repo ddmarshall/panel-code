@@ -20,53 +20,53 @@ class TestNoCamber(unittest.TestCase):
 
     def testCamber(self) -> None:
         """Test the camber relations."""
-        af = NoCamber()
+        ca = NoCamber()
 
-        def compare_values(xi: np_type.NDArray, af: NoCamber) -> None:
-            xi = np.asarray(xi)
-            y_ref = np.zeros_like(xi)
+        def compare_values(t: np_type.NDArray, af: NoCamber) -> None:
+            t = np.asarray(t)
 
             # compare point values
-            x, y = af.xy(xi)
-            self.assertIsNone(npt.assert_allclose(x, xi))
+            x_ref = t
+            y_ref = np.zeros_like(t)
+            x, y = af.xy(t)
+            self.assertIsNone(npt.assert_allclose(x, x_ref))
             self.assertIsNone(npt.assert_allclose(y, y_ref))
 
             # compare first derivatives
-            xt_ref = np.ones_like(xi)
-            yt_ref = y_ref
-            xt, yt = af.xy_t(xi)
+            xt_ref = np.ones_like(t)
+            yt_ref = np.zeros_like(t)
+            xt, yt = af.xy_t(t)
             self.assertIsNone(npt.assert_allclose(xt, xt_ref))
             self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
-            xtt_ref = y_ref
-            ytt_ref = y_ref
-            xtt, ytt = af.xy_tt(xi)
+            xtt_ref = np.zeros_like(t)
+            ytt_ref = np.zeros_like(t)
+            xtt, ytt = af.xy_tt(t)
             self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
             self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
             # compare third derivatives
-            xttt_ref = y_ref
-            yttt_ref = y_ref
-            xttt, yttt = af.xy_ttt(xi)
+            xttt_ref = np.zeros_like(t)
+            yttt_ref = np.zeros_like(t)
+            xttt, yttt = af.xy_ttt(t)
             self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
             self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
         # test point on front
-        xi = 0.25
-        compare_values(xi, af)
+        t = 0.25
+        compare_values(t, ca)
 
         # test point on back
-        xi = 0.6
-        compare_values(xi, af)
+        t = 0.6
+        compare_values(t, ca)
 
         # test points on lower and upper surface
-        xi = np.linspace(0, 1, 12)
-        compare_values(xi, af)
+        t = np.linspace(0, 1, 12)
+        compare_values(t, ca)
 
     def testEndpoints(self) -> None:
         af = NoCamber()
-        p, m = af.max_camber()
 
         # reference values
         x_ref = [0, 1]
@@ -79,11 +79,11 @@ class TestNoCamber(unittest.TestCase):
         yttt_ref = [0, 0]
 
         # test leading edge
-        xi = 0
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        t = 0
+        x, y = af.xy(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
+        xttt, yttt = af.xy_ttt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref[0]))
@@ -94,11 +94,11 @@ class TestNoCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yttt, yttt_ref[0]))
 
         # test trailing edge
-        xi = 1
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        t = 1
+        x, y = af.xy(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
+        xttt, yttt = af.xy_ttt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
@@ -109,11 +109,11 @@ class TestNoCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yttt, yttt_ref[1]))
 
         # test both
-        xi = np.array([0, 1])
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        t = np.array([0, 1])
+        x, y = af.xy(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
+        xttt, yttt = af.xy_ttt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref))
@@ -124,14 +124,14 @@ class TestNoCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
     def testJoints(self) -> None:
-        af = NoCamber()
+        ca = NoCamber()
 
-        self.assertListEqual([0.0, 1.0], af.joints())
+        self.assertListEqual([0.0, 1.0], ca.joints())
 
     def testMaxCamber(self) -> None:
-        af = NoCamber()
+        ca = NoCamber()
 
-        self.assertTupleEqual((0.0, 0.0), af.max_camber())
+        self.assertTupleEqual((0.0, ca.max_camber())
 
 
 if __name__ == "__main__":

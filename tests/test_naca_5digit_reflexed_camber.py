@@ -21,15 +21,15 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testSetters(self) -> None:
         """Test the setting of the max. camber location and ideal lift coef."""
-        af = Naca5DigitCamberReflexed(lci=2, mci=3)
+        ca = Naca5DigitCamberReflexed(lci=2, mci=3)
 
-        self.assertEqual(af.max_camber_index, 3)
-        self.assertEqual(af.lift_coefficient_index, 2)
+        self.assertEqual(ca.max_camber_index, 3)
+        self.assertEqual(ca.lift_coefficient_index, 2)
 
-        af = Naca5DigitCamberReflexedEnhanced(lci=2.3, mci=3.2)
+        ca = Naca5DigitCamberReflexedEnhanced(lci=2.3, mci=3.2)
 
-        self.assertEqual(af.max_camber_index, 3.2)
-        self.assertEqual(af.lift_coefficient_index, 2.3)
+        self.assertEqual(ca.max_camber_index, 3.2)
+        self.assertEqual(ca.lift_coefficient_index, 2.3)
 
         # Note: while published data from Jacobs and Pinkerton (1936) has
         #       values, they are noticable off from actual values. These
@@ -51,32 +51,32 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
         # test the static methods
         for pit, mit, k1it, k2it in np.nditer([p, m_ref, k1_ref, k2_ref]):
-            Cl_id = af._Cl_id(m=mit, k1=k1it, k2ok1=k2it/k1it)
-            k2ok1 = af._k2ok1(m=mit, p=pit/20)
+            Cl_id = ca._Cl_id(m=mit, k1=k1it, k2ok1=k2it/k1it)
+            k2ok1 = ca._k2ok1(m=mit, p=pit/20)
             k2ok1_ref = k2it/k1it
             self.assertIsNone(npt.assert_allclose(Cl_id, 3.0*ci/20))
             self.assertIsNone(npt.assert_allclose(k2ok1, k2ok1_ref))
 
         # test the initialization of camber
-        af.lift_coefficient_index = ci
+        ca.lift_coefficient_index = ci
         for pit, mit, k1it, k2it in np.nditer([p, m_ref, k1_ref, k2_ref]):
-            af.max_camber_index = pit
-            self.assertIsNone(npt.assert_allclose(af.m, mit))
-            self.assertIsNone(npt.assert_allclose(af.k1, k1it))
-            self.assertIsNone(npt.assert_allclose(af.k2, k2it))
+            ca.max_camber_index = pit
+            self.assertIsNone(npt.assert_allclose(ca.m, mit))
+            self.assertIsNone(npt.assert_allclose(ca.k1, k1it))
+            self.assertIsNone(npt.assert_allclose(ca.k2, k2it))
 
     def testCamber(self) -> None:
         """Test the camber relations."""
-        af_classic = Naca5DigitCamberReflexed(lci=2, mci=2)
-        af_enhanced = Naca5DigitCamberReflexedEnhanced(lci=3.7, mci=2.4)
+        ca_classic = Naca5DigitCamberReflexed(lci=2, mci=2)
+        ca_enhanced = Naca5DigitCamberReflexedEnhanced(lci=3.7, mci=2.4)
 
         def compare_values(xi: np_type.NDArray,
-                           af: Naca5DigitCamberReflexed) -> None:
+                           ca: Naca5DigitCamberReflexed) -> None:
             eps = 1e-7
 
-            m = af.m
-            k1 = af.k1
-            k2ok1 = af.k2/k1
+            m = ca.m
+            k1 = ca.k1
+            k2ok1 = ca.k2/k1
             xi = np.asarray(xi)
             it = np.nditer([xi, None])
             with it:
@@ -91,74 +91,74 @@ class TestNaca5DigitReflexed(unittest.TestCase):
                 y_ref = it.operands[1]
 
             # compare point values
-            x, y = af.xy(xi)
+            x, y = ca.xy(xi)
             self.assertIsNone(npt.assert_allclose(x, xi))
             self.assertIsNone(npt.assert_allclose(y, y_ref))
 
             # compare first derivatives
-            xpl, ypl = af.xy(xi+eps)
-            xmi, ymi = af.xy(xi-eps)
+            xpl, ypl = ca.xy(xi+eps)
+            xmi, ymi = ca.xy(xi-eps)
             xt_ref = 0.5*(xpl-xmi)/eps
             yt_ref = 0.5*(ypl-ymi)/eps
-            xt, yt = af.xy_t(xi)
+            xt, yt = ca.xy_t(xi)
             self.assertIsNone(npt.assert_allclose(xt, xt_ref))
             self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
-            xpl, ypl = af.xy_t(xi+eps)
-            xmi, ymi = af.xy_t(xi-eps)
+            xpl, ypl = ca.xy_t(xi+eps)
+            xmi, ymi = ca.xy_t(xi-eps)
             xtt_ref = 0.5*(xpl-xmi)/eps
             ytt_ref = 0.5*(ypl-ymi)/eps
-            xtt, ytt = af.xy_tt(xi)
+            xtt, ytt = ca.xy_tt(xi)
             self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
             self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
             # compare third derivatives
-            xpl, ypl = af.xy_tt(xi+eps)
-            xmi, ymi = af.xy_tt(xi-eps)
+            xpl, ypl = ca.xy_tt(xi+eps)
+            xmi, ymi = ca.xy_tt(xi-eps)
             xttt_ref = 0.5*(xpl-xmi)/eps
             yttt_ref = 0.5*(ypl-ymi)/eps
-            xttt, yttt = af.xy_ttt(xi)
+            xttt, yttt = ca.xy_ttt(xi)
             self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
             self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
         # test point on front
-        xi = 0.125
-        compare_values(xi, af_classic)
-        compare_values(xi, af_enhanced)
+        t = 0.125
+        compare_values(t, ca_classic)
+        compare_values(t, ca_enhanced)
 
         # test point on back
-        xi = 0.6
-        compare_values(xi, af_classic)
-        compare_values(xi, af_enhanced)
+        t = 0.6
+        compare_values(t, ca_classic)
+        compare_values(t, ca_enhanced)
 
         # test points on lower and upper surface
-        xi = np.linspace(0, 1, 12)
-        compare_values(xi, af_classic)
-        compare_values(xi, af_enhanced)
+        t = np.linspace(0, 1, 12)
+        compare_values(t, ca_classic)
+        compare_values(t, ca_enhanced)
 
     def testEndpoints(self) -> None:
         """Test accessing the end points of camber with integers."""
-        af = Naca5DigitCamberReflexed(lci=2, mci=3)
+        ca = Naca5DigitCamberReflexed(lci=2, mci=3)
 
         # reference values
-        coef = [af.k1/6, af.k1/6]
+        coef = [ca.k1/6, ca.k1/6]
         x_ref = [0, 1]
         y_ref = [0, 0]
         xt_ref = [1, 1]
-        yt_ref = [coef[0]*(3*af.m**2-(af.k2/af.k1)*(1-af.m)**3-af.m**3),
-                  coef[1]*((af.k2/af.k1)*(3*(1-af.m)**2-(1-af.m)**3)-af.m**3)]
+        yt_ref = [coef[0]*(3*ca.m**2-(ca.k2/ca.k1)*(1-ca.m)**3-ca.m**3),
+                  coef[1]*((ca.k2/ca.k1)*(3*(1-ca.m)**2-(1-ca.m)**3)-ca.m**3)]
         xtt_ref = [0, 0]
-        ytt_ref = [-6*coef[0]*af.m, 6*coef[1]*(af.k2/af.k1)*(1-af.m)]
+        ytt_ref = [-6*coef[0]*ca.m, 6*coef[1]*(ca.k2/ca.k1)*(1-ca.m)]
         xttt_ref = [0, 0]
-        yttt_ref = [6*coef[0], 6*coef[1]*(af.k2/af.k1)]
+        yttt_ref = [6*coef[0], 6*coef[1]*(ca.k2/ca.k1)]
 
         # test leading edge
         xi = 0
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        x, y = ca.xy(xi)
+        xt, yt = ca.xy_t(xi)
+        xtt, ytt = ca.xy_tt(xi)
+        xttt, yttt = ca.xy_ttt(xi)
         self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref[0]))
@@ -170,10 +170,10 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
         # test trailing edge
         xi = 1
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        x, y = ca.xy(xi)
+        xt, yt = ca.xy_t(xi)
+        xtt, ytt = ca.xy_tt(xi)
+        xttt, yttt = ca.xy_ttt(xi)
         self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
@@ -185,10 +185,10 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
         # test both
         xi = np.array([0, 1])
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        x, y = ca.xy(xi)
+        xt, yt = ca.xy_t(xi)
+        xtt, ytt = ca.xy_tt(xi)
+        xttt, yttt = ca.xy_ttt(xi)
         self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref))
@@ -200,15 +200,15 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testJoints(self) -> None:
         """Test correct joints are being reported."""
-        af = Naca5DigitCamberReflexed(lci=2, mci=3)
+        ca = Naca5DigitCamberReflexed(lci=2, mci=3)
 
-        self.assertListEqual([0.0, 0.2170, 1.0], af.joints())
+        self.assertListEqual([0.0, 0.2170, 1.0], ca.joints())
 
     def testMaxCamber(self) -> None:
         """Test maximum camber."""
-        af = Naca5DigitCamberReflexed(lci=2, mci=3)
+        ca = Naca5DigitCamberReflexed(lci=2, mci=3)
 
-        self.assertTupleEqual((0.15, af.xy(0.15)[1]), af.max_camber())
+        self.assertTupleEqual((0.15, af.xy(0.15)[1]), ca.max_camber())
 
 
 if __name__ == "__main__":
