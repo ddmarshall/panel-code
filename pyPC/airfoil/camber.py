@@ -98,16 +98,14 @@ class Camber(Curve):
         return np.zeros_like(t), self._y_ttt(t)
 
     @abstractmethod
-    def max_camber(self) -> Tuple[float, float]:
+    def max_camber_parameter(self) -> float:
         """
-        Return chord location of maximum camber and the maximum camber.
+        Return parameter where the camber is maximum.
 
         Returns
         -------
         float
-            Chord location of maximum camber.
-        float
-            Maximum camber.
+            Parameter where camber is maximum.
         """
 
     @abstractmethod
@@ -192,18 +190,16 @@ class NoCamber(Camber):
         """
         return [0.0, 1.0]
 
-    def max_camber(self) -> Tuple[float, float]:
+    def max_camber_parameter(self) -> float:
         """
-        Return chord location of maximum camber and the maximum camber.
+        Return parameter where the camber is maximum.
 
         Returns
         -------
         float
-            Chord location of maximum camber.
-        float
-            Maximum camber.
+            Parameter where camber is maximum.
         """
-        return 0.0, 0.0
+        return 0.0
 
     def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -342,18 +338,16 @@ class Naca4DigitCamber(Camber):
 
         return [0.0, self._p, 1.0]
 
-    def max_camber(self) -> Tuple[float, float]:
+    def max_camber_parameter(self) -> float:
         """
-        Return chord location of maximum camber and the maximum camber.
+        Return parameter where the camber is maximum.
 
         Returns
         -------
         float
-            Chord location of maximum camber.
-        float
-            Maximum camber.
+            Parameter where camber is maximum.
         """
-        return self._p, self._m
+        return self._m
 
     def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -553,18 +547,16 @@ class Naca5DigitCamber(Camber):
         """
         return [0.0, self.m, 1.0]
 
-    def max_camber(self) -> Tuple[float, float]:
+    def max_camber_parameter(self) -> float:
         """
-        Return chord location of maximum camber and the maximum camber.
+        Return parameter where the camber is maximum.
 
         Returns
         -------
         float
-            Chord location of maximum camber.
-        float
-            Maximum camber.
+            Parameter where camber is maximum.
         """
-        return self._p, self._y(self._p)
+        return self._p
 
     def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -814,18 +806,16 @@ class Naca5DigitCamberReflexed(Camber):
         """
         return [0.0, self.m, 1.0]
 
-    def max_camber(self) -> Tuple[float, float]:
+    def max_camber_parameter(self) -> Tuple[float, float]:
         """
-        Return chord location of maximum camber and the maximum camber.
+        Return parameter where the camber is maximum.
 
         Returns
         -------
         float
-            Chord location of maximum camber.
-        float
-            Maximum camber.
+            Parameter where camber is maximum.
         """
-        return self._p, self._y(self._p)
+        return self._p
 
     def _y(self, t: np_type.NDArray) -> np_type.NDArray:
         """

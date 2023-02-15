@@ -130,12 +130,13 @@ class TestNaca4DigitCamber(unittest.TestCase):
         ca = Naca4DigitCamber(mci=3, lci=4)
         ca_flat = Naca4DigitCamber(mci=0, lci=0)
 
-        def compare_values(xi: np_type.NDArray, af: Naca4DigitCamber) -> None:
+        def compare_values(t: np_type.NDArray, ca: Naca4DigitCamber) -> None:
             eps = 1e-7
 
-            p, m = af.max_camber()
-            xi = np.asarray(xi)
-            it = np.nditer([xi, None])
+            p = ca.loc_max_camber_index/10.0
+            m = ca.max_camber_index/100.0
+            t = np.asarray(t)
+            it = np.nditer([t, None])
             with it:
                 for xit, yit in it:
                     if p == 0:
@@ -148,34 +149,34 @@ class TestNaca4DigitCamber(unittest.TestCase):
                 y_ref = it.operands[1]
 
             # compare point values
-            x, y = af.xy(xi)
-            self.assertIsNone(npt.assert_allclose(x, xi))
+            x, y = ca.xy(t)
+            self.assertIsNone(npt.assert_allclose(x, t))
             self.assertIsNone(npt.assert_allclose(y, y_ref))
 
             # compare first derivatives
-            xpl, ypl = af.xy(xi+eps)
-            xmi, ymi = af.xy(xi-eps)
+            xpl, ypl = ca.xy(t+eps)
+            xmi, ymi = ca.xy(t-eps)
             xt_ref = 0.5*(xpl-xmi)/eps
             yt_ref = 0.5*(ypl-ymi)/eps
-            xt, yt = af.xy_t(xi)
+            xt, yt = ca.xy_t(t)
             self.assertIsNone(npt.assert_allclose(xt, xt_ref))
             self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
-            xpl, ypl = af.xy_t(xi+eps)
-            xmi, ymi = af.xy_t(xi-eps)
+            xpl, ypl = ca.xy_t(t+eps)
+            xmi, ymi = ca.xy_t(t-eps)
             xtt_ref = 0.5*(xpl-xmi)/eps
             ytt_ref = 0.5*(ypl-ymi)/eps
-            xtt, ytt = af.xy_tt(xi)
+            xtt, ytt = ca.xy_tt(t)
             self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
             self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
             # compare third derivatives
-            xpl, ypl = af.xy_tt(xi+eps)
-            xmi, ymi = af.xy_tt(xi-eps)
+            xpl, ypl = ca.xy_tt(t+eps)
+            xmi, ymi = ca.xy_tt(t-eps)
             xttt_ref = 0.5*(xpl-xmi)/eps
             yttt_ref = 0.5*(ypl-ymi)/eps
-            xttt, yttt = af.xy_ttt(xi)
+            xttt, yttt = ca.xy_ttt(t)
             self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
             self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
@@ -195,8 +196,9 @@ class TestNaca4DigitCamber(unittest.TestCase):
         compare_values(t, ca_flat)
 
     def testEndpoints(self) -> None:
-        af = Naca4DigitCamber(mci=4, lci=2)
-        p, m = af.max_camber()
+        ca = Naca4DigitCamber(mci=4, lci=2)
+        p = ca.loc_max_camber_index/10.0
+        m = ca.max_camber_index/100.0
 
         # reference values
         coef = [m/p**2, m/(1-p)**2]
@@ -210,11 +212,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
         yttt_ref = [0, 0]
 
         # test leading edge
-        xi = 0
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        t = 0
+        x, y = ca.xy(t)
+        xt, yt = ca.xy_t(t)
+        xtt, ytt = ca.xy_tt(t)
+        xttt, yttt = ca.xy_ttt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref[0]))
@@ -225,11 +227,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yttt, yttt_ref[0]))
 
         # test trailing edge
-        xi = 1
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        t = 1
+        x, y = ca.xy(t)
+        xt, yt = ca.xy_t(t)
+        xtt, ytt = ca.xy_tt(t)
+        xttt, yttt = ca.xy_ttt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
@@ -240,11 +242,11 @@ class TestNaca4DigitCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yttt, yttt_ref[1]))
 
         # test both
-        xi = np.array([0, 1])
-        x, y = af.xy(xi)
-        xt, yt = af.xy_t(xi)
-        xtt, ytt = af.xy_tt(xi)
-        xttt, yttt = af.xy_ttt(xi)
+        t = np.array([0, 1])
+        x, y = ca.xy(t)
+        xt, yt = ca.xy_t(t)
+        xtt, ytt = ca.xy_tt(t)
+        xttt, yttt = ca.xy_ttt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
         self.assertIsNone(npt.assert_allclose(xt, xt_ref))
@@ -265,8 +267,8 @@ class TestNaca4DigitCamber(unittest.TestCase):
         ca = Naca4DigitCamber(mci=6.1, lci=3.0)
         ca_flat = Naca4DigitCamber(mci=0, lci=0)
 
-        self.assertTupleEqual((0.3, 0.061), ca.max_camber())
-        self.assertTupleEqual((0, ca_flat.max_camber())
+        self.assertAlmostEqual(0.061, ca.max_camber_parameter())
+        self.assertEqual(0, ca_flat.max_camber_parameter())
 
 
 if __name__ == "__main__":

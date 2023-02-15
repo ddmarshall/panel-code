@@ -131,7 +131,7 @@ class TestNoCamber(unittest.TestCase):
     def testMaxCamber(self) -> None:
         ca = NoCamber()
 
-        self.assertTupleEqual((0.0, ca.max_camber())
+        self.assertEqual(0.0, ca.max_camber_parameter())
 
 
 if __name__ == "__main__":

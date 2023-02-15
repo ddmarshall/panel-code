@@ -120,13 +120,13 @@ class TestNaca5DigitCamber(unittest.TestCase):
         ca_classic = Naca5DigitCamber(lci=2, mci=2)
         ca_enhanced = Naca5DigitCamberEnhanced(lci=3.7, mci=2.4)
 
-        def compare_values(xi: np_type.NDArray, ca: Naca5DigitCamber) -> None:
+        def compare_values(t: np_type.NDArray, ca: Naca5DigitCamber) -> None:
             eps = 1e-7
 
             m = ca.m
             k1 = ca.k1
-            xi = np.asarray(xi)
-            it = np.nditer([xi, None])
+            t = np.asarray(t)
+            it = np.nditer([t, None])
             with it:
                 for xit, yit in it:
                     if xit <= m:
@@ -137,34 +137,34 @@ class TestNaca5DigitCamber(unittest.TestCase):
                 y_ref = it.operands[1]
 
             # compare point values
-            x, y = ca.xy(xi)
-            self.assertIsNone(npt.assert_allclose(x, xi))
+            x, y = ca.xy(t)
+            self.assertIsNone(npt.assert_allclose(x, t))
             self.assertIsNone(npt.assert_allclose(y, y_ref))
 
             # compare first derivatives
-            xpl, ypl = ca.xy(xi+eps)
-            xmi, ymi = ca.xy(xi-eps)
+            xpl, ypl = ca.xy(t+eps)
+            xmi, ymi = ca.xy(t-eps)
             xt_ref = 0.5*(xpl-xmi)/eps
             yt_ref = 0.5*(ypl-ymi)/eps
-            xt, yt = ca.xy_t(xi)
+            xt, yt = ca.xy_t(t)
             self.assertIsNone(npt.assert_allclose(xt, xt_ref))
             self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
-            xpl, ypl = ca.xy_t(xi+eps)
-            xmi, ymi = ca.xy_t(xi-eps)
+            xpl, ypl = ca.xy_t(t+eps)
+            xmi, ymi = ca.xy_t(t-eps)
             xtt_ref = 0.5*(xpl-xmi)/eps
             ytt_ref = 0.5*(ypl-ymi)/eps
-            xtt, ytt = ca.xy_tt(xi)
+            xtt, ytt = ca.xy_tt(t)
             self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
             self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
             # compare third derivatives
-            xpl, ypl = ca.xy_tt(xi+eps)
-            xmi, ymi = ca.xy_tt(xi-eps)
+            xpl, ypl = ca.xy_tt(t+eps)
+            xmi, ymi = ca.xy_tt(t-eps)
             xttt_ref = 0.5*(xpl-xmi)/eps
             yttt_ref = 0.5*(ypl-ymi)/eps
-            xttt, yttt = ca.xy_ttt(xi)
+            xttt, yttt = ca.xy_ttt(t)
             self.assertIsNone(npt.assert_allclose(xttt, xttt_ref))
             self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
@@ -253,7 +253,7 @@ class TestNaca5DigitCamber(unittest.TestCase):
         """Test maximum camber."""
         ca = Naca5DigitCamber(lci=2, mci=3)
 
-        self.assertTupleEqual((0.15, af.xy(0.15)[1]), ca.max_camber())
+        self.assertAlmostEqual(0.15, ca.max_camber_parameter())
 
 
 if __name__ == "__main__":
