@@ -350,19 +350,30 @@ class Airfoil(Curve):
 
 
 class OrthogonalAirfoil(Airfoil):
-    """Airfoils that can be decomposed to camber and thickness."""
+    """
+    Airfoils that can be decomposed to camber and thickness.
+
+    This class represents airfoils that are naturally described by a camber
+    line (curve) and a thickness normal to the camber line, both above and
+    below the camber line. The parameterization of the camber representation
+    and the thickness representation must be based on the same transformation.
+
+    Attributes
+    ----------
+    camber : Camber
+        Curve representing the camber of the airfoil
+    thickness : Thickness
+        Thickness distribution of the airfoil
+    xmin_parameter : float
+    xmax_parameter : float
+    """
 
     def __init__(self, camber: Camber, thickness: Thickness) -> None:
         super().__init__()
         self._camber = camber
         self._thickness = thickness
-        self._xi_xmin = None
-        self._xi_xmax = None
-
-    def _airfoil_changed(self) -> None:
-        self._xi_xmin = None
-        self._xi_xmax = None
-        super()._airfoil_changed()
+        self._t_xmin = None
+        self._t_xmax = None
 
     @property
     def camber(self) -> Camber:
@@ -375,38 +386,38 @@ class OrthogonalAirfoil(Airfoil):
         return self._thickness
 
     @property
-    def xi_xmin(self) -> float:
-        """Parameter coordinate of smallest x-coordinate for airfoil."""
-        if self._xi_xmin is None:
-            max_camber = self._camber.max_camber()[1]
+    def xmin_parameter(self) -> float:
+        """Parameter of smallest x-coordinate for airfoil."""
+        if self._t_xmin is None:
+            max_camber_parameter = self._camber.max_camber_parameter()
+            max_camber = self._camber.xy(max_camber_parameter)[1]
             if abs(max_camber) < 1e-7:
-                self._xi_xmin = 0.0
+                self._t_xmin = 0.0
             else:
                 if max_camber > 0:
-                    xi0 = 1e-7
-                    xi1 = 0.1
+                    t0 = 1e-7
+                    t1 = 0.1
                 else:
-                    xi0 = -1e-7
-                    xi1 = -0.1
-                root = root_scalar(lambda xi: self.xy_p(xi)[0],
-                                   bracket=[xi0, xi1])
-                self._xi_xmin = root.root
+                    t0 = -1e-7
+                    t1 = -0.1
+                root = root_scalar(lambda t: self.xy_t(t)[0], bracket=[t0, t1])
+                self._t_xmin = root.root
 
-        return self._xi_xmin
+        return self._t_xmin
 
     @property
-    def xi_xmax(self) -> float:
-        """Parameter coordinate of largest x-coordinate for airfoil."""
-        if self._xi_xmax is None:
+    def xmax_parameter(self) -> float:
+        """Parameter of largest x-coordinate for airfoil."""
+        if self._t_xmax is None:
             if self.x(-1)[0] >= self.x(1)[0]:
-                self._xi_xmax = -1.0
+                self._t_xmax = -1.0
             else:
-                self._xi_xmax = 1.0
+                self._t_xmax = 1.0
 
-        return self._xi_xmax
+        return self._t_xmax
 
-    def xy(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
+    def xy(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                              np_type.NDArray]:
         """
         Calculate the coordinates of geometry at parameter location.
 
@@ -417,7 +428,7 @@ class OrthogonalAirfoil(Airfoil):
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -427,19 +438,22 @@ class OrthogonalAirfoil(Airfoil):
         numpy.ndarray
             Y-coordinate of point.
         """
-        xic, sgn = self._convert_xi(xi)
+        tc, sgn = self._convert_t(t)
 
-        delta_t = self._thickness.y(xic)
-        yc = self._camber.y(xic)
-        yc_p = self._camber.y_p(xic)
-        denom = np.sqrt(1+yc_p**2)
-        x = xic - sgn*delta_t*yc_p/denom
-        y = yc + sgn*delta_t/denom
+        u = self._convert_t_to_u(tc)[0]
+        xi, eta = self._camber.xy(u)
+        nx, ny = self._camber.normal(u)
+
+        v = self._convert_t_to_v(tc)[0]
+        delta = sgn*self._thickness.delta(v)
+
+        x = xi + delta*nx
+        y = eta + delta*ny
         # return self.xo + self.scale*x, self.yo + self.scale*y
         return x, y
 
-    def xy_p(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                 np_type.NDArray]:
+    def xy_t(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                np_type.NDArray]:
         """
         Calculate rates of change of the coordinates at parameter location.
 
@@ -450,7 +464,7 @@ class OrthogonalAirfoil(Airfoil):
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -460,20 +474,28 @@ class OrthogonalAirfoil(Airfoil):
         numpy.ndarray
             Parametric rate of change of the y-coordinate of point.
         """
-        xic, sgn = self._convert_xi(xi)
+        tc, sgn = self._convert_t(t)
 
-        delta_t = self._thickness.y(xic)
-        delta_tp = self._thickness.y_p(xic)
-        yc_p = self._camber.y_p(xic)
-        yc_pp = self._camber.y_pp(xic)
-        denom = np.sqrt(1+yc_p**2)
-        x_p = 1.0 - sgn/denom*(delta_tp*yc_p + delta_t*yc_pp/denom**2)
-        y_p = yc_p + sgn/denom*(delta_tp - delta_t*yc_p*yc_pp/denom**2)
-        # return sgn*self.scale*x_p, sgn*self.scale*y_p
-        return sgn*x_p, sgn*y_p
+        u, u_t = self._convert_t_to_u(tc)[0:2]
+        xi, eta = self._camber.xy(u)
+        xi_u, eta_u = self._camber.xy_t(u)
+        k = self._camber.k(u)
+        nx, ny = self._camber.normal(u)
+        nx_u = -xi_u*k
+        ny_u = -eta_u*k
 
-    def xy_pp(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                  np_type.NDArray]:
+        v, v_t = self._convert_t_to_v(tc)[0:2]
+        delta = sgn*self._thickness.delta(v)
+        delta_v = sgn*self._thickness.delta_t(v)
+
+        x_t = sgn*(u_t*xi_u + v_t*delta_v*nx + delta*u_t*nx_u)
+        y_t = sgn*(u_t*eta_u + v_t*delta_v*ny + delta*u_t*ny_u)
+
+        # return self.scale*x_t, self.scale*y_t
+        return x_t, y_t
+
+    def xy_tt(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                 np_type.NDArray]:
         """
         Return second derivative of the coordinates at parameter location.
 
@@ -484,7 +506,7 @@ class OrthogonalAirfoil(Airfoil):
 
         Parameters
         ----------
-        xi : numpy.ndarray
+        t : numpy.ndarray
             Parameter for desired locations.
 
         Returns
@@ -494,86 +516,34 @@ class OrthogonalAirfoil(Airfoil):
         numpy.ndarray
             Parametric second derivative of the y-coordinate of point.
         """
-        xic, sgn = self._convert_xi(xi)
+        tc, sgn = self._convert_t(t)
 
-        delta_t = self._thickness.y(xic)
-        delta_tp = self._thickness.y_p(xic)
-        delta_tpp = self._thickness.y_pp(xic)
-        yc_p = self._camber.y_p(xic)
-        yc_pp = self._camber.y_pp(xic)
-        yc_ppp = self._camber.y_ppp(xic)
-        denom = np.sqrt(1+yc_p**2)
-        x_pp = -sgn/denom*(delta_tpp*yc_p + (2*delta_tp*yc_pp
-                                             + delta_t*yc_ppp)/denom**2
-                           - 3*delta_t*yc_p*yc_pp**2/denom**4)
-        y_pp = yc_pp + sgn/denom*(delta_tpp - (yc_p*(2*delta_tp*yc_pp
-                                                     + delta_t*yc_ppp)
-                                               - 2*delta_t*yc_pp**2)/denom**2
-                                  - 3*delta_t*yc_pp**2/denom**4)
-        # return self.scale*x_pp, self.scale*y_pp
-        return x_pp, y_pp
+        u, u_t, u_tt = self._convert_t_to_u(tc)
+        xi, eta = self._camber.xy(u)
+        xi_u, eta_u = self._camber.xy_t(u)
+        xi_uu, eta_uu = self._camber.xy_tt(u)
+        k = self._camber.k(u)
+        k_u = self._camber.k_t(u)
+        nx, ny = self._camber.normal(u)
+        nx_u = -xi_u*k
+        nx_uu = -(xi_uu*k + xi_u*k_u)
+        ny_u = -eta_u*k
+        ny_uu = -(eta_uu*k + eta_u*k_u)
 
-    def tangent(self, xi: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                                    np_type.NDArray]:
-        """
-        Calculate the unit tangent at parameter location.
+        v, v_t, v_tt = self._convert_t_to_v(tc)
+        delta = sgn*self._thickness.delta(v)
+        delta_v = sgn*self._thickness.delta_t(v)
+        delta_vv = sgn*self._thickness.delta_tt(v)
 
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
+        x_tt = (u_tt*xi_u + u_t**2*xi_uu + v_t**2*nx*delta_vv
+                + u_t**2*delta*nx_uu + 2*u_t*v_t*delta_v*nx_u
+                + v_tt*nx*delta_v + u_tt*delta*nx_u)
+        y_tt = (u_tt*eta_u + u_t**2*eta_uu + v_t**2*ny*delta_vv
+                + u_t**2*delta*ny_uu + 2*u_t*v_t*delta_v*ny_u
+                + v_tt*ny*delta_v + u_tt*delta*ny_u)
 
-        Returns
-        -------
-        numpy.ndarray, numpy.ndarray
-            Unit tangent at point.
-        """
-        eps = 1e-7
-        xi = np.asarray(xi, dtype=np.float64)
-
-        # np.piecewise does not work when returning tuples so need to manually
-        # do the iteration to find the leading edge cases
-        it = np.nditer([xi, None, None])
-
-        with it:
-            for xir, sxr, syr in it:
-                if np.abs(xir) < eps:
-                    tmp0 = -self.camber.y_p(xir)
-                    tmp1 = np.sqrt(tmp0**2+1)
-                    sxr[...] = tmp0/tmp1
-                    syr[...] = 1/tmp1
-                else:
-                    sxr[...], syr[...] = super().tangent(xir)
-
-            return it.operands[1], it.operands[2]
-
-    def k(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the curvature at parameter location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
-
-        Returns
-        -------
-        numpy.ndarray
-            Curvature of surface at point.
-
-        Raises
-        ------
-        ValueError
-            If there is no surface point at the given x-location.
-        """
-        eps = 1e-7
-        xi = np.asarray(xi, dtype=np.float64)
-
-        return np.piecewise(xi, [np.abs(xi) < eps, np.abs(xi) >= eps],
-                            [lambda xi: (self.thickness.k(xi)
-                                         * np.sqrt(1.0
-                                                   + self.camber.y_p(xi)**2)),
-                             lambda xi: super(self.__class__, self).k(xi)])
+        # return self.scale*x_tt, self.scale*y_tt
+        return x_tt, y_tt
 
     # def arc_length(self, xi_s: float,
     #                xi_e: np_type.NDArray) -> np_type.NDArray:
@@ -623,77 +593,40 @@ class OrthogonalAirfoil(Airfoil):
 
     #         return it.operands[1]
 
-    def dydx(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def camber_location(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                           np_type.NDArray]:
         """
-        Calculate the slope at parameteric location.
+        Return the location of camber at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Parameter for desired locations.
+        t : numpy.ndarray
+            Parameter location of interest.
 
         Returns
         -------
         numpy.ndarray
-            Slope of surface at point.
-
-        Raises
-        ------
-        ValueError
-            If there is no surface point at the given x-location.
-        """
-        eps = 1e-7
-        xi = np.asarray(xi, dtype=np.float64)
-
-        def fun(xi: float) -> float:
-            if self.camber.max_camber()[1] == 0:
-                return -np.inf*np.ones_like(xi)
-            else:
-                return -1/self.camber.y_p(np.abs(xi))
-
-        return np.piecewise(xi, [np.abs(xi) < eps, np.abs(xi) >= eps],
-                            [lambda xi: fun(xi),
-                             lambda xi: super(self.__class__, self).dydx(xi,)])
-
-    def camber_value(self, xi: np_type.NDArray) -> np_type.NDArray:
-        """
-        Return the amount of camber at specified chord location.
-
-        Parameters
-        ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Returns
-        -------
+            X-coordinate of camber at specified point.
         numpy.ndarray
-            Camber at specified point.
+            Y-coordinate of camber at specified point.
         """
-        return self._camber.y(xi)
+        return self._camber.xy(self._convert_t_to_u(t)[0])
 
-    def thickness_value(self, xi: np_type.NDArray) -> np_type.NDArray:
+    def thickness_value(self, t: np_type.NDArray) -> np_type.NDArray:
         """
-        Return the amount of thickness at specified chord location.
+        Return the amount of thickness at specified parameter location.
 
         Parameters
         ----------
-        xi : numpy.ndarray
-            Chord location of interest.
-
-        Notes
-        -----
-        There are different ways of expressing the thickness, with the "formal"
-        definition being the distance from the camber to the surface in the
-        direction normal to the camber. This definition can be challenging to
-        follow for some airfoils, so the value returned might be an approximate
-        of the formal definition.
+        t : numpy.ndarray
+            Parameter location of interest.
 
         Returns
         -------
         numpy.ndarray
             Thickness at specified point.
         """
-        return self._thickness.y(xi)
+        return self._thickness.delta(self._convert_t_to_v(t)[0])
 
     def joints(self) -> List[float]:
         """
@@ -704,15 +637,98 @@ class OrthogonalAirfoil(Airfoil):
         List[float]
             Xi-coordinates of any discontinuities.
         """
-        joints = list(set(self._camber.joints() + self._thickness.joints()))
+        camber_joints = [self._convert_u_to_t(j)
+                         for j in self._camber.joints()]
+        thickness_joints = [self._convert_v_to_t(d)
+                            for d in self._thickness.discontinuities()]
+        joints = list(set(camber_joints + thickness_joints))
         joints = list(set(joints + [-x for x in joints]))
         joints.sort()
         return joints
 
+    def _airfoil_changed(self) -> None:
+        self._t_xmin = None
+        self._t_xmax = None
+        super()._airfoil_changed()
+
+    def _convert_t_to_u(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                           np_type.NDArray,
+                                                           np_type.NDArray]:
+        """
+        Convert the airfoil parameterization to the camber parameterization.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Airfoil parameterization.
+
+        Returns
+        -------
+        numpy.ndarray
+            Corresponding camber parameterization.
+        numpy.ndarray
+            Corresponding first derivative of camber parameterization.
+        numpy.ndarray
+            Corresponding second derivative of camber parameterization.
+        """
+        return t**2, 2*t, 2*np.ones_like(t)
+
+    def _convert_u_to_t(self, u: np_type.NDArray) -> np_type.NDArray:
+        """
+        Convert the camber parameterization to the airfoil parameterization.
+
+        Parameters
+        ----------
+        u : numpy.ndarray
+            Camber parameterization.
+
+        Returns
+        -------
+        Corresponding airfoil parameterization.
+        """
+        return np.sqrt(u)
+
+    def _convert_t_to_v(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
+                                                           np_type.NDArray,
+                                                           np_type.NDArray]:
+        """
+        Convert the airfoil parameterization to the thickness parameterization.
+
+        Parameters
+        ----------
+        t : numpy.ndarray
+            Airfoil parameterization.
+
+        Returns
+        -------
+        numpy.ndarray
+            Corresponding thickness parameterization.
+        numpy.ndarray
+            Corresponding first derivative of thickness parameterization.
+        numpy.ndarray
+            Corresponding second derivative of thickness parameterization.
+        """
+        return t, np.ones_like(t), np.zeros_like(t)
+
+    def _convert_v_to_t(self, u: np_type.NDArray) -> np_type.NDArray:
+        """
+        Convert the thickness parameterization to the airfoil parameterization.
+
+        Parameters
+        ----------
+        u : numpy.ndarray
+            Camber parameterization.
+
+        Returns
+        -------
+        Corresponding airfoil parameterization.
+        """
+        return np.sqrt(u)
+
     @staticmethod
-    def _convert_xi(xi: np_type.NDArray) -> np_type.NDArray:
-        xic = np.asarray(xi).copy()
-        sgn = np.ones_like(xic)
-        sgn[xic < 0] = -1.0
-        xic[xic < 0] = -xic[xic < 0]
-        return xic, sgn
+    def _convert_t(t: np_type.NDArray) -> np_type.NDArray:
+        tc = np.asarray(t).copy()
+        sgn = np.ones_like(tc)
+        sgn[tc < 0] = -1.0
+        tc[tc < 0] = -tc[tc < 0]
+        return tc, sgn

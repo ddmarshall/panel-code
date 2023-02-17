@@ -159,11 +159,11 @@ class Curve(ABC):
             xt, yt = self.xy_t(t)
             return np.sqrt(xt**2+yt**2)
 
-        t_e = np.asarray(t_e)
+        t_e = np.asarray(t_e, dtype=np.float64)
         it = np.nditer([t_e, None])
         with it:
             for ti, alen in it:
-                alen[...], _ = quadrature(fun, t_s, ti)
+                alen[...], _ = quadrature(fun, t_s, ti, maxiter=100)
 
             return it.operands[1]
 

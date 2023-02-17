@@ -55,6 +55,27 @@ class TestNaca4Digit(unittest.TestCase):
         self.assertEqual(af.camber.loc_max_camber_index, 0)
         self.assertEqual(af.thickness.max_thickness_index, 6.25)
 
+    def testCamberTransformation(self) -> None:
+        """Test the camber coordinates."""
+        af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
+                                max_thickness_index=18)
+
+        t = np.linspace(0, 1, 12)
+        x, y = af.camber_location(t)
+        x_ref, y_ref = af.camber.xy(t**2)
+        self.assertIsNone(npt.assert_allclose(x, x_ref))
+        self.assertIsNone(npt.assert_allclose(y, y_ref))
+
+    def testThicknessTransformation(self) -> None:
+        """Test the thickness values."""
+        af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
+                                max_thickness_index=18)
+
+        t = np.linspace(0, 1, 12)
+        delta = af.thickness_value(t)
+        delta_ref = af.thickness.delta(t)
+        self.assertIsNone(npt.assert_allclose(delta, delta_ref))
+
     def testClassicSymmetricAirfoil(self) -> None:
         directory = dirname(abspath(__file__))
         tows = thickness_data(filename=None)
@@ -67,15 +88,17 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1e-5))
         self.assertIsNone(npt.assert_allclose(le_radius, tows.le_radius,
-                                              rtol=0, atol=5e-5))
+                                              atol=5e-5))
 
         # NACA 0008
         af = create_naca_4digit(max_camber_index=0, loc_max_camber_index=0,
@@ -85,13 +108,15 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1e-5))
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=6e-5)
 
         # NACA 0009
@@ -102,13 +127,15 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1e-5))
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=3e-5)
 
         # NACA 0010
@@ -119,15 +146,15 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0,
-                                              atol=1.2e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0,
-                                              atol=1.2e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1.2e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1.2e-5))
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=2e-5)
 
         # NACA 0012
@@ -138,13 +165,15 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1e-5))
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=7e-5)
 
         # NACA 0015
@@ -155,13 +184,15 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1e-5))
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=1e-5)
 
         # NACA 0018
@@ -172,13 +203,15 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1e-5))
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=1e-5)
 
         # NACA 0021
@@ -189,13 +222,15 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1e-5))
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=1e-5)
 
         # NACA 0024
@@ -206,13 +241,15 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x, upper=True)
-        xi_l = af.xi_from_x(x=tows.x, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x, upper=True)
+        t_l = af.t_from_x(x=tows.x, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y, rtol=0, atol=1e-5))
-        self.assertIsNone(npt.assert_allclose(yl, -tows.y, rtol=0, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xu, tows.x))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y, atol=1e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x))
+        self.assertIsNone(npt.assert_allclose(yl, -tows.y, atol=1e-5))
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=4e-5)
 
     def testClassicCamberedAirfoil(self) -> None:
@@ -228,21 +265,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=1.5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=1.5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=1.5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=1.5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=5e-5)
 
         # NACA 1410
@@ -253,21 +288,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=2e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=2e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=2e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=2e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=1e-5)
 
         # NACA 1412
@@ -278,21 +311,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=1.5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=1.5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=1.5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=1.5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=5e-5)
 
         # NACA 2408
@@ -303,21 +334,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=1.5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=1.5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=1.5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=1.5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=2e-5)
 
         # NACA 2410
@@ -328,21 +357,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=2e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=1.5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=2e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=1.5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=4e-5)
 
         # NACA 2412
@@ -353,21 +380,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=1.5e-5)
 
         # NACA 2415
@@ -378,21 +403,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=2e-4)
 
         # NACA 2418
@@ -403,21 +426,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=8e-5)
 
         # NACA 2421
@@ -428,21 +449,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=2e-4)
 
         # NACA 2424
@@ -453,21 +472,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=2e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=2e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=2e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=2e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=2e-4)
 
         # NACA 4412
@@ -478,21 +495,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=7e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=7e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=3e-4)
 
         # NACA 4415
@@ -503,21 +518,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=5e-4)
 
         # NACA 4418
@@ -528,21 +541,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=6e-4)
 
         # NACA 4421
@@ -553,21 +564,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=5e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=5e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=5e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=5e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=9e-4)
 
         # NACA 4424
@@ -578,21 +587,19 @@ class TestNaca4Digit(unittest.TestCase):
                     + f"{int(af.camber.loc_max_camber_index):1d}"
                     + f"{int(af.thickness.max_thickness_index):02d}.dat")
         tows.change_case_data(filename=filename)
-        xi_u = af.xi_from_x(x=tows.x_upper, upper=True)
-        xi_l = af.xi_from_x(x=tows.x_lower, upper=False)
-        _, yu = af.xy(xi_u)
-        _, yl = af.xy(xi_l)
+        t_u = af.t_from_x(x=tows.x_upper, upper=True)
+        t_l = af.t_from_x(x=tows.x_lower, upper=False)
+        xu, yu = af.xy(t_u)
+        xl, yl = af.xy(t_l)
         le_rad_slope_u = -1/af.dydx(0)
         le_rad_slope_l = -1/af.dydx(0)
         le_radius = -1/af.k(0)
-        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, rtol=0,
-                                              atol=3e-5))
-        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, rtol=0,
-                                              atol=3e-5))
-        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope,
-                               delta=1e-8)
-        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope,
-                               delta=1e-8)
+        self.assertIsNone(npt.assert_allclose(xu, tows.x_upper))
+        self.assertIsNone(npt.assert_allclose(yu, tows.y_upper, atol=3e-5))
+        self.assertIsNone(npt.assert_allclose(xl, tows.x_lower))
+        self.assertIsNone(npt.assert_allclose(yl, tows.y_lower, atol=3e-5))
+        self.assertAlmostEqual(le_rad_slope_u, tows.le_radius_slope)
+        self.assertAlmostEqual(le_rad_slope_l, tows.le_radius_slope)
         self.assertAlmostEqual(le_radius, tows.le_radius, delta=2e-3)
 
     def testAirfoilParametricDerivatives(self) -> None:
@@ -600,31 +607,31 @@ class TestNaca4Digit(unittest.TestCase):
         af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
                                 max_thickness_index=12)
 
-        def compare_values(xi: np_type.NDArray, af: OrthogonalAirfoil) -> None:
+        def compare_values(t: np_type.NDArray, af: OrthogonalAirfoil) -> None:
             eps = 1e-7
 
             # compare first derivatives
-            xpl, ypl = af.xy(xi+eps)
-            xmi, ymi = af.xy(xi-eps)
-            xp_ref = 0.5*(xpl-xmi)/eps
-            yp_ref = 0.5*(ypl-ymi)/eps
-            xp, yp = af.xy_p(xi)
-            self.assertIsNone(npt.assert_allclose(xp, xp_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(yp, yp_ref, atol=1e-7))
+            xpl, ypl = af.xy(t+eps)
+            xmi, ymi = af.xy(t-eps)
+            xt_ref = 0.5*(xpl-xmi)/eps
+            yt_ref = 0.5*(ypl-ymi)/eps
+            xt, yt = af.xy_t(t)
+            self.assertIsNone(npt.assert_allclose(xt, xt_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(yt, yt_ref, atol=1e-7))
 
             # compare second derivatives
-            xtp, ytp = af.xy_p(xi+eps)
-            xtm, ytm = af.xy_p(xi-eps)
-            xpp_ref = 0.5*(xtp-xtm)/eps
-            ypp_ref = 0.5*(ytp-ytm)/eps
-            xpp, ypp = af.xy_pp(xi)
-            self.assertIsNone(npt.assert_allclose(xpp, xpp_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(ypp, ypp_ref, atol=1e-7))
+            xtp, ytp = af.xy_t(t+eps)
+            xtm, ytm = af.xy_t(t-eps)
+            xtt_ref = 0.5*(xtp-xtm)/eps
+            ytt_ref = 0.5*(ytp-ytm)/eps
+            xtt, ytt = af.xy_tt(t)
+            self.assertIsNone(npt.assert_allclose(xtt, xtt_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref, atol=1e-7))
 
         rg = default_rng(42)
-        xi = 2*rg.random((20,))-1
-        compare_values(xi, af)
-        pass
+        t = 2*rg.random((20,))-1
+        compare_values(t, af)
+
 
     # def testAirfoilArclengthDerivatives(self) -> None:
     #     """Test calculations of arc-length derivatives."""
@@ -663,93 +670,89 @@ class TestNaca4Digit(unittest.TestCase):
         af = create_naca_4digit(max_camber_index=2, loc_max_camber_index=2,
                                 max_thickness_index=12)
 
-        def compare_values(xi: np_type.NDArray, af: OrthogonalAirfoil) -> None:
-            if np.abs(xi) < 1e-7:
-                sx_ref = -af.camber.y_p(xi)
-                sy_ref = 1.0
-            else:
-                sx_ref, sy_ref = af.xy_p(xi)
+        def compare_values(t: np_type.NDArray, af: OrthogonalAirfoil) -> None:
+            sx_ref, sy_ref = af.xy_t(t)
             tmp = np.sqrt(sx_ref**2 + sy_ref**2)
             sx_ref /= tmp
             sy_ref /= tmp
             nx_ref = -sy_ref
             ny_ref = sx_ref
 
-            sx, sy = af.tangent(xi)
-            nx, ny = af.normal(xi)
+            sx, sy = af.tangent(t)
+            nx, ny = af.normal(t)
             self.assertIsNone(npt.assert_allclose(sx, sx_ref, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(sy, sy_ref, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(nx, nx_ref, atol=1e-7))
             self.assertIsNone(npt.assert_allclose(ny, ny_ref, atol=1e-7))
 
-        xi = -1
-        compare_values(xi, af)
+        t = -1
+        compare_values(t, af)
 
-        xi = -0.2
-        compare_values(xi, af)
+        t = -0.2
+        compare_values(t, af)
 
-        xi = 0.4
-        compare_values(xi, af)
+        t = 0
+        compare_values(t, af)
 
-        xi = 1
-        compare_values(xi, af)
+        t = 0.4
+        compare_values(t, af)
 
-        # special case at leading edge
-        xi = 0
-        compare_values(xi, af)
+        t = 1
+        compare_values(t, af)
 
     def testEndpoints(self) -> None:
         af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
                                 max_thickness_index=21)
 
         # reference values
-        xi_ref = np.array([-1.0, 1.0])
-        x_ref, y_ref = af.xy(xi_ref)
-        xp_ref, yp_ref = af.xy_p(xi_ref)
-        xpp_ref, ypp_ref = af.xy_pp(xi_ref)
+        t_ref = np.array([-1.0, 1.0])
+        x_ref, y_ref = af.xy(t_ref)
+        xt_ref, yt_ref = af.xy_t(t_ref)
+        xtt_ref, ytt_ref = af.xy_tt(t_ref)
 
         # test lower trailing edge
-        xi = -1
-        x, y = af.xy(xi)
-        xp, yp = af.xy_p(xi)
-        xpp, ypp = af.xy_pp(xi)
+        t = -1
+        x, y = af.xy(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[0]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[0]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[0]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[0]))
 
         # test upper trailing edge
-        xi = 1
-        x, y = af.xy(xi)
-        xp, yp = af.xy_p(xi)
-        xpp, ypp = af.xy_pp(xi)
+        t = 1
+        x, y = af.xy(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref[1]))
         self.assertIsNone(npt.assert_allclose(y, y_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref[1]))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref[1]))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref[1]))
 
         # test both
-        xi = np.array([-1, 1])
-        x, y = af.xy(xi)
-        xp, yp = af.xy_p(xi)
-        xpp, ypp = af.xy_pp(xi)
+        t = np.array([-1, 1])
+        x, y = af.xy(t)
+        xt, yt = af.xy_t(t)
+        xtt, ytt = af.xy_tt(t)
         self.assertIsNone(npt.assert_allclose(x, x_ref))
         self.assertIsNone(npt.assert_allclose(y, y_ref))
-        self.assertIsNone(npt.assert_allclose(xp, xp_ref))
-        self.assertIsNone(npt.assert_allclose(yp, yp_ref))
-        self.assertIsNone(npt.assert_allclose(xpp, xpp_ref))
-        self.assertIsNone(npt.assert_allclose(ypp, ypp_ref))
+        self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+        self.assertIsNone(npt.assert_allclose(yt, yt_ref))
+        self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+        self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
     def testJoints(self) -> None:
         """Test correct joints are being reported."""
         af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
                                 max_thickness_index=21)
 
-        self.assertListEqual([-1.0, -0.2, 0.0, 0.2, 1.0], af.joints())
+        self.assertListEqual([-1.0, -np.sqrt(0.2), 0.0, np.sqrt(0.2), 1.0],
+                             af.joints())
 
         af = create_naca_4digit(max_camber_index=0, loc_max_camber_index=0,
                                 max_thickness_index=21)
