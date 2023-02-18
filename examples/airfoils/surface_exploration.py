@@ -47,8 +47,8 @@ def draw_surface_vectors(af: OrthogonalAirfoil) -> None:
 
     # plot leading edge curves
     fig = plt.figure()
-    fig.set_figwidth(5)
-    fig.set_figheight(4)
+    fig.set_figwidth(10)
+    fig.set_figheight(8)
     plt.plot(x_camber, y_camber, '--m')
     plt.plot([xle, xte], [yle, yte], '-.m')
     plt.plot(x_curve, y_curve, '-b')
@@ -63,7 +63,7 @@ def draw_surface_vectors(af: OrthogonalAirfoil) -> None:
     plt.xlim(right=0.2)
     plt.xlabel("$x$")
     plt.ylabel("$y$")
-    plt.text(-0.05, 0.1, f"Min. $x$ at $t=${t_xmin:.2e} \n({x_xmin:.2e}, "
+    plt.text(-0.04, 0.075, f"Min. $x$ at $t=${t_xmin:.2e} \n({x_xmin:.2e}, "
              f"{y_xmin:.2e})", fontsize="small")
     plt.show()
 
@@ -84,7 +84,7 @@ def draw_surface_curves(af: Airfoil) -> None:
     t_curve_u = np.linspace(t_xmin+offset, t_max, n_curve//2)
     t_curve = np.concatenate((t_curve_l, np.array([t_xmin-offset]),
                               t_curve_u))
-    t_curve_end_idx = t_curve_l.shape[0]+1
+    t_curve_l_end_idx = t_curve_l.shape[0]+1
     for t in t_joints[1:-1]:
         if (t > t_min) and (t < t_max):
             idx = (np.abs(t_curve-t)).argmin()
@@ -101,6 +101,9 @@ def draw_surface_curves(af: Airfoil) -> None:
         x_trans, y_trans = af.xy(t_trans)
         slope_trans = af.dydx(t_trans)
         k_trans = af.k(t_trans)
+        for i, t in enumerate(t_trans):
+            if t < t_xmin:
+                x_trans[i] *= -1
     else:
         t_trans = None
         x_trans = None
@@ -108,23 +111,20 @@ def draw_surface_curves(af: Airfoil) -> None:
         slope_trans = None
         k_trans = None
 
-    fig = plt.figure()
-    fig.set_figwidth(8)
-    fig.set_figheight(12)
-    gs = GridSpec(3, 1, figure=fig)
-    axis_xy = fig.add_subplot(gs[0, 0])
-    axis_slope = fig.add_subplot(gs[1, 0])
-    axis_curv = fig.add_subplot(gs[2, 0])
+    fig, ((axis_xy, axis_slope, axis_curv)) = plt.subplots(nrows=3, ncols=1)
+    fig.set_figwidth(12)
+    fig.set_figheight(8)
+    plt.tight_layout()
 
     axy = axis_xy
     x_min, x_max = calc_limits(x_curve)
     y_min, y_max = calc_limits(y_curve)
     if interior_joints:
         axy.plot(x_trans, y_trans, 'og')
-    axy.plot(x_curve, y_curve, '-b')
+    axy.plot(-x_curve[0:t_curve_l_end_idx], y_curve[0:t_curve_l_end_idx], '-b')
+    axy.plot(x_curve[t_curve_l_end_idx:], y_curve[t_curve_l_end_idx:], '-c')
     axy.set_xlim(x_min, x_max)
     axy.set_ylim(y_min, y_max)
-    axy.set_xlabel("$x$")
     axy.set_ylabel("$y$")
     axy.grid(True)
     axy.axis("equal")
@@ -133,10 +133,10 @@ def draw_surface_curves(af: Airfoil) -> None:
     x_min, x_max = calc_limits(t_curve)
     y_min, y_max = calc_limits(slope_curve)
     if interior_joints:
-        ax.plot(t_trans, slope_trans, 'og')
-    ax.plot(t_curve[0:t_curve_end_idx], slope_curve[0:t_curve_end_idx],
+        ax.plot(x_trans, slope_trans, 'og')
+    ax.plot(-x_curve[0:t_curve_l_end_idx], slope_curve[0:t_curve_l_end_idx],
             '-b')
-    ax.plot(t_curve[t_curve_end_idx:], slope_curve[t_curve_end_idx:], '-b')
+    ax.plot(x_curve[t_curve_l_end_idx:], slope_curve[t_curve_l_end_idx:], '-c')
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(max(-5, y_min), min(5, y_max))
     ax.set_ylabel(r"$\frac{dy}{dx}$")
@@ -146,11 +146,12 @@ def draw_surface_curves(af: Airfoil) -> None:
     x_min, x_max = calc_limits(t_curve)
     y_min, y_max = calc_limits(k_curve)
     if interior_joints:
-        ax.plot(t_trans, k_trans, 'og')
-    ax.plot(t_curve, k_curve, '-b')
+        ax.plot(x_trans, k_trans, 'og')
+    ax.plot(-x_curve[0:t_curve_l_end_idx], k_curve[0:t_curve_l_end_idx], '-b')
+    ax.plot(x_curve[t_curve_l_end_idx:], k_curve[t_curve_l_end_idx:], '-c')
     ax.set_xlim(x_min, x_max)
-    ax.set_ylim(y_min, y_max)
-    ax.set_xlabel(r"$t$")
+    ax.set_ylim(max(-40, y_min), min(10, y_max))
+    ax.set_xlabel(r"$x_\mathrm{upper}$, -$x_\mathrm{lower}$")
     ax.set_ylabel("$k$")
     ax.grid(True)
 
@@ -171,42 +172,39 @@ def draw_parameter_variation(af: Airfoil) -> None:
     t_curve_u = np.linspace(t_xmin+offset, t_max, n_curve//2)
     t_curve = np.concatenate((t_curve_l, np.array([t_xmin-offset]),
                               t_curve_u))
-    t_curve_end_idx = t_curve_l.shape[0]+1
     for t in t_joints[1:-1]:
         if (t > t_min) and (t < t_max):
             idx = (np.abs(t_curve-t)).argmin()
             t_curve[idx] = t
 
     x_curve, y_curve = af.xy(t_curve)
-    slope_curve = af.dydx(t_curve)
-    k_curve = af.k(t_curve)
+    xt_curve, yt_curve = af.xy_t(t_curve)
+    xtt_curve, ytt_curve = af.xy_tt(t_curve)
 
     # get camber transition location
     interior_joints = len(t_joints) > 2
     if interior_joints:
         t_trans = t_joints[1:-1]
         x_trans, y_trans = af.xy(t_trans)
-        slope_trans = af.dydx(t_trans)
-        k_trans = af.k(t_trans)
+        xt_trans, yt_trans = af.xy_t(t_trans)
+        xtt_trans, ytt_trans = af.xy_tt(t_trans)
     else:
         t_trans = None
         x_trans = None
         y_trans = None
-        slope_trans = None
-        k_trans = None
+        xt_trans = None
+        yt_trans = None
+        xtt_trans = None
+        ytt_trans = None
 
-    fig = plt.figure()
-    fig.set_figwidth(8)
-    fig.set_figheight(12)
-    gs = GridSpec(4, 1, figure=fig)
-    axis_x = fig.add_subplot(gs[0, 0])
-    axis_y = fig.add_subplot(gs[1, 0])
-    axis_slope = fig.add_subplot(gs[2, 0])
-    axis_curv = fig.add_subplot(gs[3, 0])
-
-    x_min, x_max = calc_limits(t_curve)
+    fig, ((axis_x, axis_y), (axis_xt, axis_yt),
+          (axis_xtt, axis_ytt)) = plt.subplots(nrows=3, ncols=2)
+    fig.set_figwidth(12)
+    fig.set_figheight(8)
+    plt.tight_layout(w_pad=4)
 
     ax = axis_x
+    x_min, x_max = calc_limits(t_curve)
     y_min, y_max = calc_limits(x_curve)
     if interior_joints:
         ax.plot(t_trans, x_trans, 'og')
@@ -217,6 +215,7 @@ def draw_parameter_variation(af: Airfoil) -> None:
     ax.grid(True)
 
     ax = axis_y
+    x_min, x_max = calc_limits(t_curve)
     y_min, y_max = calc_limits(y_curve)
     if interior_joints:
         ax.plot(t_trans, y_trans, 'og')
@@ -226,27 +225,52 @@ def draw_parameter_variation(af: Airfoil) -> None:
     ax.set_ylabel("$y$")
     ax.grid(True)
 
-    ax = axis_slope
-    y_min, y_max = calc_limits(slope_curve)
+    ax = axis_xt
+    x_min, x_max = calc_limits(t_curve)
+    y_min, y_max = calc_limits(xt_curve)
     if interior_joints:
-        ax.plot(t_trans, slope_trans, 'og')
-    ax.plot(t_curve[0:t_curve_end_idx], slope_curve[0:t_curve_end_idx],
-            '-b')
-    ax.plot(t_curve[t_curve_end_idx:], slope_curve[t_curve_end_idx:], '-b')
+        ax.plot(t_trans, xt_trans, 'og')
+    ax.plot(t_curve, xt_curve, '-b')
     ax.set_xlim(x_min, x_max)
-    ax.set_ylim(max(-5, y_min), min(5, y_max))
-    ax.set_ylabel(r"$\frac{dy}{dx}$")
+    # ax.set_ylim(max(-5, y_min), min(5, y_max))
+    ax.set_ylim(y_min, y_max)
+    ax.set_ylabel(r"$\frac{dx}{dt}$")
     ax.grid(True)
 
-    ax = axis_curv
-    y_min, y_max = calc_limits(k_curve)
+    ax = axis_yt
+    x_min, x_max = calc_limits(t_curve)
+    y_min, y_max = calc_limits(yt_curve)
     if interior_joints:
-        ax.plot(t_trans, k_trans, 'og')
-    ax.plot(t_curve, k_curve, '-b')
+        ax.plot(t_trans, yt_trans, 'og')
+    ax.plot(t_curve, yt_curve, '-b')
+    ax.set_xlim(x_min, x_max)
+    # ax.set_ylim(max(-5, y_min), min(5, y_max))
+    ax.set_ylim(y_min, y_max)
+    ax.set_ylabel(r"$\frac{dy}{dt}$")
+    ax.grid(True)
+
+    ax = axis_xtt
+    x_min, x_max = calc_limits(t_curve)
+    y_min, y_max = calc_limits(xtt_curve)
+    if interior_joints:
+        ax.plot(t_trans, xtt_trans, 'og')
+    ax.plot(t_curve, xtt_curve, '-b')
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(y_min, y_max)
     ax.set_xlabel(r"$t$")
-    ax.set_ylabel("$k$")
+    ax.set_ylabel(r"$\frac{d^2x}{dt^2}$")
+    ax.grid(True)
+
+    ax = axis_ytt
+    x_min, x_max = calc_limits(t_curve)
+    y_min, y_max = calc_limits(ytt_curve)
+    if interior_joints:
+        ax.plot(t_trans, ytt_trans, 'og')
+    ax.plot(t_curve, ytt_curve, '-b')
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
+    ax.set_xlabel(r"$t$")
+    ax.set_ylabel(r"$\frac{d^2y}{dt^2}$")
     ax.grid(True)
 
 
@@ -288,4 +312,4 @@ if __name__ == "__main__":
     #                         max_thickness_index=12)
     draw_surface_vectors(af)
     draw_surface_curves(af)
-    # draw_parameter_variation(af)
+    draw_parameter_variation(af)
