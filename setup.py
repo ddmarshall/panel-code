@@ -14,7 +14,7 @@ with open("LICENSE.md") as f:
 
 setup(
     name="panel-code",
-    version="0.2.0-develop",
+    version="0.2.0",
     description="Panel code method implementations to model aerodynamic"
     " flows.",
     long_description=readme,
