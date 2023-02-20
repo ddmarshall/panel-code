@@ -63,8 +63,8 @@ def draw_surface_vectors(af: OrthogonalAirfoil) -> None:
     plt.xlim(right=0.2)
     plt.xlabel("$x$")
     plt.ylabel("$y$")
-    plt.text(-0.04, 0.075, f"Min. $x$ at $t=${t_xmin:.2e} \n({x_xmin:.2e}, "
-             f"{y_xmin:.2e})", fontsize="small")
+    plt.text(-0.04, y_sample[-1], f"Min. $x$ at $t=${t_xmin:.2e}\n"
+             f"({x_xmin:.2e}, {y_xmin:.2e})", fontsize="small")
     plt.show()
 
 
