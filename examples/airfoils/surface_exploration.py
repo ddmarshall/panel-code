@@ -279,14 +279,14 @@ def calc_limits(v: nptype.NDArray) -> Tuple[float, float]:
     v_min = np.ma.masked_invalid(v).min()
     v_max = np.ma.masked_invalid(v).max()
     delta_v = v_max - v_min
-    if abs(v_min/delta_v) < 0.05:
+    if delta_v != 0.0 and abs(v_min/delta_v) < 0.05:
         v_min -= delta_v/10
     elif v_min > 0:
         v_min *= 0.9
     else:
         v_min *= 1.1
 
-    if abs(v_max/delta_v) < 0.05:
+    if delta_v != 0.0 and abs(v_max/delta_v) < 0.05:
         v_max += delta_v/10
     elif v_max < 0:
         v_max *= 0.9
