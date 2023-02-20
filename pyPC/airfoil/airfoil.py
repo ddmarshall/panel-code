@@ -8,7 +8,6 @@ from typing import Tuple, List
 import numpy as np
 import numpy.typing as np_type
 
-from scipy.integrate import quadrature
 from scipy.optimize import root_scalar
 
 from pyPC.airfoil.curve import Curve
@@ -544,54 +543,6 @@ class OrthogonalAirfoil(Airfoil):
 
         # return self.scale*x_tt, self.scale*y_tt
         return x_tt, y_tt
-
-    # def arc_length(self, xi_s: float,
-    #                xi_e: np_type.NDArray) -> np_type.NDArray:
-    #     """
-    #     Calculate the arc-length distance between two points on surface.
-
-    #     Parameters
-    #     ----------
-    #     xi_s : float
-    #         Start point of distance calculation.
-    #     xi_e : numpy.ndarray
-    #         End point of distance calculation.
-
-    #     Returns
-    #     -------
-    #     numpy.ndarray
-    #         Distance from start point to end point.
-    #     """
-    #     xi_e = np.asarray(xi_e, dtype=np.float64)
-
-    #     # NOTE: This prototype works for xi>=0 as a parameterization
-    #     #       of xi=t**2. How can this be integrated into existing
-    #     #       architecture? Current airfoil code breaks near leading edge
-    #     #       because of the sqrt(x) term in thickness.
-    #     def fun(t):
-    #         xi = t**2
-    #         yc_p = self._camber.y_p(xi)
-    #         alpha = np.sqrt(1+yc_p**2)
-    #         beta = yc_p*alpha
-    #         delta = self._thickness.y(xi)
-    #         k_c = self._camber.k(xi)
-    #         a = (self._thickness._tmax/0.20)*self._thickness.a
-    #         ddeltadt = a[0]+2*t*(a[1]+2*a[2]*xi+3*a[3]*xi**2+4*a[4]*xi**3)
-    #         dxdt = 2*t-(beta*ddeltadt+2*t*delta*k_c)
-    #         dydt = 2*t*yc_p+(alpha*ddeltadt-2*t*delta*yc_p*k_c)
-    #         return np.sqrt(dxdt**2+dydt**2)
-    #     s_test = quadrature(fun, np.sqrt(xi_min), np.sqrt(xi_max))
-    #     def fun(xi):
-    #         xp, yp = self.xy_p(xi)
-    #         return np.sqrt(xp**2+yp**2)
-
-    #     xi_ea = np.asarray(xi_e)
-    #     it = np.nditer([xi_ea, None])
-    #     with it:
-    #         for xi, alen in it:
-    #             alen[...], _ = quadrature(fun, xi_s, xi)
-
-    #         return it.operands[1]
 
     def camber_location(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                            np_type.NDArray]:
