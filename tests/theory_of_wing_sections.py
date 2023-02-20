@@ -68,9 +68,8 @@ class thickness_data:
             Filename of the new case data.
         """
         # read in data
-        file = open(filename, "r", encoding="utf8")
-        lines = file.readlines()
-        file.close()
+        with open(filename, "r", encoding="utf8") as file:
+            lines = file.readlines()
 
         # get header info
         self._le_radius = float(lines[0][12:-1])/100.0
@@ -112,6 +111,8 @@ class camber_data:
     delta_v : numpy.ndarray
         Relative increment of vertical velocity due to camber
     """
+
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, filename: str):
         self._ideal_Cl = 0.0
@@ -169,9 +170,8 @@ class camber_data:
             Filename of the new case data.
         """
         # read in data
-        file = open(filename, "r", encoding="utf8")
-        lines = file.readlines()
-        file.close()
+        with open(filename, "r", encoding="utf8") as file:
+            lines = file.readlines()
 
         # get header info
         self._ideal_Cl = float(lines[0][5:-1])
@@ -264,9 +264,8 @@ class airfoil_data:
             Filename of the new case data.
         """
         # read in data
-        file = open(filename, "r", encoding="utf8")
-        lines = file.readlines()
-        file.close()
+        with open(filename, "r", encoding="utf8") as file:
+            lines = file.readlines()
 
         # get header info
         self._le_radius = float(lines[0][12:-1])/100.0

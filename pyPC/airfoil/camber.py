@@ -397,17 +397,16 @@ class Naca4DigitCamber(Camber):
         def fore(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return (self._m/self._p**2)*(2*self._p*t - t**2)
+
+            return (self._m/self._p**2)*(2*self._p*t - t**2)
 
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return (self._m/(1-self._p)**2)*(1 + 2*self._p*(t - 1) - t**2)
 
-        return np.piecewise(t, [t <= self._p, t > self._p],
-                            [lambda t: fore(t), lambda t: aft(t)])
+            return (self._m/(1-self._p)**2)*(1 + 2*self._p*(t - 1) - t**2)
+
+        return np.piecewise(t, [t <= self._p, t > self._p], [fore, aft])
 
     def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -431,17 +430,16 @@ class Naca4DigitCamber(Camber):
         def fore(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return 2*(self._m/self._p**2)*(self._p - t)
+
+            return 2*(self._m/self._p**2)*(self._p - t)
 
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return 2*(self._m/(1-self._p)**2)*(self._p - t)
 
-        return np.piecewise(t, [t <= self._p, t > self._p],
-                            [lambda t: fore(t), lambda t: aft(t)])
+            return 2*(self._m/(1-self._p)**2)*(self._p - t)
+
+        return np.piecewise(t, [t <= self._p, t > self._p], [fore, aft])
 
     def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -465,17 +463,14 @@ class Naca4DigitCamber(Camber):
         def fore(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return -2*(self._m/self._p**2)*np.ones_like(t)
+            return -2*(self._m/self._p**2)*np.ones_like(t)
 
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return -2*(self._m/(1-self._p)**2)*np.ones_like(t)
+            return -2*(self._m/(1-self._p)**2)*np.ones_like(t)
 
-        return np.piecewise(t, [t <= self._p, t > self._p],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self._p, t > self._p], [fore, aft])
 
     def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -502,8 +497,7 @@ class Naca4DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return np.zeros_like(t)
 
-        return np.piecewise(t, [t <= self._p, t > self._p],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self._p, t > self._p], [fore, aft])
 
 
 class Naca5DigitCamber(Camber):
@@ -607,8 +601,7 @@ class Naca5DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return (self.k1*self.m**3/6)*(1 - t)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
     def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -633,8 +626,7 @@ class Naca5DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return -(self.k1*m**3/6)*np.ones_like(t)
 
-        return np.piecewise(t, [t <= m, t > m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= m, t > m], [fore, aft])
 
     def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -658,8 +650,7 @@ class Naca5DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return np.zeros_like(t)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
     def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -683,8 +674,7 @@ class Naca5DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return np.zeros_like(t)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
     def _p_setter(self, mci: int) -> None:
         if mci == 1:
@@ -738,8 +728,7 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamber):
         def camber_slope(m: float) -> float:
             return 3*self._p**2 - 6*m*self._p + m**2*(3-m)
 
-        root = root_scalar(lambda x: camber_slope(x),
-                           bracket=[self._p, 2*self._p])
+        root = root_scalar(camber_slope, bracket=[self._p, 2*self._p])
         self._m = root.root
         self._determine_k1()
 
@@ -868,8 +857,7 @@ class Naca5DigitCamberReflexed(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return (k1/6)*(k2ok1*(t-m)**3 - k2ok1*(1-m)**3*t + m**3*(1-t))
 
-        return np.piecewise(t, [t <= m, t > m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= m, t > m], [fore, aft])
 
     def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -896,8 +884,7 @@ class Naca5DigitCamberReflexed(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return (k1/6)*(3*k2ok1*(t-m)**2 - k2ok1*(1-m)**3 - m**3)
 
-        return np.piecewise(t, [t <= m, t > m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= m, t > m], [fore, aft])
 
     def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -921,8 +908,7 @@ class Naca5DigitCamberReflexed(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return (self.k2)*(t - self.m)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
     def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -946,8 +932,7 @@ class Naca5DigitCamberReflexed(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return self.k2*np.ones_like(t)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
     def _p_setter(self, mci: int) -> None:
         if mci == 2:

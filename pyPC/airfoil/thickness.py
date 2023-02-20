@@ -430,6 +430,10 @@ class Naca45DigitModifiedThickness(Thickness):
         Coefficients for aft equation.
     """
 
+    # NOTE: I don't see why pylint is saying this class has 9 attributes when
+    #       I only see 6.
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, mti: float, lei: float, lmti: float) -> None:
         # start with valid defaults for setters to work
         self._closed_te = False
@@ -542,7 +546,7 @@ class Naca45DigitModifiedThickness(Thickness):
                                      + term*(self.d[2] + term*self.d[3]))
 
         return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
-                                       [lambda t: fore(t), lambda t: aft(t)])
+                                       [fore, aft])
 
     def delta_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -571,7 +575,7 @@ class Naca45DigitModifiedThickness(Thickness):
             return -2*t*(self.d[1] + (1-t2)*(2*self.d[2] + 3*(1-t2)*self.d[3]))
 
         return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
-                                       [lambda t: fore(t), lambda t: aft(t)])
+                                       [fore, aft])
 
     def delta_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -600,7 +604,7 @@ class Naca45DigitModifiedThickness(Thickness):
                        + 3*(1-t2)*(1-5*t2)*self.d[3])
 
         return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
-                                       [lambda t: fore(t), lambda t: aft(t)])
+                                       [fore, aft])
 
     def _calculate_coefficients(self):
         # Pade approximation that goes through all Stack and von Doenhoff

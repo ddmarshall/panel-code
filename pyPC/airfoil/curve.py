@@ -163,8 +163,7 @@ class Curve(ABC):
         it = np.nditer([t_e, None])
         with it:
             for ti, alen in it:
-                segment_ends = [x for x in self.joints()
-                                if (x < ti) and (x > t_s)]
+                segment_ends = [x for x in self.joints() if t_s < x < ti]
                 segment_ends.append(ti)
                 t_begin = t_s
                 alen[...] = 0.0

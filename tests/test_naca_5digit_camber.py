@@ -14,9 +14,9 @@ import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
 
-from pyPC.airfoil.camber import Naca5DigitCamber, Naca5DigitCamberEnhanced
-
 from theory_of_wing_sections import camber_data
+
+from pyPC.airfoil.camber import Naca5DigitCamber, Naca5DigitCamberEnhanced
 
 
 class TestNaca5DigitCamber(unittest.TestCase):
@@ -51,6 +51,7 @@ class TestNaca5DigitCamber(unittest.TestCase):
         # test the initialization of camber
         ca.lift_coefficient_index = lci
         for pit, mit, k1it in np.nditer([p, m_ref, k1_ref]):
+            # pylint: disable=protected-access
             ca.max_camber_index = pit
             self.assertIsNone(npt.assert_allclose(ca._m, mit))
             self.assertIsNone(npt.assert_allclose(ca._k1, k1it))
@@ -117,6 +118,8 @@ class TestNaca5DigitCamber(unittest.TestCase):
 
     def testCamber(self) -> None:
         """Test the camber relations."""
+        # pylint: disable=too-many-locals
+        # pylint: disable=too-many-statements
         ca_classic = Naca5DigitCamber(lci=2, mci=2)
         ca_enhanced = Naca5DigitCamberEnhanced(lci=3.7, mci=2.4)
 
@@ -192,6 +195,7 @@ class TestNaca5DigitCamber(unittest.TestCase):
 
     def testEndpoints(self) -> None:
         """Test accessing the end points of camber with integers."""
+        # pylint: disable=too-many-locals
         ca = Naca5DigitCamber(lci=2, mci=3)
 
         # reference values

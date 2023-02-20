@@ -408,7 +408,7 @@ class OrthogonalAirfoil(Airfoil):
     def xmax_parameter(self) -> float:
         """Parameter of largest x-coordinate for airfoil."""
         if self._t_xmax is None:
-            if self.x(-1)[0] >= self.x(1)[0]:
+            if self.xy(-1)[0] >= self.xy(1)[0]:
                 self._t_xmax = -1.0
             else:
                 self._t_xmax = 1.0
@@ -473,10 +473,10 @@ class OrthogonalAirfoil(Airfoil):
         numpy.ndarray
             Parametric rate of change of the y-coordinate of point.
         """
+        # pylint: disable=too-many-locals
         tc, sgn = self._convert_t(t)
 
         u, u_t = self._convert_t_to_u(tc)[0:2]
-        xi, eta = self._camber.xy(u)
         xi_u, eta_u = self._camber.xy_t(u)
         k = self._camber.k(u)
         nx, ny = self._camber.normal(u)
@@ -515,10 +515,10 @@ class OrthogonalAirfoil(Airfoil):
         numpy.ndarray
             Parametric second derivative of the y-coordinate of point.
         """
+        # pylint: disable=too-many-locals
         tc, sgn = self._convert_t(t)
 
         u, u_t, u_tt = self._convert_t_to_u(tc)
-        xi, eta = self._camber.xy(u)
         xi_u, eta_u = self._camber.xy_t(u)
         xi_uu, eta_uu = self._camber.xy_tt(u)
         k = self._camber.k(u)

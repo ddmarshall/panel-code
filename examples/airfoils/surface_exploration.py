@@ -7,7 +7,6 @@ from typing import Tuple
 import numpy as np
 import numpy.typing as nptype
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
 
 from pyPC.airfoil.camber import Naca4DigitCamber
 from pyPC.airfoil.thickness import Naca45DigitThickness
@@ -17,6 +16,7 @@ from pyPC.airfoil.airfoil import Airfoil
 
 def draw_surface_vectors(af: OrthogonalAirfoil) -> None:
     """Draw surface vectors in the leading edge region."""
+    # pylint: disable=too-many-locals
     n_sample = 8
     t_start = -0.4
     t_end = -t_start
@@ -70,6 +70,7 @@ def draw_surface_vectors(af: OrthogonalAirfoil) -> None:
 
 def draw_surface_curves(af: Airfoil) -> None:
     """Draw surface and related properties."""
+    # pylint: disable=too-many-locals
     n_curve = 300
     t_min = -1
     t_max = 1
@@ -86,7 +87,7 @@ def draw_surface_curves(af: Airfoil) -> None:
                               t_curve_u))
     t_curve_l_end_idx = t_curve_l.shape[0]+1
     for t in t_joints[1:-1]:
-        if (t > t_min) and (t < t_max):
+        if t_min < t < t_max:
             idx = (np.abs(t_curve-t)).argmin()
             t_curve[idx] = t
 
@@ -158,6 +159,7 @@ def draw_surface_curves(af: Airfoil) -> None:
 
 def draw_parameter_variation(af: Airfoil) -> None:
     """Draw surface properties as a function of parameterization."""
+    # pylint: disable=too-many-locals
     n_curve = 300
     t_min = -1
     t_max = 1
@@ -173,7 +175,7 @@ def draw_parameter_variation(af: Airfoil) -> None:
     t_curve = np.concatenate((t_curve_l, np.array([t_xmin-offset]),
                               t_curve_u))
     for t in t_joints[1:-1]:
-        if (t > t_min) and (t < t_max):
+        if t_min < t < t_max:
             idx = (np.abs(t_curve-t)).argmin()
             t_curve[idx] = t
 
@@ -303,7 +305,8 @@ def create_naca_4digit(max_camber_index: float, loc_max_camber_index: float,
     return OrthogonalAirfoil(camber, thickness)
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Run main function for this example."""
     af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
                             max_thickness_index=21)
     # af = create_naca_4digit(max_camber_index=1, loc_max_camber_index=4,
@@ -313,3 +316,7 @@ if __name__ == "__main__":
     draw_surface_vectors(af)
     draw_surface_curves(af)
     draw_parameter_variation(af)
+
+
+if __name__ == "__main__":
+    main()

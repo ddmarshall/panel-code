@@ -49,6 +49,7 @@ class TestNaca5DigitReflexed(unittest.TestCase):
         k2_ref = np.array([0.0468090174, 0.0974945233, 0.1964888189,
                            0.4283075436])
 
+        # pylint: disable=protected-access
         # test the static methods
         for pit, mit, k1it, k2it in np.nditer([p, m_ref, k1_ref, k2_ref]):
             Cl_id = ca._Cl_id(m=mit, k1=k1it, k2ok1=k2it/k1it)
@@ -67,6 +68,8 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testCamber(self) -> None:
         """Test the camber relations."""
+        # pylint: disable=too-many-locals
+        # pylint: disable=too-many-statements
         ca_classic = Naca5DigitCamberReflexed(lci=2, mci=2)
         ca_enhanced = Naca5DigitCamberReflexedEnhanced(lci=3.7, mci=2.4)
 
@@ -146,6 +149,7 @@ class TestNaca5DigitReflexed(unittest.TestCase):
 
     def testEndpoints(self) -> None:
         """Test accessing the end points of camber with integers."""
+        # pylint: disable=too-many-locals
         ca = Naca5DigitCamberReflexed(lci=2, mci=3)
 
         # reference values
