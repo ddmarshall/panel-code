@@ -632,38 +632,43 @@ class TestNaca4Digit(unittest.TestCase):
         t = 2*rg.random((20,))-1
         compare_values(t, af)
 
+    def testAirfoilArclengthDerivatives(self) -> None:
+        """Test calculations of arc-length derivatives."""
+        af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
+                                max_thickness_index=12)
 
-    # def testAirfoilArclengthDerivatives(self) -> None:
-    #     """Test calculations of arc-length derivatives."""
-    #     # TODO: Implement
-    #     af = create_naca_4digit(max_camber_index=0, loc_max_camber_index=0,
-    #                             max_thickness_index=14)
+        # test calculation of entire length
+        t_min = -1
+        t_max = 1
+        s_max = af.arc_length(t_min, t_max)
+        s_max_ref = 2.05127024
+        self.assertAlmostEqual(s_max, s_max_ref)
+        self.assertAlmostEqual(af.surface_length, s_max_ref)
 
-    #     # test calculation of entire length
-    #     xi_min = 0.001
-    #     xi_max = 1
-    #     s_max = af.arc_length(xi_min, xi_max)
-    #     s_max_ref = 2
-    #     self.assertAlmostEqual(s_max, s_max_ref, 1e-7)
+        def compare_values(s: np_type.NDArray, af: OrthogonalAirfoil) -> None:
+            eps = 1e-7
 
-    #     def compare_values(xi: np_type.NDArray, af: OrthogonalAirfoil) -> None:
-    #         if np.abs(xi) < 1e-7:
-    #             sx_ref = -af.camber.y_p(xi)
-    #             sy_ref = 1.0
-    #         else:
-    #             sx_ref, sy_ref = af.xy_p(xi)
-    #         tmp = np.sqrt(sx_ref**2 + sy_ref**2)
-    #         sx_ref /= tmp
-    #         sy_ref /= tmp
-    #         nx_ref = -sy_ref
-    #         ny_ref = sx_ref
+            # compare first derivatives
+            xpl, ypl = af.xy_from_s(s+eps)
+            xmi, ymi = af.xy_from_s(s-eps)
+            xs_ref = 0.5*(xpl-xmi)/eps
+            ys_ref = 0.5*(ypl-ymi)/eps
+            xs, ys = af.xy_s(s)
+            self.assertIsNone(npt.assert_allclose(xs, xs_ref, rtol=2e-7))
+            self.assertIsNone(npt.assert_allclose(ys, ys_ref, rtol=2e-7))
 
-    #         sx, sy = af.tangent(xi)
-    #         nx, ny = af.normal(xi)
-    #         self.assertIsNone(npt.assert_allclose(sx, sx_ref, atol=1e-7))
-    #         self.assertIsNone(npt.assert_allclose(sy, sy_ref, atol=1e-7))
-    #         self.assertIsNone(npt.assert_allclose(nx, nx_ref, atol=1e-7))
-    #         self.assertIsNone(npt.assert_allclose(ny, ny_ref, atol=1e-7))
+            # compare second derivatives
+            xsp, ysp = af.xy_s(s+eps)
+            xsm, ysm = af.xy_s(s-eps)
+            xss_ref = 0.5*(xsp-xsm)/eps
+            yss_ref = 0.5*(ysp-ysm)/eps
+            xss, yss = af.xy_ss(s)
+            self.assertIsNone(npt.assert_allclose(xss, xss_ref, atol=2e-7))
+            self.assertIsNone(npt.assert_allclose(yss, yss_ref, atol=5e-7))
+
+        rg = default_rng(42)
+        s = s_max*rg.random((10,))
+        compare_values(s, af)
 
     def testAirfoilNormalTangentVectors(self) -> None:
         """Test calculations of unit normal and tangent vectors."""

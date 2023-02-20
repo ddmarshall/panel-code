@@ -163,7 +163,14 @@ class Curve(ABC):
         it = np.nditer([t_e, None])
         with it:
             for ti, alen in it:
-                alen[...], _ = quadrature(fun, t_s, ti, maxiter=100)
+                segment_ends = [x for x in self.joints()
+                                if (x < ti) and (x > t_s)]
+                segment_ends.append(ti)
+                t_begin = t_s
+                alen[...] = 0.0
+                for t_end in segment_ends:
+                    alen[...] += quadrature(fun, t_begin, t_end)[0]
+                    t_begin = t_end
 
             return it.operands[1]
 
