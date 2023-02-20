@@ -616,8 +616,8 @@ class TestNaca4Digit(unittest.TestCase):
             xt_ref = 0.5*(xpl-xmi)/eps
             yt_ref = 0.5*(ypl-ymi)/eps
             xt, yt = af.xy_t(t)
-            self.assertIsNone(npt.assert_allclose(xt, xt_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(yt, yt_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(xt, xt_ref))
+            self.assertIsNone(npt.assert_allclose(yt, yt_ref))
 
             # compare second derivatives
             xtp, ytp = af.xy_t(t+eps)
@@ -625,8 +625,8 @@ class TestNaca4Digit(unittest.TestCase):
             xtt_ref = 0.5*(xtp-xtm)/eps
             ytt_ref = 0.5*(ytp-ytm)/eps
             xtt, ytt = af.xy_tt(t)
-            self.assertIsNone(npt.assert_allclose(xtt, xtt_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(xtt, xtt_ref))
+            self.assertIsNone(npt.assert_allclose(ytt, ytt_ref))
 
         rg = default_rng(42)
         t = 2*rg.random((20,))-1
@@ -680,10 +680,10 @@ class TestNaca4Digit(unittest.TestCase):
 
             sx, sy = af.tangent(t)
             nx, ny = af.normal(t)
-            self.assertIsNone(npt.assert_allclose(sx, sx_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(sy, sy_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(nx, nx_ref, atol=1e-7))
-            self.assertIsNone(npt.assert_allclose(ny, ny_ref, atol=1e-7))
+            self.assertIsNone(npt.assert_allclose(sx, sx_ref))
+            self.assertIsNone(npt.assert_allclose(sy, sy_ref))
+            self.assertIsNone(npt.assert_allclose(nx, nx_ref))
+            self.assertIsNone(npt.assert_allclose(ny, ny_ref))
 
         t = -1
         compare_values(t, af)
