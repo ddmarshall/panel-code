@@ -210,7 +210,7 @@ class Naca45DigitThickness(Thickness):
         self._tmax = mti/100.0
 
     @property
-    def a(self) -> float:
+    def a(self) -> np_type.NDArray:
         """Equation coefficients."""
         return self._a
 
@@ -399,7 +399,7 @@ class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
         # fith row is trailing edge thickness
         i = 4
         if self._closed_te:
-            t_te = 0
+            t_te = 0.0
         else:
             t_te = 0.002
         B[i, :] = [1, 1, 1, 1, 1]
@@ -437,8 +437,8 @@ class Naca45DigitModifiedThickness(Thickness):
     def __init__(self, mti: float, lei: float, lmti: float) -> None:
         # start with valid defaults for setters to work
         self._closed_te = False
-        self._lei = 4
-        self._t_m = 4
+        self._lei: float = 4
+        self._t_m: float = 4
         self._a = np.zeros(4)
         self._d = np.zeros(4)
 
@@ -486,12 +486,12 @@ class Naca45DigitModifiedThickness(Thickness):
         self._calculate_coefficients()
 
     @property
-    def a(self) -> float:
+    def a(self) -> np_type.NDArray:
         """Fore equation coefficients."""
         return self._a
 
     @property
-    def d(self) -> float:
+    def d(self) -> np_type.NDArray:
         """Aft equation coefficients."""
         return self._d
 
@@ -606,7 +606,7 @@ class Naca45DigitModifiedThickness(Thickness):
         return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
                                        [fore, aft])
 
-    def _calculate_coefficients(self):
+    def _calculate_coefficients(self) -> None:
         # Pade approximation that goes through all Stack and von Doenhoff
         # (1935) values. Improves upon Riegels (1961) fit.
         p = [1.0310900853, -2.7171508529, 4.8594083156]

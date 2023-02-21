@@ -20,7 +20,7 @@ class Cylinder(Airfoil):
         Radius of the cylinder.
     """
 
-    def __init__(self, radius) -> None:
+    def __init__(self, radius: float) -> None:
         super().__init__()
         self._r = radius
 
@@ -30,7 +30,7 @@ class Cylinder(Airfoil):
         return self._r
 
     @radius.setter
-    def radius(self, radius) -> float:
+    def radius(self, radius: float) -> None:
         self._r = radius
 
     def xy(self, t: np_type.NDArray) -> Tuple[np_type.NDArray,

@@ -311,6 +311,9 @@
         <packagedElement xmi:type="uml:Dependency" xmi:id="uNCTmSBbLw2oQ" name="" client="ussZFAQmY5Ryf" supplier="u0Go0ldWIMDco"/>
         <packagedElement xmi:type="uml:Dependency" xmi:id="u7uPn3N683ZQG" name="" client="ussZFAQmY5Ryf" supplier="u1HnYIZiszlGa"/>
         <packagedElement xmi:type="uml:Dependency" xmi:id="u0bvZqvACqXEo" name="" client="ussZFAQmY5Ryf" supplier="uZfnN9FJBY1Vo"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="uNCTmSBbLw2oQ" name="" client="ussZFAQmY5Ryf" supplier="u0Go0ldWIMDco"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="u7uPn3N683ZQG" name="" client="ussZFAQmY5Ryf" supplier="u1HnYIZiszlGa"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="u0bvZqvACqXEo" name="" client="ussZFAQmY5Ryf" supplier="uZfnN9FJBY1Vo"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Package" xmi:id="uZfnN9FJBY1Vo" name="camber">
         <packagedElement xmi:type="uml:Class" xmi:id="uhDOHJDl18MwN" name="Camber" isAbstract="true">
@@ -530,6 +533,8 @@
         <packagedElement xmi:type="uml:Dependency" xmi:id="u0bvZqvACqXEo" name="" client="ussZFAQmY5Ryf" supplier="uZfnN9FJBY1Vo"/>
         <packagedElement xmi:type="uml:Dependency" xmi:id="uuWcwaljqSNwK" name="" client="uZfnN9FJBY1Vo" supplier="u0Go0ldWIMDco"/>
         <packagedElement xmi:type="uml:Dependency" xmi:id="u0bvZqvACqXEo" name="" client="ussZFAQmY5Ryf" supplier="uZfnN9FJBY1Vo"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="uuWcwaljqSNwK" name="" client="uZfnN9FJBY1Vo" supplier="u0Go0ldWIMDco"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="u0bvZqvACqXEo" name="" client="ussZFAQmY5Ryf" supplier="uZfnN9FJBY1Vo"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Package" xmi:id="u1HnYIZiszlGa" name="thickness">
         <packagedElement xmi:type="uml:Class" xmi:id="u6x2jz173vgV6" name="Thickness" isAbstract="true">
@@ -639,6 +644,8 @@
         </packagedElement>
         <packagedElement xmi:type="uml:Dependency" xmi:id="u7uPn3N683ZQG" name="" client="ussZFAQmY5Ryf" supplier="u1HnYIZiszlGa"/>
         <packagedElement xmi:type="uml:Dependency" xmi:id="uEMljcFUIzmMb" name="" client="u1HnYIZiszlGa" supplier="u0Go0ldWIMDco"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="uEMljcFUIzmMb" name="" client="u1HnYIZiszlGa" supplier="u0Go0ldWIMDco"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="u7uPn3N683ZQG" name="" client="ussZFAQmY5Ryf" supplier="u1HnYIZiszlGa"/>
         <packagedElement xmi:type="uml:Dependency" xmi:id="uEMljcFUIzmMb" name="" client="u1HnYIZiszlGa" supplier="u0Go0ldWIMDco"/>
         <packagedElement xmi:type="uml:Dependency" xmi:id="u7uPn3N683ZQG" name="" client="ussZFAQmY5Ryf" supplier="u1HnYIZiszlGa"/>
         <packagedElement xmi:type="uml:Dependency" xmi:id="uEMljcFUIzmMb" name="" client="u1HnYIZiszlGa" supplier="u0Go0ldWIMDco"/>
@@ -778,9 +785,9 @@
               </assocwidget>
             </associations>
           </diagram>
-          <diagram xmi.id="u7D6eVku3VePh" name="Airfoil" type="1" documentation="" backgroundcolor="#ffffff" fillcolor="#ffffc0" font="Fira Sans,10,-1,5,29,0,0,0,0,0,Book" griddotcolor="#ffffff" linecolor="#990000" linewidth="0" textcolor="#000000" usefillcolor="1" showattribassocs="1" showatts="1" showattsig="1" showops="1" showopsig="1" showpackage="1" showpubliconly="0" showscope="1" showstereotype="2" localid="-1" showgrid="0" snapgrid="0" snapcsgrid="0" snapx="25" snapy="25" zoom="96.5217" canvasheight="1041.82" canvaswidth="1100.06" isopen="1">
+          <diagram xmi.id="u7D6eVku3VePh" name="Airfoil" type="1" documentation="" backgroundcolor="#ffffff" fillcolor="#ffffc0" font="Fira Sans,10,-1,5,29,0,0,0,0,0,Book" griddotcolor="#ffffff" linecolor="#990000" linewidth="0" textcolor="#000000" usefillcolor="1" showattribassocs="1" showatts="1" showattsig="1" showops="1" showopsig="1" showpackage="1" showpubliconly="0" showscope="1" showstereotype="2" localid="-1" showgrid="0" snapgrid="0" snapcsgrid="0" snapx="25" snapy="25" zoom="93.5762" canvasheight="1041.82" canvaswidth="1170.18" isopen="1">
             <widgets>
-              <classwidget xmi.id="u0RpNKWX2Kqlw" localid="u1Zj0HCfdt6bK" textcolor="#000000" linecolor="#990000" linewidth="0" usefillcolor="1" usesdiagramfillcolor="0" usesdiagramusefillcolor="0" fillcolor="#ffffc0" font="Fira Sans,10,-1,5,50,0,0,0,0,0,Book" autoresize="1" x="214.083" y="922.413" width="188" height="176" isinstance="0" showstereotype="2" showoperations="1" showpubliconly="0" showopsigs="601" showpackage="1" showscope="1" showattributes="1" showattsigs="601"/>
+              <classwidget xmi.id="u0RpNKWX2Kqlw" localid="u1Zj0HCfdt6bK" textcolor="#000000" linecolor="#990000" linewidth="0" usefillcolor="1" usesdiagramfillcolor="0" usesdiagramusefillcolor="0" fillcolor="#ffffc0" font="Fira Sans,10,-1,5,50,0,0,0,0,0,Book" autoresize="1" x="214.083" y="922.413" width="189" height="176" isinstance="0" showstereotype="2" showoperations="1" showpubliconly="0" showopsigs="601" showpackage="1" showscope="1" showattributes="1" showattsigs="601"/>
               <classwidget xmi.id="uyUwSEkOoPl4i" localid="u31v69YMJkUXx" textcolor="#000000" linecolor="#990000" linewidth="0" usefillcolor="1" usesdiagramfillcolor="0" usesdiagramusefillcolor="0" fillcolor="#ffffc0" font="Fira Sans,10,-1,5,50,0,0,0,0,0,Book" autoresize="1" x="863.393" y="1009.82" width="152" height="32" isinstance="0" showstereotype="2" showoperations="1" showpubliconly="0" showopsigs="601" showpackage="1" showscope="1" showattributes="1" showattsigs="601"/>
               <classwidget xmi.id="uJ7S0i8jAxV60" localid="uXqjX1m0L8yMN" textcolor="#000000" linecolor="#990000" linewidth="0" usefillcolor="1" usesdiagramfillcolor="0" usesdiagramusefillcolor="0" fillcolor="#ffffc0" font="Fira Sans,10,-1,5,50,0,0,0,0,0,Book" autoresize="1" x="339.304" y="300.643" width="489" height="240" isinstance="0" showstereotype="2" showoperations="1" showpubliconly="0" showopsigs="601" showpackage="1" showscope="1" showattributes="1" showattsigs="601" drawascircle="0"/>
               <classwidget xmi.id="utCy786C08JR1" localid="uqbmqY6nenA24" textcolor="#000000" linecolor="#990000" linewidth="0" usefillcolor="1" usesdiagramfillcolor="0" usesdiagramusefillcolor="0" fillcolor="#ffffc0" font="Fira Sans,10,-1,5,50,0,0,0,0,0,Book" autoresize="1" x="36.6071" y="680.783" width="487" height="144" isinstance="0" showstereotype="2" showoperations="1" showpubliconly="0" showopsigs="601" showpackage="1" showscope="1" showattributes="1" showattsigs="601"/>
@@ -893,7 +900,7 @@
     <packagedElement xmi:type="uml:Model" xmi:id="Entity_Relationship_Model" name="Entity Relationship Model"/>
   </uml:Model>
   <xmi:Extension extender="umbrello">
-    <docsettings viewid="u7D6eVku3VePh" documentation="" uniqueid="uAPssGH05yPm8"/>
+    <docsettings viewid="uDjJDCS3NgUgX" documentation="" uniqueid="u9HvZpYDY2w8Q"/>
     <listview>
       <listitem id="Views" type="800" open="1">
         <listitem id="Component_View" type="821" open="1"/>
@@ -1049,20 +1056,24 @@
           <listitem id="upxpA6wrTrvT1" type="807" label="Curve" open="0"/>
           <listitem id="Datatypes" type="830" open="0">
             <listitem id="urIuItytBCR37" type="829" open="0"/>
-            <listitem id="u7gzzNn5Go5q0" type="829" open="0"/>
             <listitem id="uEKsVNpbJvODF" type="829" open="0"/>
             <listitem id="uge4lPnmjbavt" type="829" open="0"/>
-            <listitem id="un3LzjriE6ppg" type="829" open="0"/>
+            <listitem id="uIvwrtCRODaEW" type="829" open="0"/>
+            <listitem id="ubnmlRTHMaiwc" type="829" open="0"/>
+            <listitem id="uNDQ6m7RL8WmJ" type="829" open="0"/>
             <listitem id="uYNstEIq8Dq57" type="829" open="0"/>
+            <listitem id="ugRUIVOHAE1JS" type="829" open="0"/>
             <listitem id="uHTVyPv9Ytrte" type="829" open="0"/>
+            <listitem id="u6GuZF74aHPdr" type="829" open="0"/>
             <listitem id="uwcfkQZMelBdL" type="829" open="0"/>
+            <listitem id="uAny4Jf5jRVjl" type="829" open="0"/>
             <listitem id="uEeAIqMBMl7sV" type="829" open="0"/>
             <listitem id="uZRszkfPpHjrs" type="829" open="0"/>
             <listitem id="udl8GzJXjGT9q" type="829" open="0"/>
-            <listitem id="uSOxqCVIs53Ol" type="829" open="0"/>
             <listitem id="ubMZsqlAQS00F" type="829" open="0"/>
             <listitem id="u5Nun9v1GVdag" type="829" open="0"/>
             <listitem id="ugsUJdQRZSCE4" type="829" open="0"/>
+            <listitem id="uUPZ8WmFEOfKZ" type="829" open="0"/>
             <listitem id="uHdlrYBrXw6PW" type="829" open="0"/>
           </listitem>
           <listitem id="uIEkGI16sbEdx" type="807" label="Packages" open="0"/>

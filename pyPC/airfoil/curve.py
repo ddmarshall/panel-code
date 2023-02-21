@@ -155,7 +155,7 @@ class Curve(ABC):
             Distance from start point to end point.
         """
 
-        def fun(t):
+        def fun(t: float) -> float:
             xt, yt = self.xy_t(t)
             return np.sqrt(xt**2+yt**2)
 
@@ -164,7 +164,7 @@ class Curve(ABC):
         with it:
             for ti, alen in it:
                 segment_ends = [x for x in self.joints() if t_s < x < ti]
-                segment_ends.append(ti)
+                segment_ends.append(float(ti))
                 t_begin = t_s
                 alen[...] = 0.0
                 for t_end in segment_ends:
