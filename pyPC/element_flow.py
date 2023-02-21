@@ -14,8 +14,83 @@ import numpy as np
 import numpy.typing as np_type
 
 
+class Element2D(ABC):
+    """Fundamental interface for any 2-dimensional element."""
+
+    @abstractmethod
+    def potential(self, xp: np_type.NDArray,
+                  yp: np_type.NDArray, top: bool) -> np_type.NDArray:
+        """
+        Calculate the velocity potential at given point.
+
+        Parameters
+        ----------
+        xp : numpy.ndarray
+            X-coorindate of point to evaluate potential.
+        yp : numpy.ndarray
+            Y-coorindate of point to evaluate potential.
+        top : bool
+            Flag indicating whether the top or bottom of the branch cut (if
+            one exists) should be returned when the input point is on the
+            branch cut.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the velocity potential.
+        """
+
+    @abstractmethod
+    def stream_function(self, xp: np_type.NDArray, yp: np_type.NDArray,
+                        top: bool) -> np_type.NDArray:
+        """
+        Calculate the stream function at given point.
+
+        Parameters
+        ----------
+        xp : numpy.ndarray
+            X-coorindate of point to evaluate potential.
+        yp : numpy.ndarray
+            Y-coorindate of point to evaluate potential.
+        top : bool
+            Flag indicating whether the top or bottom of the branch cut (if
+            one exists) should be returned when the input point is on the
+            branch cut.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the stream function.
+        """
+
+    @abstractmethod
+    def velocity(self, xp: np_type.NDArray, yp: np_type.NDArray,
+                 top: bool) -> Tuple[np_type.NDArray, np_type.NDArray]:
+        """
+        Calculate the induced velocity at given point.
+
+        Parameters
+        ----------
+        xp : numpy.ndarray
+            X-coordinate of point to evaluate velocity.
+        yp : numpy.ndarray
+            Y-coordinate of point to evaluate velocity.
+        top : bool
+            Flag indicating whether the top or bottom of the branch cut (if
+            one exists) should be returned when the input point is on the
+            branch cut.
+
+        Returns
+        -------
+        numpy.ndarray
+            Value of the x-velocity.
+        numpy.ndarray
+            Value of the y-velocity.
+        """
+
+
 @dataclass
-class PointElement2D(ABC):
+class PointElement2D(Element2D):
     """
     Base class for 2D point elements.
 
@@ -60,66 +135,6 @@ class PointElement2D(ABC):
         """
         self._strength_over_2pi = strength/(2*np.pi)
 
-    @abstractmethod
-    def potential(self, xp: np_type.NDArray,
-                  yp: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the velocity potential at given point.
-
-        Parameters
-        ----------
-        xp : numpy.ndarray
-            X-coorindate of point to evaluate potential.
-        yp : numpy.ndarray
-            Y-coorindate of point to evaluate potential.
-
-        Returns
-        -------
-        numpy.ndarray
-            Value of the velocity potential.
-        """
-
-    @abstractmethod
-    def stream_function(self, xp: np_type.NDArray,
-                        yp: np_type.NDArray) -> np_type.NDArray:
-        """
-        Calculate the stream function at given point.
-
-        Parameters
-        ----------
-        xp : numpy.ndarray
-            X-coorindate of point to evaluate potential.
-        yp : numpy.ndarray
-            Y-coorindate of point to evaluate potential.
-
-        Returns
-        -------
-        numpy.ndarray
-            Value of the stream function.
-        """
-
-    @abstractmethod
-    def velocity(self, xp: np_type.NDArray,
-                 yp: np_type.NDArray) -> Tuple[np_type.NDArray,
-                                               np_type.NDArray]:
-        """
-        Calculate the induced velocity at given point.
-
-        Parameters
-        ----------
-        xp : numpy.ndarray
-            X-coordinate of point to evaluate velocity.
-        yp : numpy.ndarray
-            Y-coordinate of point to evaluate velocity.
-
-        Returns
-        -------
-        numpy.ndarray
-            Value of the x-velocity.
-        numpy.ndarray
-            Value of the y-velocity.
-        """
-
     def _r_terms(self, xp: np_type.NDArray,
                  yp: np_type.NDArray) -> Tuple[np_type.NDArray,
                                                np_type.NDArray,
@@ -129,18 +144,18 @@ class PointElement2D(ABC):
 
         Parameters
         ----------
-        xp : np_type.NDArray
+        xp : numpy.ndarray
             X-coordinate of the point to calculate terms.
-        yp : np_type.NDArray
+        yp : numpy.ndarray
             Y-coordinate of the point to calculate terms.
 
         Returns
         -------
-        rx : np_type.NDArray
+        rx : numpy.ndarray
             X-component of the vector from element to point.
-        ry : np_type.NDArray
+        ry : numpy.ndarray
             Y-component of the vector from element to point.
-        rmag2 : np_type.NDArray
+        rmag2 : numpy.ndarray
             Square of the distance from element to point.
         """
         rx = xp - self.xo
@@ -149,8 +164,10 @@ class PointElement2D(ABC):
         return rx, ry, rmag2
 
 
-class LineElement2D(ABC):
+class LineElement2D(Element2D):
     """Base class for 2D point elements."""
+
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, xo: Tuple[float, float], yo: Tuple[float, float]):
         self.set_panel_coordinates(xo, yo)
@@ -176,6 +193,8 @@ class LineElement2D(ABC):
         self._sy = self._sy/self._ell
         self._nx = -self._sy
         self._ny = self._sx
+        self._xc = 0.5*(xo[1]+xo[0])
+        self._yc = 0.5*(yo[1]+yo[0])
 
     def get_panel_xo(self) -> Tuple[float, float]:
         """
@@ -251,6 +270,19 @@ class LineElement2D(ABC):
         """
         return self._nx, self._ny
 
+    def get_panel_collo_point(self) -> Tuple[float, float]:
+        """
+        Return the collocation point for the panel.
+
+        Returns
+        -------
+        float
+            X-component of the panel collocation point.
+        float
+            Y-component of the panel collocation point.
+        """
+        return self._xc, self._yc
+
     def get_panel_length(self) -> float:
         """
         Return the length of the panel.
@@ -262,73 +294,16 @@ class LineElement2D(ABC):
         """
         return self._ell
 
-    @abstractmethod
-    def potential(self, xp: np_type.NDArray,
-                  yp: np_type.NDArray, top: bool) -> np_type.NDArray:
+    def get_panel_angle(self) -> float:
         """
-        Calculate the velocity potential at given point.
-
-        Parameters
-        ----------
-        xp : numpy.ndarray
-            X-coorindate of point to evaluate potential.
-        yp : numpy.ndarray
-            Y-coorindate of point to evaluate potential.
-        top : bool
-            Flag indicating whether the top (eta>0) or bottom (eta<0) should
-            be returned when the input point is collinear with panel.
+        Return the angle of the panel.
 
         Returns
         -------
-        numpy.ndarray
-            Value of the velocity potential.
+        float
+            Angle of panel.
         """
-
-    @abstractmethod
-    def stream_function(self, xp: np_type.NDArray, yp: np_type.NDArray,
-                        top: bool) -> np_type.NDArray:
-        """
-        Calculate the stream function at given point.
-
-        Parameters
-        ----------
-        xp : numpy.ndarray
-            X-coorindate of point to evaluate potential.
-        yp : numpy.ndarray
-            Y-coorindate of point to evaluate potential.
-        top : bool
-            Flag indicating whether the top (eta>0) or bottom (eta<0) should
-            be returned when the input point is collinear with panel.
-
-        Returns
-        -------
-        numpy.ndarray
-            Value of the stream function.
-        """
-
-    @abstractmethod
-    def velocity(self, xp: np_type.NDArray, yp: np_type.NDArray,
-                 top: bool) -> Tuple[np_type.NDArray, np_type.NDArray]:
-        """
-        Calculate the induced velocity at given point.
-
-        Parameters
-        ----------
-        xp : numpy.ndarray
-            X-coordinate of point to evaluate velocity.
-        yp : numpy.ndarray
-            Y-coordinate of point to evaluate velocity.
-        top : bool
-            Flag indicating whether the top (eta>0) or bottom (eta<0) should
-            be returned when the input point is collinear with panel.
-
-        Returns
-        -------
-        numpy.ndarray
-            Value of the x-velocity.
-        numpy.ndarray
-            Value of the y-velocity.
-        """
+        return np.arctan2(self._yo[1]-self._yo[0], self._xo[1]-self._xo[0])
 
     def _get_xi_eta(self, xp: np_type.NDArray,
                     yp: np_type.NDArray) -> Tuple[np_type.NDArray,

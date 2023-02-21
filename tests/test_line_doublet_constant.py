@@ -97,14 +97,14 @@ class TestLineDoubletConstant2D(unittest.TestCase):
                                                   yo=doublet.get_panel_yo(),
                                                   mu=doublet.get_strength(),
                                                   num_elements=ns)
-        u_app, v_app = doublet_app.velocity(x, y)
-        phi_app = doublet_app.potential(x, y)
-        psi_app = doublet_app.stream_function(x, y)
+        u_app, v_app = doublet_app.velocity(x, y, True)
+        phi_app = doublet_app.potential(x, y, True)
+        psi_app = doublet_app.stream_function(x, y, True)
 
-        self.assertIsNone(npt.assert_allclose(phi, phi_app, rtol=0, atol=7e-4))
-        self.assertIsNone(npt.assert_allclose(psi, psi_app, rtol=0, atol=9e-4))
-        self.assertIsNone(npt.assert_allclose(u, u_app, rtol=0, atol=3e-2))
-        self.assertIsNone(npt.assert_allclose(v, v_app, rtol=0, atol=2e-2))
+        self.assertIsNone(npt.assert_allclose(phi, phi_app, atol=7e-4))
+        self.assertIsNone(npt.assert_allclose(psi, psi_app, atol=9e-4))
+        self.assertIsNone(npt.assert_allclose(u, u_app, atol=3e-2))
+        self.assertIsNone(npt.assert_allclose(v, v_app, atol=2e-2))
 
 
 if __name__ == "__main__":

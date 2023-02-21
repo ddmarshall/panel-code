@@ -51,11 +51,11 @@ class TestPointSource2D(unittest.TestCase):
 
         # test some hand calculations
         psi_ref: float | np_type.NDArray
-        psi = ps.stream_function(xpt[0], ypt[0])
+        psi = ps.stream_function(xpt[0], ypt[0], True)
         psi_ref = 0.0578243602
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
 
-        psi = ps.stream_function(xpt, ypt)
+        psi = ps.stream_function(xpt, ypt, True)
         psi_ref = np.array([0.0578243602, 0.0603497810])
         self.assertIsNone(npt.assert_allclose(psi, psi_ref))
 
@@ -135,7 +135,7 @@ class TestPointSource2D(unittest.TestCase):
         pe = PointSource2D(xo=xo, yo=yo, strength=strength)
         phi = pe.potential(xp, yp)
         self.assertIsNone(npt.assert_allclose(phi, phi_ref, rtol=1e-5))
-        psi = pe.stream_function(xp, yp)
+        psi = pe.stream_function(xp, yp, True)
         self.assertIsNone(npt.assert_allclose(psi, psi_ref, rtol=1e-5))
         u, v = pe.velocity(xp, yp)
         self.assertIsNone(npt.assert_allclose(u, u_ref, rtol=1e-5))

@@ -106,17 +106,22 @@ class TestLineElement2D(unittest.TestCase):
         ell = le.get_panel_length()
         sx, sy = le.get_panel_tangent()
         nx, ny = le.get_panel_normal()
+        xc, yc = le.get_panel_collo_point()
         ell_ref = np.sqrt((x_ip1-x_i)**2 + (y_ip1-y_i)**2)
         sx_ref = (x_ip1-x_i)/ell_ref
         sy_ref = (y_ip1-y_i)/ell_ref
         nx_ref = -sy_ref
         ny_ref = sx_ref
+        xc_ref = 0.5*(x_i + x_ip1)
+        yc_ref = 0.5*(y_i + y_ip1)
 
         self.assertIsNone(npt.assert_allclose(ell, ell_ref))
         self.assertIsNone(npt.assert_allclose(sx, sx_ref))
         self.assertIsNone(npt.assert_allclose(sy, sy_ref))
         self.assertIsNone(npt.assert_allclose(nx, nx_ref))
         self.assertIsNone(npt.assert_allclose(ny, ny_ref))
+        self.assertIsNone(npt.assert_allclose(xc, xc_ref))
+        self.assertIsNone(npt.assert_allclose(yc, yc_ref))
 
         # test resetting and that normal, tangent, and length are correct
         le.set_panel_coordinates((1, 2), (2, 1))
@@ -125,17 +130,22 @@ class TestLineElement2D(unittest.TestCase):
         ell = le.get_panel_length()
         sx, sy = le.get_panel_tangent()
         nx, ny = le.get_panel_normal()
+        xc, yc = le.get_panel_collo_point()
         ell_ref = np.sqrt((x_ip1-x_i)**2 + (y_ip1-y_i)**2)
         sx_ref = (x_ip1-x_i)/ell_ref
         sy_ref = (y_ip1-y_i)/ell_ref
         nx_ref = -sy_ref
         ny_ref = sx_ref
+        xc_ref = 0.5*(x_i + x_ip1)
+        yc_ref = 0.5*(y_i + y_ip1)
 
         self.assertIsNone(npt.assert_allclose(ell, ell_ref))
         self.assertIsNone(npt.assert_allclose(sx, sx_ref))
         self.assertIsNone(npt.assert_allclose(sy, sy_ref))
         self.assertIsNone(npt.assert_allclose(nx, nx_ref))
         self.assertIsNone(npt.assert_allclose(ny, ny_ref))
+        self.assertIsNone(npt.assert_allclose(xc, xc_ref))
+        self.assertIsNone(npt.assert_allclose(yc, yc_ref))
 
     def test_XiEta(self) -> None:
         """Test the calculation of xi- and eta-coordinates."""

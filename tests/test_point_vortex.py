@@ -31,11 +31,11 @@ class TestPointVortex2D(unittest.TestCase):
 
         # test some hand calculations
         phi_ref: float | np_type.NDArray
-        phi = pv.potential(xpt[0], ypt[0])
+        phi = pv.potential(xpt[0], ypt[0], True)
         phi_ref = -0.0578243602
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
 
-        phi = pv.potential(xpt, ypt)
+        phi = pv.potential(xpt, ypt, True)
         phi_ref = np.array([-0.0578243602, -0.0603497810])
         self.assertIsNone(npt.assert_allclose(phi, phi_ref))
 
@@ -133,7 +133,7 @@ class TestPointVortex2D(unittest.TestCase):
                     psi_ref[i, j] = float(data[5])
 
         pv = PointVortex2D(xo=xo, yo=yo, strength=strength)
-        phi = pv.potential(xp, yp)
+        phi = pv.potential(xp, yp, True)
         self.assertIsNone(npt.assert_allclose(phi, phi_ref, rtol=1e-5))
         psi = pv.stream_function(xp, yp)
         self.assertIsNone(npt.assert_allclose(psi, psi_ref, rtol=1e-5))

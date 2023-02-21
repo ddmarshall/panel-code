@@ -23,7 +23,7 @@ def draw_point_source_flow_field() -> None:
     nptsy = 100
     xg, yg = np.meshgrid(np.linspace(-1, 5, nptsx), np.linspace(-1, 5, nptsy))
 
-    stream_function = source.stream_function(xg, yg)
+    stream_function = source.stream_function(xg, yg, True)
     potential = source.potential(xg, yg)
     ug, vg = source.velocity(xg, yg)
 
