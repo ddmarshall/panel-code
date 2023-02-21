@@ -14,10 +14,10 @@ import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
 
+from theory_of_wing_sections import thickness_data
+
 from pyPC.airfoil.thickness import (Naca45DigitModifiedThickness,
                                     Naca45DigitModifiedThicknessEnhanced)
-
-from theory_of_wing_sections import thickness_data
 
 
 def _calculate_leading_edge_radius(th: Naca45DigitModifiedThickness) -> float:
@@ -70,6 +70,7 @@ class TestNaca45DigitModifiedThickness(unittest.TestCase):
 
     def testClassicThickness(self) -> None:
         """Test the classic thickness coordinates to published data."""
+        # pylint: disable=too-many-statements
         directory = dirname(abspath(__file__))
         tows = thickness_data(filename=None)
 

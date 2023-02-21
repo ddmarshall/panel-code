@@ -15,15 +15,16 @@ import numpy.typing as np_type
 import numpy.testing as npt
 from numpy.random import default_rng
 
+from theory_of_wing_sections import thickness_data, airfoil_data
+
 from pyPC.airfoil.camber import Naca4DigitCamber
 from pyPC.airfoil.thickness import Naca45DigitThickness
 from pyPC.airfoil.airfoil import OrthogonalAirfoil
 
-from theory_of_wing_sections import thickness_data, airfoil_data
-
 
 def create_naca_4digit(max_camber_index: float, loc_max_camber_index: float,
                        max_thickness_index: float) -> OrthogonalAirfoil:
+    """Create NACA 4-digit airfoil manually."""
     camber = Naca4DigitCamber(mci=max_camber_index, lci=loc_max_camber_index)
     thickness = Naca45DigitThickness(mti=max_thickness_index)
     return OrthogonalAirfoil(camber, thickness)
@@ -77,6 +78,8 @@ class TestNaca4Digit(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(delta, delta_ref))
 
     def testClassicSymmetricAirfoil(self) -> None:
+        """Test classic symmetric airfoil against reference data."""
+        # pylint: disable=too-many-statements
         directory = dirname(abspath(__file__))
         tows = thickness_data(filename=None)
 
@@ -254,6 +257,7 @@ class TestNaca4Digit(unittest.TestCase):
 
     def testClassicCamberedAirfoil(self) -> None:
         """Test classic airfoil against published data."""
+        # pylint: disable=too-many-statements
         directory = dirname(abspath(__file__))
         tows = airfoil_data(filename=None)
 
@@ -604,6 +608,7 @@ class TestNaca4Digit(unittest.TestCase):
 
     def testAirfoilParametricDerivatives(self) -> None:
         """Test calculations of parameteric derivatives."""
+        # pylint: disable=too-many-locals
         af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
                                 max_thickness_index=12)
 
@@ -646,6 +651,7 @@ class TestNaca4Digit(unittest.TestCase):
         self.assertAlmostEqual(af.surface_length, s_max_ref)
 
         def compare_values(s: np_type.NDArray, af: OrthogonalAirfoil) -> None:
+            # pylint: disable=too-many-locals
             eps = 1e-7
 
             # compare first derivatives
@@ -706,6 +712,8 @@ class TestNaca4Digit(unittest.TestCase):
         compare_values(t, af)
 
     def testEndpoints(self) -> None:
+        """Test end point calculation."""
+        # pylint: disable=too-many-locals
         af = create_naca_4digit(max_camber_index=4, loc_max_camber_index=2,
                                 max_thickness_index=21)
 

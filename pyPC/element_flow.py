@@ -167,6 +167,8 @@ class PointElement2D(Element2D):
 class LineElement2D(Element2D):
     """Base class for 2D point elements."""
 
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, xo: Tuple[float, float], yo: Tuple[float, float]):
         self.set_panel_coordinates(xo, yo)
 

@@ -62,14 +62,14 @@ class ApproxLineElementConstant2D(ApproxLineElement2D):
         """Return the element strength."""
         return self._strength
 
-    def potential(self, x: np_type.NDArray, y: np_type.NDArray,
+    def potential(self, xp: np_type.NDArray, yp: np_type.NDArray,
                   top: bool) -> np_type.NDArray:
         """
         Calculate the potential.
 
         Parameters
         ----------
-        x : numpy.ndarray
+        xp : numpy.ndarray
             X-coordinate of point to evaluate velocity.
         yp : numpy.ndarray
             Y-coordinate of point to evaluate velocity.
@@ -86,22 +86,22 @@ class ApproxLineElementConstant2D(ApproxLineElement2D):
 
         xpan = np.linspace(self._xo[0], self._xo[1], self.ne)
         ypan = np.linspace(self._yo[0], self._yo[1], self.ne)
-        potential = np.zeros_like(x)
-        for xp, yp in zip(xpan, ypan):
-            element.xo = xp
-            element.yo = yp
-            potential = potential + element.potential(x, y, top)
+        potential = np.zeros_like(xp)
+        for xpa, ypa in zip(xpan, ypan):
+            element.xo = xpa
+            element.yo = ypa
+            potential = potential + element.potential(xp, yp, top)
 
         return potential
 
-    def stream_function(self, x: np_type.NDArray, y: np_type.NDArray,
+    def stream_function(self, xp: np_type.NDArray, yp: np_type.NDArray,
                         top: bool) -> np_type.NDArray:
         """
         Calculate the stream function.
 
         Parameters
         ----------
-        x : numpy.ndarray
+        xp : numpy.ndarray
             X-coordinate of point to evaluate velocity.
         yp : numpy.ndarray
             Y-coordinate of point to evaluate velocity.
@@ -118,23 +118,23 @@ class ApproxLineElementConstant2D(ApproxLineElement2D):
 
         xpan = np.linspace(self._xo[0], self._xo[1], self.ne)
         ypan = np.linspace(self._yo[0], self._yo[1], self.ne)
-        stream_function = np.zeros_like(x)
-        for xp, yp in zip(xpan, ypan):
-            element.xo = xp
-            element.yo = yp
+        stream_function = np.zeros_like(xp)
+        for xpa, ypa in zip(xpan, ypan):
+            element.xo = xpa
+            element.yo = ypa
             stream_function = (stream_function
-                               + element.stream_function(x, y, top))
+                               + element.stream_function(xp, yp, top))
 
         return stream_function
 
-    def velocity(self, x: np_type.NDArray, y: np_type.NDArray,
+    def velocity(self, xp: np_type.NDArray, yp: np_type.NDArray,
                  top: bool) -> Tuple[np_type.NDArray, np_type.NDArray]:
         """
         Calculate the velocity vector components.
 
         Parameters
         ----------
-        x : numpy.ndarray
+        xp : numpy.ndarray
             X-coordinate of point to evaluate velocity.
         yp : numpy.ndarray
             Y-coordinate of point to evaluate velocity.
@@ -153,12 +153,12 @@ class ApproxLineElementConstant2D(ApproxLineElement2D):
 
         xpan = np.linspace(self._xo[0], self._xo[1], self.ne)
         ypan = np.linspace(self._yo[0], self._yo[1], self.ne)
-        u = np.zeros_like(x)
-        v = np.zeros_like(x)
-        for xp, yp in zip(xpan, ypan):
-            element.xo = xp
-            element.yo = yp
-            utemp, vtemp = element.velocity(x, y, top)
+        u = np.zeros_like(xp)
+        v = np.zeros_like(xp)
+        for xpa, ypa in zip(xpan, ypan):
+            element.xo = xpa
+            element.yo = ypa
+            utemp, vtemp = element.velocity(xp, yp, top)
             u = u + utemp
             v = v + vtemp
 

@@ -18,7 +18,7 @@ The main contributors to this project are:
 Version History
 ---------------
 
-* 0.2.0-develop - Development effort
+* 0.2.0 - Added framework for generating airfoils
 * 0.1.0 - Initial release with point elements and constant strength linear elements
 
 License

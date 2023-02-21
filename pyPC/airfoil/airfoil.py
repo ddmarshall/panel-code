@@ -3,7 +3,7 @@
 """Classes associated with airfoils and their analysis."""
 
 from abc import abstractmethod
-from typing import Tuple, List
+from typing import Optional, Tuple, List
 
 import numpy as np
 import numpy.typing as np_type
@@ -36,7 +36,7 @@ class Airfoil(Curve):
 
     def __init__(self) -> None:
         super().__init__()
-        self._s_max = None
+        self._s_max: Optional[float] = None
 
     @property
     def surface_length(self) -> float:
@@ -72,12 +72,12 @@ class Airfoil(Curve):
         # TODO: this should be part of a bounding box method perhaps
         xmin, _ = self.leading_edge()
         xmin += -0.01
-        xmax = max(self.xy(-1)[0], self.xy(1)[0])
+        xmax = max(float(self.xy(-1)[0]), float(self.xy(1)[0]))
         if ((x < xmin).any() or (x > xmax).any()):
             raise ValueError("Invalid x-coordinate provided.")
 
         def fun(ti: float, x: float) -> float:
-            return self.xy(ti)[0] - x
+            return float(self.xy(ti)[0]) - x
 
         it = np.nditer([x, None])
         if upper:
@@ -87,16 +87,17 @@ class Airfoil(Curve):
         with it:
             # pylint: disable=cell-var-from-loop
             for xx, ti in it:
+                xxf = float(xx)
                 if xx < 0:
-                    root = root_scalar(lambda t: fun(t, xx),
+                    root = root_scalar(lambda t: fun(t, xxf),
                                        x0=0, x1=abs(xx))
                     ti[...] = root.root
-                elif np.abs(fun(bracket[0], xx)) < 1e-8:
+                elif np.abs(fun(bracket[0], xxf)) < 1e-8:
                     ti[...] = bracket[0]
-                elif np.abs(fun(bracket[1], xx)) < 1e-8:
+                elif np.abs(fun(bracket[1], xxf)) < 1e-8:
                     ti[...] = bracket[1]
                 else:
-                    root = root_scalar(lambda t: fun(t, xx), bracket=bracket)
+                    root = root_scalar(lambda t: fun(t, xxf), bracket=bracket)
                     ti[...] = root.root
 
             return it.operands[1]
@@ -131,7 +132,8 @@ class Airfoil(Curve):
         it = np.nditer([s_a, None])
         with it:
             for ss, ti in it:
-                root = root_scalar(lambda t: fun(t, ss), bracket=[-1, 1])
+                root = root_scalar(lambda t: fun(t, float(ss)),
+                                   bracket=[-1, 1])
                 ti[...] = root.root
 
             return it.operands[1]
@@ -371,8 +373,8 @@ class OrthogonalAirfoil(Airfoil):
         super().__init__()
         self._camber = camber
         self._thickness = thickness
-        self._t_xmin = None
-        self._t_xmax = None
+        self._t_xmin: Optional[float] = None
+        self._t_xmax: Optional[float] = None
 
     @property
     def camber(self) -> Camber:
@@ -408,7 +410,7 @@ class OrthogonalAirfoil(Airfoil):
     def xmax_parameter(self) -> float:
         """Parameter of largest x-coordinate for airfoil."""
         if self._t_xmax is None:
-            if self.x(-1)[0] >= self.x(1)[0]:
+            if self.xy(-1)[0] >= self.xy(1)[0]:
                 self._t_xmax = -1.0
             else:
                 self._t_xmax = 1.0
@@ -473,10 +475,10 @@ class OrthogonalAirfoil(Airfoil):
         numpy.ndarray
             Parametric rate of change of the y-coordinate of point.
         """
+        # pylint: disable=too-many-locals
         tc, sgn = self._convert_t(t)
 
         u, u_t = self._convert_t_to_u(tc)[0:2]
-        xi, eta = self._camber.xy(u)
         xi_u, eta_u = self._camber.xy_t(u)
         k = self._camber.k(u)
         nx, ny = self._camber.normal(u)
@@ -515,10 +517,10 @@ class OrthogonalAirfoil(Airfoil):
         numpy.ndarray
             Parametric second derivative of the y-coordinate of point.
         """
+        # pylint: disable=too-many-locals
         tc, sgn = self._convert_t(t)
 
         u, u_t, u_tt = self._convert_t_to_u(tc)
-        xi, eta = self._camber.xy(u)
         xi_u, eta_u = self._camber.xy_t(u)
         xi_uu, eta_uu = self._camber.xy_tt(u)
         k = self._camber.k(u)

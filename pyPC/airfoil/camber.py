@@ -306,8 +306,8 @@ class Naca4DigitCamber(Camber):
 
     def __init__(self, mci: float, lci: float) -> None:
         # bootstrap values
-        self._m = 2
-        self._p = 2
+        self._m: float = 2
+        self._p: float = 2
         self.max_camber_index = mci
         self.loc_max_camber_index = lci
 
@@ -397,17 +397,16 @@ class Naca4DigitCamber(Camber):
         def fore(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return (self._m/self._p**2)*(2*self._p*t - t**2)
+
+            return (self._m/self._p**2)*(2*self._p*t - t**2)
 
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return (self._m/(1-self._p)**2)*(1 + 2*self._p*(t - 1) - t**2)
 
-        return np.piecewise(t, [t <= self._p, t > self._p],
-                            [lambda t: fore(t), lambda t: aft(t)])
+            return (self._m/(1-self._p)**2)*(1 + 2*self._p*(t - 1) - t**2)
+
+        return np.piecewise(t, [t <= self._p, t > self._p], [fore, aft])
 
     def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -431,17 +430,16 @@ class Naca4DigitCamber(Camber):
         def fore(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return 2*(self._m/self._p**2)*(self._p - t)
+
+            return 2*(self._m/self._p**2)*(self._p - t)
 
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return 2*(self._m/(1-self._p)**2)*(self._p - t)
 
-        return np.piecewise(t, [t <= self._p, t > self._p],
-                            [lambda t: fore(t), lambda t: aft(t)])
+            return 2*(self._m/(1-self._p)**2)*(self._p - t)
+
+        return np.piecewise(t, [t <= self._p, t > self._p], [fore, aft])
 
     def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -465,17 +463,14 @@ class Naca4DigitCamber(Camber):
         def fore(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return -2*(self._m/self._p**2)*np.ones_like(t)
+            return -2*(self._m/self._p**2)*np.ones_like(t)
 
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             if self._m == 0:
                 return np.zeros_like(t)
-            else:
-                return -2*(self._m/(1-self._p)**2)*np.ones_like(t)
+            return -2*(self._m/(1-self._p)**2)*np.ones_like(t)
 
-        return np.piecewise(t, [t <= self._p, t > self._p],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self._p, t > self._p], [fore, aft])
 
     def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -502,8 +497,7 @@ class Naca4DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return np.zeros_like(t)
 
-        return np.piecewise(t, [t <= self._p, t > self._p],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self._p, t > self._p], [fore, aft])
 
 
 class Naca5DigitCamber(Camber):
@@ -607,8 +601,7 @@ class Naca5DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return (self.k1*self.m**3/6)*(1 - t)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
     def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -633,8 +626,7 @@ class Naca5DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return -(self.k1*m**3/6)*np.ones_like(t)
 
-        return np.piecewise(t, [t <= m, t > m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= m, t > m], [fore, aft])
 
     def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -658,8 +650,7 @@ class Naca5DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return np.zeros_like(t)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
     def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -683,10 +674,9 @@ class Naca5DigitCamber(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return np.zeros_like(t)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
-    def _p_setter(self, mci: int) -> None:
+    def _p_setter(self, mci: float) -> None:
         if mci == 1:
             self._m = 0.0580
             self._k1 = 361.4
@@ -708,7 +698,7 @@ class Naca5DigitCamber(Camber):
 
         self._p = mci/20.0
 
-    def _lci_setter(self, lci: int) -> None:
+    def _lci_setter(self, lci: float) -> None:
         if lci != 2:
             raise ValueError("Invalid NACA 5-Digit ideal lift coefficient "
                              f"parameter: {lci}.")
@@ -738,8 +728,7 @@ class Naca5DigitCamberEnhanced(Naca5DigitCamber):
         def camber_slope(m: float) -> float:
             return 3*self._p**2 - 6*m*self._p + m**2*(3-m)
 
-        root = root_scalar(lambda x: camber_slope(x),
-                           bracket=[self._p, 2*self._p])
+        root = root_scalar(camber_slope, bracket=[self._p, 2*self._p])
         self._m = root.root
         self._determine_k1()
 
@@ -832,7 +821,7 @@ class Naca5DigitCamberReflexed(Camber):
         """
         return [0.0, self.m, 1.0]
 
-    def max_camber_parameter(self) -> Tuple[float, float]:
+    def max_camber_parameter(self) -> float:
         """
         Return parameter where the camber is maximum.
 
@@ -868,8 +857,7 @@ class Naca5DigitCamberReflexed(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return (k1/6)*(k2ok1*(t-m)**3 - k2ok1*(1-m)**3*t + m**3*(1-t))
 
-        return np.piecewise(t, [t <= m, t > m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= m, t > m], [fore, aft])
 
     def _y_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -896,8 +884,7 @@ class Naca5DigitCamberReflexed(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return (k1/6)*(3*k2ok1*(t-m)**2 - k2ok1*(1-m)**3 - m**3)
 
-        return np.piecewise(t, [t <= m, t > m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= m, t > m], [fore, aft])
 
     def _y_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -921,8 +908,7 @@ class Naca5DigitCamberReflexed(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return (self.k2)*(t - self.m)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
     def _y_ttt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -946,10 +932,9 @@ class Naca5DigitCamberReflexed(Camber):
         def aft(t: np_type.NDArray) -> np_type.NDArray:
             return self.k2*np.ones_like(t)
 
-        return np.piecewise(t, [t <= self.m, t > self.m],
-                            [lambda t: fore(t), lambda t: aft(t)])
+        return np.piecewise(t, [t <= self.m, t > self.m], [fore, aft])
 
-    def _p_setter(self, mci: int) -> None:
+    def _p_setter(self, mci: float) -> None:
         if mci == 2:
             self._m = 0.1300
             self._k1 = 51.99
@@ -972,7 +957,7 @@ class Naca5DigitCamberReflexed(Camber):
 
         self._p = mci/20.0
 
-    def _lci_setter(self, lci: int) -> None:
+    def _lci_setter(self, lci: float) -> None:
         if lci != 2:
             raise ValueError("Invalid NACA 5-Digit reflexed ideal lift "
                              f"coefficient parameter: {lci}.")
@@ -992,7 +977,7 @@ class Naca5DigitCamberReflexedEnhanced(Naca5DigitCamberReflexed):
         self._lci = (3.0/20.0)*lci
         super().__init__(lci=lci, mci=mci)
 
-    def _p_setter(self, mci) -> float:
+    def _p_setter(self, mci: float) -> None:
         if mci < 1 or mci >= 6:
             raise ValueError("Invalid NACA 5-Digit reflexed max. camber "
                              f"location: {mci}")
@@ -1012,7 +997,7 @@ class Naca5DigitCamberReflexedEnhanced(Naca5DigitCamberReflexed):
         self._m = root.root
         self._determine_k1k2()
 
-    def _lci_setter(self, lci: float) -> float:
+    def _lci_setter(self, lci: float) -> None:
         if lci < 1 or lci >= 4:
             raise ValueError("Invalid NACA 5-Digit reflexed ideal lift "
                              f"coefficient parameter: {lci}.")

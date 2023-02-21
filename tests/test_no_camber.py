@@ -23,6 +23,7 @@ class TestNoCamber(unittest.TestCase):
         ca = NoCamber()
 
         def compare_values(t: np_type.NDArray, af: NoCamber) -> None:
+            # pylint: disable=too-many-locals
             t = np.asarray(t)
 
             # compare point values
@@ -71,6 +72,8 @@ class TestNoCamber(unittest.TestCase):
         compare_values(t, ca)
 
     def testEndpoints(self) -> None:
+        """Test the end point calculations."""
+        # pylint: disable=too-many-locals
         af = NoCamber()
 
         # reference values
@@ -129,11 +132,13 @@ class TestNoCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
     def testJoints(self) -> None:
+        """Test the joints."""
         ca = NoCamber()
 
         self.assertListEqual([0.0, 1.0], ca.joints())
 
     def testMaxCamber(self) -> None:
+        """Test the max camber calculation."""
         ca = NoCamber()
 
         self.assertEqual(0.0, ca.max_camber_parameter())

@@ -14,9 +14,9 @@ import numpy as np
 import numpy.typing as np_type
 import numpy.testing as npt
 
-from pyPC.airfoil.camber import Naca4DigitCamber
-
 from theory_of_wing_sections import camber_data
+
+from pyPC.airfoil.camber import Naca4DigitCamber
 
 
 class TestNaca4DigitCamber(unittest.TestCase):
@@ -50,6 +50,7 @@ class TestNaca4DigitCamber(unittest.TestCase):
 
     def testClassic(self) -> None:
         """Test the camber coordinates and slope against published data."""
+        # pylint: disable=too-many-statements
         directory = dirname(abspath(__file__))
         tows = camber_data(filename=None)
 
@@ -127,6 +128,8 @@ class TestNaca4DigitCamber(unittest.TestCase):
 
     def testCamber(self) -> None:
         """Test the camber relations."""
+        # pylint: disable=too-many-statements
+        # pylint: disable=too-many-locals
         ca = Naca4DigitCamber(mci=3, lci=4)
         ca_flat = Naca4DigitCamber(mci=0, lci=0)
 
@@ -203,6 +206,9 @@ class TestNaca4DigitCamber(unittest.TestCase):
         compare_values(t, ca_flat)
 
     def testEndpoints(self) -> None:
+        """Test calculation of end point conditions."""
+        # pylint: disable=too-many-statements
+        # pylint: disable=too-many-locals
         ca = Naca4DigitCamber(mci=4, lci=2)
         p = ca.loc_max_camber_index/10.0
         m = ca.max_camber_index/100.0
@@ -264,6 +270,7 @@ class TestNaca4DigitCamber(unittest.TestCase):
         self.assertIsNone(npt.assert_allclose(yttt, yttt_ref))
 
     def testJoints(self) -> None:
+        """Test joints."""
         ca = Naca4DigitCamber(mci=3, lci=4.0)
         ca_flat = Naca4DigitCamber(mci=0, lci=0)
 
@@ -271,6 +278,7 @@ class TestNaca4DigitCamber(unittest.TestCase):
         self.assertListEqual([0.0, 1.0], ca_flat.joints())
 
     def testMaxCamber(self) -> None:
+        """Test the max camber calculations."""
         ca = Naca4DigitCamber(mci=6.1, lci=3.0)
         ca_flat = Naca4DigitCamber(mci=0, lci=0)
 

@@ -130,21 +130,21 @@ class TestCylinder(unittest.TestCase):
             self.assertIsNone(npt.assert_allclose(alen_ref, alen))
 
         # test point on lower surface (both directions)
-        t_s = -0.97
-        t_e = -0.35
-        compare_arclength(t_s, t_e, surf)
-        compare_arclength(t_e, t_s, surf)
+        t_1 = -0.97
+        t_2 = -0.35
+        compare_arclength(t_1, t_2, surf)
+        compare_arclength(t_2, t_1, surf)
 
         # test point on upper surface (both directions)
-        t_s = 0.4
-        t_e = 0.78
-        compare_arclength(t_s, t_e, surf)
-        compare_arclength(t_e, t_s, surf)
+        t_1 = 0.4
+        t_2 = 0.78
+        compare_arclength(t_1, t_2, surf)
+        compare_arclength(t_2, t_1, surf)
 
         # # test points on lower and upper surface
-        t_e = np.linspace(-1, 1, 11)
-        t_s = -1.0
-        compare_arclength(t_s, t_e, surf)
+        t_2 = np.linspace(-1, 1, 11)
+        t_1 = -1.0
+        compare_arclength(t_1, t_2, surf)
 
     def testParametricCalculations(self) -> None:
         """Test the calculations when given parametric value."""
@@ -152,6 +152,7 @@ class TestCylinder(unittest.TestCase):
         surf = Cylinder(radius=R)
 
         def compare_values(t: np_type.NDArray, surf: Cylinder) -> None:
+            # pylint: disable=too-many-locals
             eps = 1e-7
             x_ref = surf.radius*(1+np.cos(np.pi*(1-t)))
             y_ref = surf.radius*np.sin(np.pi*(1-t))
@@ -197,6 +198,7 @@ class TestCylinder(unittest.TestCase):
         surf = Cylinder(radius=R)
 
         def compare_values(t: np_type.NDArray, surf: Cylinder) -> None:
+            # pylint: disable=too-many-locals
             eps = 1e-7
             s = surf.arc_length(-1, t)
 
@@ -224,9 +226,6 @@ class TestCylinder(unittest.TestCase):
             xss, yss = surf.xy_ss(s)
             self.assertIsNone(npt.assert_allclose(xss, xss_ref))
             self.assertIsNone(npt.assert_allclose(yss, yss_ref, atol=1e-7))
-
-        def theta_fun(t: np_type.NDArray) -> np_type.NDArray:
-            return np.pi*(1-t)
 
         # test point on lower surface
         t = -0.35

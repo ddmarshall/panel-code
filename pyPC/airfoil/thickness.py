@@ -210,7 +210,7 @@ class Naca45DigitThickness(Thickness):
         self._tmax = mti/100.0
 
     @property
-    def a(self) -> float:
+    def a(self) -> np_type.NDArray:
         """Equation coefficients."""
         return self._a
 
@@ -399,7 +399,7 @@ class Naca45DigitThicknessEnhanced(Naca45DigitThickness):
         # fith row is trailing edge thickness
         i = 4
         if self._closed_te:
-            t_te = 0
+            t_te = 0.0
         else:
             t_te = 0.002
         B[i, :] = [1, 1, 1, 1, 1]
@@ -430,11 +430,15 @@ class Naca45DigitModifiedThickness(Thickness):
         Coefficients for aft equation.
     """
 
+    # NOTE: I don't see why pylint is saying this class has 9 attributes when
+    #       I only see 6.
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, mti: float, lei: float, lmti: float) -> None:
         # start with valid defaults for setters to work
         self._closed_te = False
-        self._lei = 4
-        self._t_m = 4
+        self._lei: float = 4
+        self._t_m: float = 4
         self._a = np.zeros(4)
         self._d = np.zeros(4)
 
@@ -482,12 +486,12 @@ class Naca45DigitModifiedThickness(Thickness):
         self._calculate_coefficients()
 
     @property
-    def a(self) -> float:
+    def a(self) -> np_type.NDArray:
         """Fore equation coefficients."""
         return self._a
 
     @property
-    def d(self) -> float:
+    def d(self) -> np_type.NDArray:
         """Aft equation coefficients."""
         return self._d
 
@@ -542,7 +546,7 @@ class Naca45DigitModifiedThickness(Thickness):
                                      + term*(self.d[2] + term*self.d[3]))
 
         return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
-                                       [lambda t: fore(t), lambda t: aft(t)])
+                                       [fore, aft])
 
     def delta_t(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -571,7 +575,7 @@ class Naca45DigitModifiedThickness(Thickness):
             return -2*t*(self.d[1] + (1-t2)*(2*self.d[2] + 3*(1-t2)*self.d[3]))
 
         return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
-                                       [lambda t: fore(t), lambda t: aft(t)])
+                                       [fore, aft])
 
     def delta_tt(self, t: np_type.NDArray) -> np_type.NDArray:
         """
@@ -600,9 +604,9 @@ class Naca45DigitModifiedThickness(Thickness):
                        + 3*(1-t2)*(1-5*t2)*self.d[3])
 
         return self._tmax*np.piecewise(t, [t <= self._t_m, t > self._t_m],
-                                       [lambda t: fore(t), lambda t: aft(t)])
+                                       [fore, aft])
 
-    def _calculate_coefficients(self):
+    def _calculate_coefficients(self) -> None:
         # Pade approximation that goes through all Stack and von Doenhoff
         # (1935) values. Improves upon Riegels (1961) fit.
         p = [1.0310900853, -2.7171508529, 4.8594083156]
